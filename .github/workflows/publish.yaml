@@ -1,4 +1,4 @@
-name: Publish to PowerShell Gallery
+name: Publish
 
 on:
   push:
@@ -8,9 +8,8 @@ on:
       - 'Juriba.Dashworks/**'
 
 jobs:
-  deploy:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
-    name: Deploy
+  publishpsgallery:
+    name: 'PowerShell Gallery'
     runs-on: ubuntu-latest
     env:
       NUGET_API_KEY: ${{ secrets.NUGETAPIKEY }}
