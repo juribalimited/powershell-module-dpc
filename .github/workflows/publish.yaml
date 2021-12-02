@@ -1,0 +1,22 @@
+name: Publish to PowerShell Gallery
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - main
+
+jobs:
+  deploy:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    name: Deploy
+    runs-on: ubuntu-latest
+    env:
+      NUGET_API_KEY: ${{ secrets.NUGETAPIKEY }}
+    steps:
+      - uses: actions/checkout@v2
+      - shell: pwsh
+        run: Publish-Module -Path .\Juriba.Dashworks -NuGetApiKey $env:NUGET_API_KEY -Verbose
