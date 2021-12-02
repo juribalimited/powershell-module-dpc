@@ -4,10 +4,14 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'Juriba.Dashworks/**'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
+    paths:
+      - 'Juriba.Dashworks/**'
 
 jobs:
   deploy:

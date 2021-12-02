@@ -101,10 +101,10 @@
             # LicenseUri = ''
 
             # A URL to the main website for this project.
-            # ProjectUri = ''
+            ProjectUri = 'https://github.com/juribalimited/powershell-module-dashworks'
 
             # A URL to an icon representing this module.
-            # IconUri = ''
+            IconUri    = 'https://raw.githubusercontent.com/juribalimited/powershell-module-dashworks/main/resources/juriba_logo.jpeg'
 
             # ReleaseNotes of this module
             # ReleaseNotes = ''
