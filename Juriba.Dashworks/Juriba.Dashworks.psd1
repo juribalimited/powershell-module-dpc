@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.Dashworks.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.0.3'
+    ModuleVersion     = '0.0.4'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -98,7 +98,7 @@
             # Tags = @()
 
             # A URL to the license for this module.
-            # LicenseUri = ''
+            LicenseUri = 'https://raw.githubusercontent.com/juribalimited/powershell-module-dashworks/main/LICENSE'
 
             # A URL to the main website for this project.
             ProjectUri = 'https://github.com/juribalimited/powershell-module-dashworks'
