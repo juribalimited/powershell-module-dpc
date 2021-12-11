@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.Dashworks.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.0.4'
+    ModuleVersion     = '0.0.5'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -30,7 +30,8 @@
     Copyright         = '(c) Juriba. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description       = 'PowerShell Module to interact with Juriba Dashworks.'
+    # Description       = 'PowerShell Module to interact with Juriba Dashworks.'
+    Description = 'This module is currently under active development and is not intended for public use.'
 
     # Minimum version of the PowerShell engine required by this module
     # PowerShellVersion = ''
