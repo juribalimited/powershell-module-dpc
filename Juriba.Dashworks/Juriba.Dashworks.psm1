@@ -1,8 +1,8 @@
 Set-StrictMode -Version Latest
 
 # Get public and private function definition files
-$public = @(Get-ChildItem -Path "$PSScriptRoot\Public\*.ps1" -Exclude "*.Tests.*" -ErrorAction SilentlyContinue)
-$private = @(Get-ChildItem -Path "$PSScriptRoot\Private\*.ps1" -Exclude "*.Tests.*" -ErrorAction SilentlyContinue)
+$public = @(Get-ChildItem -Path "$PSScriptRoot\Public\*" -Include ('*.ps1', '*.psd1') -Exclude "*.Tests.*" -ErrorAction SilentlyContinue)
+$private = @(Get-ChildItem -Path "$PSScriptRoot\Private\*" -Include ('*.ps1', '*.psd1') -Exclude "*.Tests.*" -ErrorAction SilentlyContinue)
 
 # Importing all functions
 foreach ($import in @($public + $private)) {
