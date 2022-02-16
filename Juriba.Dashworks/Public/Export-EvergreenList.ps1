@@ -7,19 +7,39 @@ function Export-EvergreenList {
         Returns an Evergreen List as an array.
         Takes ListId and ObjectType as an input
 
+        .PARAMETER Instance
+
+        Dashworks instance. For example, myinstance.dashworks.app
+
+        .PARAMETER Port
+
+        Dashworks API port number. Default = 8443
+
+        .PARAMETER APIKey
+
+        Dashworks API Key.
+
+        .PARAMETER ListId
+
+        ListId of the list to be exported.
+
+        .PARAMETER ObjectType
+
+        Object type of the list. One of Device, User, Application, Mailbox
+
         .EXAMPLE
-        $DashworksSession = @{
-            Domain = "mydashworksinstance.dashworks.app"
-            Port = "8443"
-            APIKey = "xxxx"
-        }
-        Export-EvergreenList -DashworksSession $DashworksSession -ListId 1234 -ObjectType Device
+
+        PS> Export-EvergreenList -ListId 1234 -ObjectType Device -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
     #>
 
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true)]
-        [System.Collections.Hashtable]$DashworksSession,
+        [Parameter(Mandatory=$true)]
+        [string]$Instance,
+        [Parameter(Mandatory=$false)]
+        [int]$Port = 8443,
+        [Parameter(Mandatory=$true)]
+        [string]$APIKey,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [int]$ListId,
@@ -35,8 +55,8 @@ function Export-EvergreenList {
         "Mailbox"       {"mailboxes"}
     }
 
-    $uri = 'https://{0}:{1}/apiv1/{2}?$listid={3}' -f $DashworksSession.Domain, $DashworksSession.Port, $path, $ListId
-    $headers = @{'x-api-key' = $DashworksSession.APIKey}
+    $uri = 'https://{0}:{1}/apiv1/{2}?$listid={3}' -f $Instance, $Port, $path, $ListId
+    $headers = @{'x-api-key' = $APIKey}
 
     try {
         $response = Invoke-WebRequest -uri $uri -Headers $headers -Method GET
