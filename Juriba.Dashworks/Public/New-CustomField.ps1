@@ -8,9 +8,17 @@ function New-CustomField {
 
     Creates a new custom field using the Dashworks API v1.
 
-    .PARAMETER DashworksSession
+    .PARAMETER Instance
 
-    Hash table containing Domain, Port and API Key for your Dashworks instance.
+    Dashworks instance. For example, myinstance.dashworks.app
+
+    .PARAMETER Port
+
+    Dashworks API port number. Default = 8443
+
+    .PARAMETER APIKey
+
+    Dashworks API Key.
 
     .PARAMETER Name
 
@@ -32,29 +40,24 @@ function New-CustomField {
 
     Set the new custom field to active or inactive. Defaults to Active.
 
-    .INPUTS
-
-    None. You cannot pipe objects to Add-Extension
-
     .OUTPUTS
 
     None.
 
     .EXAMPLE
 
-    PS> New-CustomField -ObjectTypes Device, User -Name "MyNewCustomField" -CSVColumnHeader "mynewcustomdfield" -Type Text -IsActive $true -DashworksSession $DashworksSession
+    PS> New-CustomField -ObjectTypes Device, User -Name "MyNewCustomField" -CSVColumnHeader "mynewcustomfield" -Type Text -IsActive $true -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
 
     #>
 
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
-        "PSUseShouldProcessForStateChangingFunctions",
-        "",
-        Justification = "API endpoint does not support ShouldProcess."
-    )]
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$true)]
-        [System.Collections.Hashtable]$DashworksSession,
+        [string]$Instance,
+        [Parameter(Mandatory=$false)]
+        [int]$Port = 8443,
+        [Parameter(Mandatory=$true)]
+        [string]$APIKey,
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$Name,
@@ -92,16 +95,18 @@ function New-CustomField {
     $payload.Add("valueTypeId", $typeId)
 
     $jsonbody = $payload | ConvertTo-Json
-    $uri = "https://{0}:{1}/apiv1/custom-fields" -f $DashworksSession.Domain, $DashworksSession.Port
-    $headers = @{'x-api-key' = $DashworksSession.APIKey }
+    $uri = "https://{0}:{1}/apiv1/custom-fields" -f $Instance, $Port
+    $headers = @{'x-api-key' = $APIKey }
 
     try {
-        $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body $jsonbody -ContentType 'application/json'
-        if ($result.StatusCode -eq 200) {
-            Write-Information "Custom field created" -InformationAction Continue
-        }
-        else {
-            throw "Error in custom field creation"
+        if ($PSCmdlet.ShouldProcess($Name)) {
+            $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body $jsonbody -ContentType 'application/json'
+            if ($result.StatusCode -eq 200) {
+                Write-Information "Custom field created" -InformationAction Continue
+            }
+            else {
+                throw "Error in custom field creation"
+            }
         }
     }
     catch {
