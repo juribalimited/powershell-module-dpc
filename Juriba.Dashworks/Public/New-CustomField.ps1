@@ -72,7 +72,7 @@ function New-CustomField {
         [bool]$IsActive = $true
     )
 
-    $TypeId = switch($Type) {
+    $typeId = switch($Type) {
         "Text"      {1}
         "MultiText" {2}
         "LargeText" {3}
@@ -89,7 +89,7 @@ function New-CustomField {
     $payload.Add("isMailboxField",($ObjectTypes -contains "Mailbox"))
     $payload.Add("isUserField", ($ObjectTypes -contains "User"))
     $payload.Add("name", $Name)
-    $payload.Add("valueTypeId", $TypeId)
+    $payload.Add("valueTypeId", $typeId)
 
     $jsonbody = $payload | ConvertTo-Json
     $uri = "https://{0}:{1}/apiv1/custom-fields" -f $DashworksSession.Domain, $DashworksSession.Port
