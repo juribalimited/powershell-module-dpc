@@ -1,5 +1,5 @@
 #Requires -Version 7
-function Remove-DashworksDevice {
+function Remove-DwImportDevice {
     <#
         .SYNOPSIS
         Deletes a device in the import API.
@@ -29,7 +29,7 @@ function Remove-DashworksDevice {
         ImportId for the device.
 
         .EXAMPLE
-        PS> Remove-DashworksDevice -ImportId 1 -UniqueComputerIdentifier "w123abc" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Remove-DwImportDevice -ImportId 1 -UniqueComputerIdentifier "w123abc" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
 
     #>
 

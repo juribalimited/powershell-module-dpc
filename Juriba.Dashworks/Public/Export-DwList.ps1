@@ -1,4 +1,4 @@
-function Export-EvergreenList {
+function Export-DwList {
     <#
         .SYNOPSIS
         Returns an Evergreen List as an array.
@@ -29,7 +29,7 @@ function Export-EvergreenList {
 
         .EXAMPLE
 
-        PS> Export-EvergreenList -ListId 1234 -ObjectType Device -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Export-DwList -ListId 1234 -ObjectType Device -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
     #>
 
     [CmdletBinding()]

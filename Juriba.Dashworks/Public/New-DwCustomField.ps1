@@ -1,4 +1,4 @@
-function New-CustomField {
+function New-DwCustomField {
     <#
     .SYNOPSIS
 
@@ -46,7 +46,7 @@ function New-CustomField {
 
     .EXAMPLE
 
-    PS> New-CustomField -ObjectTypes Device, User -Name "MyNewCustomField" -CSVColumnHeader "mynewcustomfield" -Type Text -IsActive $true -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+    PS> New-DwCustomField -ObjectTypes Device, User -Name "MyNewCustomField" -CSVColumnHeader "mynewcustomfield" -Type Text -IsActive $true -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
 
     #>
 
