@@ -1,4 +1,4 @@
-function Get-DashworksDevice {
+function Get-DwImportDevice {
     <#
         .SYNOPSIS
         Gets a Dashworks device from the import API.
@@ -35,7 +35,7 @@ function Get-DashworksDevice {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-DashworksDevice -ImportId 1 -UniqueComputerIdentifier "w123abc" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Get-DwImportDevice -ImportId 1 -UniqueComputerIdentifier "w123abc" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
     #>
 
     [CmdletBinding()]

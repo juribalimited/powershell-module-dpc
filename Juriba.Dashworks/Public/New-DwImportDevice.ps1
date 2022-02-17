@@ -1,12 +1,12 @@
 #Requires -Version 7
-function Set-DashworksDevice {
+function New-DwImportDevice {
     <#
         .SYNOPSIS
-        Updates a device in the import API.
+        Creates a new Dashworks device using the import API.
 
         .DESCRIPTION
-        Updates a device in the import API.
-        Takes the ImportId, UniqueComputerIdentifier and jsonBody as an input.
+        Creates a new Dashworks device using the import API.
+        Takes the ImportId and JsonBody as an input.
 
         .PARAMETER Instance
 
@@ -20,10 +20,6 @@ function Set-DashworksDevice {
 
         Dashworks API Key.
 
-        .PARAMETER UniqueComputerIdentifier
-
-        UniqueComputerIdentifier for the device.
-
         .PARAMETER ImportId
 
         ImportId for the device.
@@ -33,8 +29,7 @@ function Set-DashworksDevice {
         Json payload with updated device details.
 
         .EXAMPLE
-        PS> Set-DashworksDevice -ImportId 1 -UniqueComputerIdentifier "w123abc" -JsonBody $jsonBody -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
-
+        PS> New-DwImportDevice -ImportId 1 -JsonBody $jsonBody -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
     #>
 
     [CmdletBinding(SupportsShouldProcess)]
@@ -46,24 +41,22 @@ function Set-DashworksDevice {
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
         [parameter(Mandatory=$true)]
-        [string]$UniqueComputerIdentifier,
-        [parameter(Mandatory=$true)]
         [int]$ImportId,
         [ValidateScript({
-            Test-Json $_
+            ((Test-Json $_) -and (($_ | ConvertFrom-Json).uniqueComputerIdentifier))
         },
-        ErrorMessage = "JsonBody is not valid json."
+        ErrorMessage = "JsonBody is not valid json or does not contain a uniqueComputerIdentifier"
         )]
         [parameter(Mandatory=$true)]
         [string]$JsonBody
     )
 
-    $uri = "https://{0}:{1}/apiv2/imports/devices/{2}/items/{3}" -f $Instance, $Port, $ImportId, $UniqueComputerIdentifier
+    $uri = "https://{0}:{1}/apiv2/imports/devices/{2}/items" -f $Instance, $Port, $ImportId
     $headers = @{'x-api-key' = $APIKey}
 
     try {
-        if ($PSCmdlet.ShouldProcess($UniqueComputerIdentifier)) {
-            $result = Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body $JsonBody
+        if ($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueComputerIdentifier)) {
+            $result = Invoke-RestMethod -Uri $uri -Method POST -Headers $headers -ContentType "application/json" -Body $jsonBody
         }
     }
     catch {
