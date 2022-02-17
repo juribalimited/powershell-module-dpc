@@ -1,12 +1,12 @@
 #requires -Version 7
-function New-DwImportDeviceImport {
+function Set-DwImportDeviceImport {
     <#
         .SYNOPSIS
-        Creates a new device import. 
+        Updates a new device import. 
 
         .DESCRIPTION
-        Creates a new deivce import using the import API.
-        Takes the import name and an enabled boolean. 
+        Updates a deivce import using the import API.
+        Takes the new name and/or enabled status. 
 
         .PARAMETER Instance
 
@@ -20,17 +20,21 @@ function New-DwImportDeviceImport {
 
         Dashworks API Key.
 
+        .PARAMETER ImportId
+
+        Id of import to be updated.
+        
         .PARAMETER Name
 
         The name of the new device import.
 
         .PARAMETER Enabled
 
-        Should the new import be enabled. Default = True.
+        Should the new import be enabled. 
 
         .EXAMPLE
 
-        PS> New-DwImportDeviceImport -Name "My New Import" -Instance "myinstance.dashworks.app" -APIKey "xxxxx" 
+        PS> Set-DwImportDeviceImport -ImportId 1 -Name "My New Import Name" -Enabled $false -Instance "myinstance.dashworks.app" -APIKey "xxxxx" 
 
     #>
     [CmdletBinding(SupportsShouldProcess)]
@@ -42,12 +46,18 @@ function New-DwImportDeviceImport {
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
         [parameter(Mandatory=$true)]
+        [int]$ImportId,
+        [parameter(Mandatory=$false)]
         [string]$Name,
         [parameter(Mandatory=$false)]
-        [bool]$Enabled = $true
+        [bool]$Enabled
     )
 
-    $uri = "https://{0}:{1}/apiv2/imports/devices" -f $Instance, $Port
+    if (-Not $Name -And -Not $Enabled) {
+        throw "Either Name or Enabled must be specified."
+    }
+    
+    $uri = "https://{0}:{1}/apiv2/imports/devices/{2}" -f $Instance, $Port, $ImportId
     $headers = @{'x-api-key' = $APIKey}
 
     $payload = @{}
@@ -57,8 +67,8 @@ function New-DwImportDeviceImport {
     $JsonBody = $payload | ConvertTo-Json
 
     try {
-        if ($PSCmdlet.ShouldProcess($Name) {
-            $result = Invoke-RestMethod -Uri $uri -Method POST -Headers $headers -ContentType "application/json" -Body $jsonBody
+        if ($PSCmdlet.ShouldProcess($ImportId) {
+            $result = Invoke-RestMethod -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body $jsonBody
         }
     }
     catch {
