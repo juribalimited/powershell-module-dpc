@@ -70,7 +70,18 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport = @('Export-DwList.ps1', 'Get-DwImportDevice.ps1' ,'New-DWCustomField.ps1' ,'New-DWImportDevice.ps1' ,'Remove-DWImportDevice.ps1' ,'Set-DwImportDevice.ps1')
+    FunctionsToExport = @(
+                            'Export-DwList.ps1', 
+                            'Get-DwImportDevice.ps1',
+                            'New-DwCustomField.ps1',
+                            'New-DwImportDevice.ps1',
+                            'Remove-DwImportDevice.ps1',
+                            'Set-DwImportDevice.ps1',
+                            'Get-DwImportDeviceFeed.ps1',
+                            'New-DwImportDeviceFeed.ps1',
+                            'Remove-DwImportDeviceFeed.ps1',
+                            'Set-DwImportDeviceFeed.ps1'
+                        )
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     # CmdletsToExport   = '*'
