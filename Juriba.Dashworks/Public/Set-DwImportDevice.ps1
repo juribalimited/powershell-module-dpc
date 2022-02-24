@@ -64,12 +64,11 @@ function Set-DwImportDevice {
     try {
         if ($PSCmdlet.ShouldProcess($UniqueComputerIdentifier)) {
             $result = Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body $JsonBody
+            return $result
         }
     }
     catch {
-        Write-Error ("{0}. {1}" -f $_.Exception.Response.StatusCode.Value__, ($_ | ConvertFrom-Json).details)
-        break
+        Write-Error $_
     }
 
-    return $result
 }

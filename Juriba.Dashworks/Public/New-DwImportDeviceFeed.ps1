@@ -63,7 +63,6 @@ function New-DwImportDeviceFeed {
         }
     }
     catch {
-        Write-Error ("{0}. {1}" -f $_.Exception.Response.StatusCode.Value__, ($_ | ConvertFrom-Json).details)
-        break
+        Write-Error $_
     }
 }

@@ -76,11 +76,9 @@ function Set-DwImportDeviceFeed {
         if ($_.Exception.Response.StatusCode.Value__ -eq 409)
         {
             Write-Error ("{0}" -f "Update conflicted with another feed. Check if another feed exists with the same name.")
-            break
         }
         else {
-            Write-Error ("{0}. {1}" -f $_.Exception.Response.StatusCode.Value__, ($_ | ConvertFrom-Json).details)
-            break
+            Write-Error $_
         }
     }
 }
