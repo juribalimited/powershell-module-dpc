@@ -87,7 +87,6 @@ function Export-DwList {
         return ($results | Select-Object -Property $c)
     }
     catch {
-        Write-Error $_.Exception.Message
-        break
+        Write-Error $_
     }
 }

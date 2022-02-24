@@ -113,12 +113,10 @@ function New-DwCustomField {
         if ($_.Exception.Response.StatusCode.Value__ -eq 409)
         {
             Write-Error ("{0}" -f (($_ | ConvertFrom-Json).detail))
-            break
         }
         else
         {
-            Write-Error ("{0}. {1}" -f $_.Exception.Response.StatusCode.Value__, ($_ | ConvertFrom-Json).details)
-            break
+            Write-Error $_
         }
     }
 }

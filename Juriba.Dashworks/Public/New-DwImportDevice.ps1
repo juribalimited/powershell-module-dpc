@@ -57,12 +57,11 @@ function New-DwImportDevice {
     try {
         if ($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueComputerIdentifier)) {
             $result = Invoke-RestMethod -Uri $uri -Method POST -Headers $headers -ContentType "application/json" -Body $jsonBody
+            return $result
         }
     }
     catch {
-        Write-Error ("{0}. {1}" -f $_.Exception.Response.StatusCode.Value__, ($_ | ConvertFrom-Json).details)
-        break
+        Write-Error $_
     }
 
-    return $result
 }

@@ -64,16 +64,19 @@ function Get-DwImportDevice {
         $device = switch($InfoLevel) {
             "Basic" { ($result.Content | ConvertFrom-Json).UniqueComputerIdentifier }
             "Full"  { $result.Content }
+
         }
+        return $device
     }
     catch {
         if ($_.Exception.Response.StatusCode.Value__ -eq 404) {
-            Write-Information "device not found" -InformationAction Continue
+            # 404 means the device was not found, don't treat this as an error
+            # as we expect this function to be used to check if a device exists
+            Write-Verbose "device not found"
         }
         else {
-            Write-Error ("{0}. {1}" -f $_.Exception.Response.StatusCode.Value__, $_.Exception.Message)
+            Write-Error $_
         }
     }
 
-    return $device
 }
