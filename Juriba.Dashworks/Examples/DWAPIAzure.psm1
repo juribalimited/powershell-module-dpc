@@ -12,7 +12,7 @@ Function Get-AzAccessToken{
 
         [Parameter(Mandatory=$false)]
         [string]$Scope
-    ) 
+    )
 
     $OAuthURI = "https://login.microsoftonline.com/$TenantId/oauth2/token"
 
@@ -29,14 +29,14 @@ Function Get-AzAccessToken{
         $OAuthBody.Add('resource','https://graph.microsoft.com')
     }
 
-    $OAuthheaders = 
+    $OAuthheaders =
     @{
         "content-type" = "application/x-www-form-urlencoded"
     }
 
     $accessToken = Invoke-RESTMethod -Method 'POST' -URI $OAuthURI -Body $OAuthBody -Headers $OAuthheaders
 
-    return $accessToken.access_Token 
+    return $accessToken.access_Token
     <#
     .Synopsis
     Gets a session bearer token for the Azure credentials provided.
@@ -73,7 +73,7 @@ Function Get-AzureUserTable([string]$accessToken){
     Uses the /users Graph endpoint to pull all user information into a data table for insersion into a SQL database.
 
     .Parameter accessToken
-    The access token for the session you are pulling information from 
+    The access token for the session you are pulling information from.
 
     .Outputs
     Output type [system.data.datatable]
@@ -142,6 +142,28 @@ Function Get-AzureUserTable([string]$accessToken){
 
 Function Get-IntuneDeviceTable([string]$accessToken){
 
+    <#
+    .Synopsis
+    Get a datatable containing all InTune device data.
+
+    .Description
+    Uses the /deviceManagement/managedDevices Graph endpoint to pull all device information into a data table for insersion into a SQL database.
+
+    .Parameter accessToken
+    The access token for the session you are pulling information from.
+
+    .Outputs
+    Output type [system.data.datatable]
+    A datatable containing all of the rows returned by the /deviceManagement/managedDevices Graph API Endpoint.
+
+    .Notes
+    Any nested data returned by Azure will be pushed into the data table as a string containing the nested JSON.
+
+    .Example
+    # Get the InTune data for the access token passed.
+    $dtInTuneData = Get-IntuneDevices -accessToken $AccessToken
+    #>
+
     $dtResults = New-Object System.Data.DataTable
 
     $uri='https://graph.microsoft.com/v1.0/deviceManagement/managedDevices'
@@ -194,27 +216,5 @@ Function Get-IntuneDeviceTable([string]$accessToken){
     while ($null -ne $users.'@odata.nextLink')
 
     return @(,($dtResults))
-
-    <#
-    .Synopsis
-    Get a datatable containing all InTune device data.
-
-    .Description
-    Uses the /deviceManagement/managedDevices Graph endpoint to pull all device information into a data table for insersion into a SQL database.
-
-    .Parameter accessToken
-    The access token for the session you are pulling information from 
-
-    .Outputs
-    Output type [system.data.datatable]
-    A datatable containing all of the rows returned by the /deviceManagement/managedDevices Graph API Endpoint.
-
-    .Notes
-    Any nested data returned by Azure will be pushed into the data table as a string containing the nested JSON.
-
-    .Example
-    # Get the InTune data for the access token passed.
-    $dtInTuneData = Get-IntuneDevices -accessToken $AccessToken
-    #>
 }
 

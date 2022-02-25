@@ -52,7 +52,7 @@ function Remove-DwAPIUserFeedData {
     {
         if (-not $FeedName)
         {
-            return 'User feed not found by name or ID'
+            throw 'User feed not found by name or ID'
         }
 
         $FeedId = Get-DwAPIDeviceFeed -FeedName $FeedName -ApiKey $APIKey
@@ -60,10 +60,10 @@ function Remove-DwAPIUserFeedData {
 
     if (-not $FeedId)
     {
-        return 'User feed not found by name or ID'
+        throw 'User feed not found by name or ID'
     }
 
-    $Deleteheaders = 
+    $Deleteheaders =
     @{
         "X-API-KEY" = "$APIKey"
         "accept" = "*/*"

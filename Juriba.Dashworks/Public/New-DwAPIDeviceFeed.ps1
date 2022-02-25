@@ -33,7 +33,7 @@ function New-DwAPIDeviceFeed {
         [Parameter(Mandatory=$True)]
         [PSObject]$APIKey,
 
-        [parameter(Mandatory=$True,ValueFromPipeline = $True)]
+        [parameter(Mandatory=$True)]
         [string[]]$FeedName
     )
     if ($PSCmdlet.ShouldProcess("Create Device feed",$Feedname)) {

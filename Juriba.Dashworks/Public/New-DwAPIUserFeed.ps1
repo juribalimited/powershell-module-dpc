@@ -4,7 +4,7 @@ function New-DwAPIUserFeed {
     Returns the user feed id returned from the Dashworks API
 
     .Description
-    Searches for, and allows for creation of, a Dashworks API user feed by the name of the feed.
+    Searches for, and if not found, forces the creation of, a Dashworks API user feed by the name of the feed.
 
     .Parameter APIUri
     The URI to the Dashworks instance being examined.
@@ -28,11 +28,11 @@ function New-DwAPIUserFeed {
     Param (
         [parameter(Mandatory=$True)]
         [string]$APIUri,
-        
+
         [Parameter(Mandatory=$True)]
         [PSObject]$APIKey,
 
-        [parameter(Mandatory=$True,ValueFromPipeline = $True)]
+        [parameter(Mandatory=$True)]
         [string[]]$FeedName
     )
     if ($PSCmdlet.ShouldProcess("Create User feed",$Feedname)) {

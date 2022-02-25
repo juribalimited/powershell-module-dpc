@@ -32,7 +32,7 @@ function Get-DwAPIUserFeed {
     Param (
         [parameter(Mandatory=$True)]
         [string]$APIUri,
-        
+
         [Parameter(Mandatory=$True)]
         [string]$APIKey,
 
@@ -43,7 +43,7 @@ function Get-DwAPIUserFeed {
         [bool]$Create = $False
     )
 
-    $Getheaders = 
+    $Getheaders =
     @{
         "accept" = "application/json"
         "X-API-KEY" = "$APIKey"
@@ -63,7 +63,7 @@ function Get-DwAPIUserFeed {
             "enabled"  = "true"
         }
 
-        $Postheaders = 
+        $Postheaders =
         @{
             "content-type" = "application/json"
             "X-API-KEY" = "$APIKey"

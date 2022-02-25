@@ -32,18 +32,18 @@ function Get-DwAPIDeviceFeed {
     Param (
         [parameter(Mandatory=$True)]
         [string]$APIUri,
-        
+
         [Parameter(Mandatory=$True)]
         [string]$APIKey,
 
         [parameter(Mandatory=$True)]
         [string]$FeedName,
-        
+
         [Parameter(Mandatory=$False)]
         [bool]$Create = $False
     )
 
-    $Getheaders = 
+    $Getheaders =
     @{
         "accept" = "application/json"
         "X-API-KEY" = "$APIKey"
@@ -62,8 +62,8 @@ function Get-DwAPIDeviceFeed {
             "name" = $FeedName
             "enabled"  = "true"
         }
-    
-        $Postheaders = 
+
+        $Postheaders =
         @{
             "content-type" = "application/json"
             "X-API-KEY" = "$APIKey"
