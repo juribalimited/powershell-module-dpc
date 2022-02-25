@@ -1,5 +1,4 @@
 function New-DwAPIUserFeed {
-
     <#
     .Synopsis
     Returns the user feed id returned from the Dashworks API
@@ -39,5 +38,4 @@ function New-DwAPIUserFeed {
     if ($PSCmdlet.ShouldProcess("Create User feed",$Feedname)) {
         return Get-DwAPIUserFeed -APIUri $APIUri -APIKey $APIKey -FeedName $Feedname -Create $True
     }
-    
 }

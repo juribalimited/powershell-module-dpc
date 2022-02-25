@@ -1,5 +1,4 @@
 function New-DwAPIDeviceFeed {
-
     <#
     .Synopsis
     Returns the device feed id returned from the Dashworks API
@@ -30,7 +29,7 @@ function New-DwAPIDeviceFeed {
     Param (
         [parameter(Mandatory=$True)]
         [string]$APIUri,
-        
+
         [Parameter(Mandatory=$True)]
         [PSObject]$APIKey,
 
@@ -40,6 +39,4 @@ function New-DwAPIDeviceFeed {
     if ($PSCmdlet.ShouldProcess("Create Device feed",$Feedname)) {
         return Get-DwAPIDeviceFeed -APIUri $APIUri -APIKey $APIKey -FeedName $Feedname -Create $True
     }
-    
-    
 }
