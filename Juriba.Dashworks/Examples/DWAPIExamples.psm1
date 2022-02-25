@@ -1,5 +1,6 @@
 
 Function Get-AzAccessToken{
+    [OutputType([String])]
     Param (
         [parameter(Mandatory=$True)]
         [string]$TenantId,
@@ -65,6 +66,7 @@ Function Get-AzAccessToken{
 Export-Modulemember -function Get-AzAccessToken
 
 Function Get-AzureUserTable([string]$accessToken){
+
     <#
     .Synopsis
     Get a datatable containing all Azure user data.
@@ -86,6 +88,8 @@ Function Get-AzureUserTable([string]$accessToken){
     # Get the user data for the access token passed.
     $dtAzureUserData = Get-AzureUsers -accessToken $AccessToken
     #>
+
+    [OutputType([PSObject])]
 
     $uri='https://graph.microsoft.com/v1.0/users?$select=id,accountEnabled,ageGroup,assignedLicenses,assignedPlans,businessPhones,city,companyName,consentProvidedForMinor,country,createdDateTime,creationType,deletedDateTime,department,displayName,employeeHireDate,employeeId,employeeOrgData,employeeType,externalUserState,externalUserStateChangeDateTime,faxNumber,givenName,id,identities,imAddresses,isResourceAccount,jobTitle,lastPasswordChangeDateTime,legalAgeGroupClassification,licenseAssignmentStates,mail,mailNickname,mobilePhone,officeLocation,onPremisesDistinguishedName,onPremisesDomainName,onPremisesExtensionAttributes,onPremisesImmutableId,onPremisesLastSyncDateTime,onPremisesProvisioningErrors,onPremisesSamAccountName,onPremisesSecurityIdentifier,onPremisesSyncEnabled,onPremisesUserPrincipalName,otherMails,passwordPolicies,passwordProfile,postalCode,preferredDataLocation,preferredLanguage,provisionedPlans,proxyAddresses,refreshTokensValidFromDateTime,showInAddressList,signInSessionsValidFromDateTime,state,streetAddress,surname,usageLocation,userPrincipalName,userType'
 
@@ -164,6 +168,8 @@ Function Get-IntuneDeviceTable([string]$accessToken){
     $dtInTuneData = Get-IntuneDevices -accessToken $AccessToken
     #>
 
+    [OutputType([PSObject])]
+
     $dtResults = New-Object System.Data.DataTable
 
     $uri='https://graph.microsoft.com/v1.0/deviceManagement/managedDevices'
@@ -220,7 +226,7 @@ Function Get-IntuneDeviceTable([string]$accessToken){
 Export-Modulemember -function Get-IntuneDeviceTable
 
 Function Convert-DwAPIDeviceFromInTune($IntuneDataTable){
-
+    [OutputType([System.Data.DataTable])]
     $dataTable = New-Object System.Data.DataTable
 
     $dataTable.Columns.Add("uniqueComputerIdentifier", [string]) | Out-Null
@@ -284,7 +290,7 @@ Function Convert-DwAPIDeviceFromInTune($IntuneDataTable){
 Export-Modulemember -function Convert-DwAPIDeviceFromInTune
 
 Function Convert-DwAPIUserFromAzure($AzureDataTable){
-
+    [OutputType([System.Data.DataTable])]
     $dataTable = New-Object System.Data.DataTable
 
     $dataTable.Columns.Add("username", [string]) | Out-Null
@@ -373,11 +379,12 @@ function Invoke-DwAPIUploadDeviceFeedDataTable{
     Write-DeviceFeedData -APIUri $uriRoot -DWDataTable $dtDashworksInput -FeedId $DeviceImportID -APIKey $APIKey
     #>
 
+    [OutputType([string])]
     [CmdletBinding(SupportsShouldProcess)]
     Param (
         [parameter(Mandatory=$True)]
         [string]$APIUri,
-        
+
         [Parameter(Mandatory=$True)]
         [System.Data.DataTable]$DWDataTable,
 
@@ -468,11 +475,12 @@ function Invoke-DwAPIAUploadUserFeedDataTable {
     Write-DeviceFeedData -APIUri $uriRoot -DWDataTable $dtDashworksInput -FeedId $DeviceImportID -APIKey $APIKey
     #>
 
+    [OutputType([string])]
     [CmdletBinding(SupportsShouldProcess)]
     Param (
         [parameter(Mandatory=$True)]
         [string]$APIUri,
-        
+
         [Parameter(Mandatory=$True)]
         [System.Data.DataTable]$DWDataTable,
 
@@ -509,12 +517,8 @@ function Invoke-DwAPIAUploadUserFeedDataTable {
 
     $uri = "$APIUri/apiv2/imports/users/$FeedId/items"
 
-    
-    WRITE-OUTPUT "Got here with $($DWDataTable.Rows.Count) Rows to process"
-
     foreach($Row in $DWDataTable)
-    {   
-        WRITE-OUTPUT "Got here"
+    {
         $Body = $null
         $Body = $Row | Select-Object * -ExcludeProperty ItemArray, Table, RowError, RowState, HasErrors | ConvertTo-Json
         try {
@@ -592,7 +596,7 @@ function Invoke-DwAPIAUploadUserFeedFromAD {
     )
 
     $Properties = @("lastlogontimestamp","description","homeDirectory","homeDrive","mail","CanonicalName")
-    
+
     if ($ADServer)
     {
         if ($Cred)
@@ -601,7 +605,7 @@ function Invoke-DwAPIAUploadUserFeedFromAD {
         }
         else
         {
-            $ADUsers = get-aduser -Filter * -Properties $properties -Server $ADServer 
+            $ADUsers = get-aduser -Filter * -Properties $properties -Server $ADServer
         }
     }else{
         if ($Cred)
