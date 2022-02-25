@@ -12,7 +12,8 @@
     RootModule        = 'Juriba.Dashworks.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.0.9'
+    ModuleVersion     = '0.0.12'
+
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -70,7 +71,19 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport = @('Export-DwList.ps1', 'Get-DwImportDevice.ps1' ,'New-DWCustomField.ps1' ,'New-DWImportDevice.ps1' ,'Remove-DWImportDevice.ps1' ,'Set-DwImportDevice.ps1')
+
+    FunctionsToExport = @(
+                            'Export-DwList',
+                            'Get-DwImportDevice',
+                            'New-DwCustomField',
+                            'New-DwImportDevice',
+                            'Remove-DwImportDevice',
+                            'Set-DwImportDevice',
+                            'Get-DwImportDeviceFeed',
+                            'New-DwImportDeviceFeed',
+                            'Remove-DwImportDeviceFeed',
+                            'Set-DwImportDeviceFeed'
+                        )
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     # CmdletsToExport   = '*'
