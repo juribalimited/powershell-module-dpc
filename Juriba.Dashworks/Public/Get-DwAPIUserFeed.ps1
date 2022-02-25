@@ -38,7 +38,7 @@ function Get-DwAPIUserFeed {
 
         [parameter(Mandatory=$True)]
         [string]$FeedName,
-        
+
         [Parameter(Mandatory=$False)]
         [bool]$Create = $False
     )
@@ -62,7 +62,7 @@ function Get-DwAPIUserFeed {
             "name" = $FeedName
             "enabled"  = "true"
         }
-    
+
         $Postheaders = 
         @{
             "content-type" = "application/json"
@@ -75,5 +75,4 @@ function Get-DwAPIUserFeed {
     }
 
     return $FeedDetails.id
-    
 }

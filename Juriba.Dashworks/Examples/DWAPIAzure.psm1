@@ -64,7 +64,7 @@ Function Get-AzAccessToken{
 }
 
 
-Function Get-AzureUsers([string]$accessToken){
+Function Get-AzureUserTable([string]$accessToken){
     <#
     .Synopsis
     Get a datatable containing all Azure user data.
@@ -140,7 +140,7 @@ Function Get-AzureUsers([string]$accessToken){
 }
 
 
-Function Get-IntuneDevices([string]$accessToken){
+Function Get-IntuneDeviceTable([string]$accessToken){
 
     $dtResults = New-Object System.Data.DataTable
 

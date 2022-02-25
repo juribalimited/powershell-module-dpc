@@ -74,5 +74,5 @@ function Get-DwAPIDeviceFeed {
         $FeedDetails = Invoke-RestMethod -Headers $Postheaders -Uri $uri -Method Post -Body $Body
     }
 
-    return $FeedDetails.id  
+    return $FeedDetails.id
 }

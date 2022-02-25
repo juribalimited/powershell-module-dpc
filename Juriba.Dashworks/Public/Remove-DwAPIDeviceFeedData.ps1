@@ -30,7 +30,7 @@ function Remove-DwAPIDeviceFeedData {
     .Example
     # Remove the device data for the feed named "Testing Feed".
     Remove-DwAPIDeviceFeedData -APIUri $uriRoot -APIKey $APIKey -FeedName "Testing Feed"
-    
+
     #>
 
     [CmdletBinding(SupportsShouldProcess)]

@@ -30,7 +30,7 @@ function Remove-DwAPIUserFeedData {
     .Example
     # Get the device feed id for the feed named "Testing Feed".
     Remove-DwAPIDeviceFeedData -APIUri $uriRoot -APIKey $APIKey -FeedName "Testing Feed"
-    
+
     #>
 
     [CmdletBinding(SupportsShouldProcess)]
