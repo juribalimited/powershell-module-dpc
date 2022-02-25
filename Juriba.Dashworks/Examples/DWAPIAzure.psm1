@@ -79,7 +79,7 @@ Function Get-AzureUsers([string]$accessToken){
             $dtResults = New-Object System.Data.DataTable
             $ScriptBlock=$null
 
-            foreach($object_properties in $($users.Value[0] | Get-Member | ?{$_.MemberType -eq "NoteProperty"}))
+            foreach($object_properties in $($users.Value[0] | Get-Member | where-object{$_.MemberType -eq "NoteProperty"}))
             {
 
                 $DataType = switch ($object_properties.Definition.substring(0,$object_properties.Definition.IndexOf(' ')))
@@ -152,7 +152,7 @@ Function Get-IntuneDevices([string]$accessToken){
 
         $ScriptBlock=$null
 
-        foreach($object_properties in $($devices.Value[0] | Get-Member | ?{$_.MemberType -eq "NoteProperty"}))
+        foreach($object_properties in $($devices.Value[0] | Get-Member | where-object{$_.MemberType -eq "NoteProperty"}))
         {
             if($CreateTable)
             {

@@ -25,6 +25,7 @@ function New-DwAPIUserFeed {
     $UserImportID = New-DwAPIUserFeed -APIUri $uriRoot -FeedName 'Test Device feed' -APIKey $APIKey
     #>
 
+    [CmdletBinding(SupportsShouldProcess)]
     Param (
         [parameter(Mandatory=$True)]
         [string]$APIUri,
@@ -35,7 +36,8 @@ function New-DwAPIUserFeed {
         [parameter(Mandatory=$True,ValueFromPipeline = $True)]
         [string[]]$FeedName
     )
-
-    return Get-DwAPIUserFeed -APIUri $APIUri -APIKey $APIKey -FeedName $Feedname -Create $True
+    if ($PSCmdlet.ShouldProcess("Create User feed",$Feedname)) {
+        return Get-DwAPIUserFeed -APIUri $APIUri -APIKey $APIKey -FeedName $Feedname -Create $True
+    }
     
 }

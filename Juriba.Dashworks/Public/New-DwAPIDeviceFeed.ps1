@@ -26,6 +26,7 @@ function New-DwAPIDeviceFeed {
     $DeviceImportID = New-DwAPIDeviceFeed -APIUri $uriRoot -FeedName 'Test Device feed' -APIKey $APIKey
     #>
 
+    [CmdletBinding(SupportsShouldProcess)]
     Param (
         [parameter(Mandatory=$True)]
         [string]$APIUri,
@@ -36,7 +37,9 @@ function New-DwAPIDeviceFeed {
         [parameter(Mandatory=$True,ValueFromPipeline = $True)]
         [string[]]$FeedName
     )
-
-    return Get-DeviceFeed -APIUri $APIUri -APIKey $APIKey -FeedName $Feedname -Create $True
+    if ($PSCmdlet.ShouldProcess("Create Device feed",$Feedname)) {
+        return Get-DwAPIDeviceFeed -APIUri $APIUri -APIKey $APIKey -FeedName $Feedname -Create $True
+    }
+    
     
 }
