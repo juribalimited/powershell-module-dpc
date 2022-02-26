@@ -1,10 +1,10 @@
-function Get-DwImportDevice {
+function Get-DwImportApplication {
     <#
         .SYNOPSIS
-        Gets a Dashworks device from the import API.
+        Gets a Dashworks application from the import API.
 
         .DESCRIPTION
-        Gets a Dashworks device from the import API.
+        Gets a Dashworks application from the import API.
         Takes the ImportId and UniqueIdentifier as an input.
 
         .PARAMETER Instance
@@ -21,21 +21,21 @@ function Get-DwImportDevice {
 
         .PARAMETER UniqueIdentifier
 
-        UniqueIdentifier for the device.
+        UniqueIdentifier for the application.
 
         .PARAMETER ImportId
 
-        ImportId for the device.
+        ImportId for the application.
 
         .PARAMETER InfoLevel
 
         Optional. Sets the level of information that this function returns. Accepts Basic or Full.
-        Basic returns only the UniqueIdentifier, use when confirming a device exists.
-        Full returns the full json object for the device.
+        Basic returns only the UniqueIdentifier, use when confirming an application exists.
+        Full returns the full json object for the application.
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-DwImportDevice -ImportId 1 -UniqueIdentifier "w123abc" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Get-DwImportApplication -ImportId 1 -UniqueIdentifier "app123" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
     #>
 
     [CmdletBinding()]
@@ -55,24 +55,24 @@ function Get-DwImportDevice {
         [string]$InfoLevel = "Basic"
     )
 
-    $uri = "https://{0}:{1}/apiv2/imports/devices/{2}/items/{3}" -f $Instance, $Port, $ImportId, $UniqueIdentifier
+    $uri = "https://{0}:{1}/apiv2/imports/applications/{2}/items/{3}" -f $Instance, $Port, $ImportId, $UniqueIdentifier
     $headers = @{'x-api-key' = $APIKey}
 
-    $device = ''
+    $application = ''
     try {
         $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json"
-        $device = switch($InfoLevel) {
+        $application = switch($InfoLevel) {
             "Basic" { ($result.Content | ConvertFrom-Json).UniqueIdentifier }
             "Full"  { $result.Content }
 
         }
-        return $device
+        return $application
     }
     catch {
         if ($_.Exception.Response.StatusCode.Value__ -eq 404) {
-            # 404 means the device was not found, don't treat this as an error
-            # as we expect this function to be used to check if a device exists
-            Write-Verbose "device not found"
+            # 404 means the application was not found, don't treat this as an error
+            # as we expect this function to be used to check if a application exists
+            Write-Verbose "application not found"
         }
         else {
             Write-Error $_

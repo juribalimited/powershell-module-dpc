@@ -1,12 +1,12 @@
 #Requires -Version 7
-function Set-DwImportDevice {
+function Remove-DwImportApplication {
     <#
         .SYNOPSIS
-        Updates a device in the import API.
+        Deletes an application in the import API.
 
         .DESCRIPTION
-        Updates a device in the import API.
-        Takes the ImportId, UniqueIdentifier and jsonBody as an input.
+        Deletes an application in the import API.
+        Takes the ImportId and UniqueIdentifier as an input.
 
         .PARAMETER Instance
 
@@ -22,18 +22,14 @@ function Set-DwImportDevice {
 
         .PARAMETER UniqueIdentifier
 
-        UniqueIdentifier for the device.
+        UniqueIdentifier for the application.
 
         .PARAMETER ImportId
 
-        ImportId for the device.
-
-        .PARAMETER JsonBody
-
-        Json payload with updated device details.
+        ImportId for the application.
 
         .EXAMPLE
-        PS> Set-DwImportDevice -ImportId 1 -UniqueIdentifier "w123abc" -JsonBody $jsonBody -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Remove-DwImportApplication -ImportId 1 -UniqueIdentifier "app123" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
 
     #>
 
@@ -48,22 +44,15 @@ function Set-DwImportDevice {
         [parameter(Mandatory=$true)]
         [string]$UniqueIdentifier,
         [parameter(Mandatory=$true)]
-        [int]$ImportId,
-        [ValidateScript({
-            Test-Json $_
-        },
-        ErrorMessage = "JsonBody is not valid json."
-        )]
-        [parameter(Mandatory=$true)]
-        [string]$JsonBody
+        [int]$ImportId
     )
 
-    $uri = "https://{0}:{1}/apiv2/imports/devices/{2}/items/{3}" -f $Instance, $Port, $ImportId, $UniqueIdentifier
+    $uri = "https://{0}:{1}/apiv2/imports/applications/{2}/items/{3}" -f $Instance, $Port, $ImportId, $UniqueIdentifier
     $headers = @{'x-api-key' = $APIKey}
 
     try {
         if ($PSCmdlet.ShouldProcess($UniqueIdentifier)) {
-            $result = Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body $JsonBody
+            $result = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $headers
             return $result
         }
     }
