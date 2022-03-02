@@ -1,5 +1,5 @@
 SELECT DISTINCT 
-	sys.ResourceId AS [DeviceUniqueIdentifier]
+	sys.ResourceId AS [DeviceUniqueIdentifier],
     pkg.PackageID + adv.ProgramName as [ApplicationUniqueIdentifier]
 FROM v_Advertisement adv 
 JOIN v_Package pkg ON adv.PackageID = pkg.PackageID 

@@ -7,7 +7,7 @@ those relationships into Dashworks.
 .DESCRIPTION
 A sample script to query the MECM database for Packages (Packaged Applications) and related devices and import
 those relationships into Dashworks.
-Script assumes the applications and devices already exist and will skip thsoe which do not exist. 
+Script assumes the applications and devices already exist and will skip thsoe which do not exist.
 
 #>
 
@@ -66,13 +66,13 @@ $groupedTable = ($table | Group-Object DeviceUniqueIdentifier)
 foreach ($device in $groupedTable) {
     $i++
     $deviceUniqueIdentifier = $device.Name
-    
+
     Write-Progress -Activity "Importing Device/Application Relationships to Dashworks" -Status ("Processing device: {0}" -f $deviceUniqueIdentifier) -PercentComplete ($i/$groupedTable.Count*100)
 
     $existingDevice = Get-DwImportDevice @DashworksParams -ImportId $importId -UniqueIdentifier $deviceUniqueIdentifier
     if ($existingDevice) {
         # build json payload from grouped table results
-        $jsonBody = @{applications = ($device.Group | Select-Object @{Name='applicationDistHierId'; Expression={$importId}}, @{Name='applicationBusinessKey'; Expression={$_.ApplicationUniqueIdentifier}}, @{Name='installed'; Expression={$true}})} | ConvertTo-Json
+        $jsonBody = @{applications = @($device.Group | Select-Object @{Name='applicationDistHierId'; Expression={$importId}}, @{Name='applicationBusinessKey'; Expression={$_.ApplicationUniqueIdentifier}}, @{Name='installed'; Expression={$true}})} | ConvertTo-Json
         # post to api
         $result = Set-DwImportDevice @DashworksParams -ImportId $importId -UniqueIdentifier $deviceUniqueIdentifier -JsonBody $jsonBody
         # check result, for an update we are expecting status code 204
