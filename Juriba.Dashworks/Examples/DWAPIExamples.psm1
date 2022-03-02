@@ -558,7 +558,7 @@ function Invoke-DwAPIAUploadUserFeedFromAD {
     The name of the feed to be searched for and used.
 
     .Parameter FeedId
-    The id of the device feed to be used.
+    The id of the user feed in question.
 
     .Parameter ADServer
     The name of a DC to connect Get-ADUser to.
@@ -572,7 +572,7 @@ function Invoke-DwAPIAUploadUserFeedFromAD {
 
     .Example
     # Get the device feed id for the named feed.
-    Write-DeviceFeedData -APIUri $uriRoot -DWDataTable $dtDashworksInput -FeedId $DeviceImportID -APIKey $APIKey
+    Invoke-DwAPIAUploadUserFeedFromAD -APIUri $uriRoot -APIKey $APIKey -FeedName "AD Users"
     #>
 
     Param (
@@ -592,7 +592,7 @@ function Invoke-DwAPIAUploadUserFeedFromAD {
         [string]$ADServer,
 
         [parameter(Mandatory=$False)]
-        [PSCredential]$Cred
+        [PSCredential]$Credential
     )
 
     $Properties = @("lastlogontimestamp","description","homeDirectory","homeDrive","mail","CanonicalName")
@@ -601,7 +601,7 @@ function Invoke-DwAPIAUploadUserFeedFromAD {
     {
         if ($Cred)
         {
-            $ADUsers = get-aduser -Filter * -Properties $properties -Server $ADServer -Credential $Cred
+            $ADUsers = get-aduser -Filter * -Properties $properties -Server $ADServer -Credential $Credential
         }
         else
         {
@@ -610,7 +610,7 @@ function Invoke-DwAPIAUploadUserFeedFromAD {
     }else{
         if ($Cred)
         {
-            $ADUsers = get-aduser -Filter * -Properties $properties -Credential $Cred
+            $ADUsers = get-aduser -Filter * -Properties $properties -Credential $Credential
         }
         else
         {
@@ -695,3 +695,192 @@ function Invoke-DwAPIAUploadUserFeedFromAD {
 
     Return "$RowCount users added"
 }
+Export-Modulemember -function Invoke-DwAPIAUploadUserFeedFromAD
+
+function Invoke-DwAPIUploadUserLocationFeedFromAD {
+    <#
+    .Synopsis
+    Pulls user data from Get-ADUser and upload to a DW User Location feed
+
+    .Description
+    Takes all users from Get-ADUser (optional server/cred parameters) transforms the fields into a datatable in the format required
+    for the DW API and then uploads that user data to a named or numbered data feed.
+
+    .Parameter APIUri
+    The URI to the Dashworks instance being examined.
+
+    .Parameter APIKey
+    The APIKey for a user with access to the required resources.
+
+    .Parameter LocationFeedID
+    The id of the location feed to be used.
+
+    .Parameter UserFeedId
+    The id of the user feed in question.
+
+    .Parameter ADServer
+    The name of a DC to connect Get-ADUser to.
+
+    .Parameter Credentials
+    The credentials to use when calling Get-ADUser
+
+    .Outputs
+    Output type [string]
+    Text confirming the number of rows to be inserted.
+
+    .Example
+    # Get the device feed id for the named feed.
+    Write-DeviceFeedData -APIUri $uriRoot -DWDataTable $dtDashworksInput -FeedId $DeviceImportID -APIKey $APIKey
+    #>
+
+    Param (
+        [parameter(Mandatory=$True)]
+        [string]$APIUri,
+
+        [Parameter(Mandatory=$True)]
+        [string]$APIKey,
+
+        [parameter(Mandatory=$True)]
+        [string]$LocationFeedID = $null,
+
+        [parameter(Mandatory=$True)]
+        [string]$UserFeedId,
+
+        [parameter(Mandatory=$False)]
+        [string]$ADServer,
+
+        [parameter(Mandatory=$False)]
+        [PSCredential]$Cred
+    )
+
+    $Properties = @("StreetAddress","City","State","PostalCode","co")
+
+    if ($ADServer)
+    {
+        if ($Cred)
+        {
+            $ADUsers = get-aduser -Filter * -Properties $properties -Server $ADServer -Credential $Cred
+        }
+        else
+        {
+            $ADUsers = get-aduser -Filter * -Properties $properties -Server $ADServer
+        }
+    }else{
+        if ($Cred)
+        {
+            $ADUsers = get-aduser -Filter * -Properties $properties -Credential $Cred
+        }
+        else
+        {
+            $ADUsers = get-aduser -Filter * -Properties $properties
+        }
+    }
+
+    $Locations = @()
+    $UserLocations = @{}
+
+    foreach($User in $ADUsers)
+    {
+        $uniqueIdentifier=$null
+        if ("$($User.StreetAddress)$($User.City)$($User.State)$($User.PostalCode)$($User.co)" -ne "")
+        {
+            $stringAsStream = [System.IO.MemoryStream]::new()
+            $writer = [System.IO.StreamWriter]::new($stringAsStream)
+            $writer.write("$($User.StreetAddress)$($User.City)$($User.State)$($User.PostalCode)$($User.co)")
+            $writer.Flush()
+            $stringAsStream.Position = 0
+            $uniqueIdentifier = (Get-FileHash -InputStream $stringAsStream | Select-Object -property Hash).Hash
+
+            if ($null -eq $Locations.uniqueidentifier)
+            {
+                $Location = New-Object PSObject
+                $Location | Add-Member -type NoteProperty -Name 'uniqueIdentifier' -Value $uniqueIdentifier
+                $Location | Add-Member -type NoteProperty -Name 'name' -Value $(if ($User.StreetAddress -like '*`n*'){($User.StreetAddress -split "`n")[0]}else{$User.StreetAddress})
+                $Location | Add-Member -type NoteProperty -Name 'region' -Value "No Region Data"
+                $Location | Add-Member -type NoteProperty -Name 'country' -Value $User.co
+                $Location | Add-Member -type NoteProperty -Name 'state' -Value $User.State
+                $Location | Add-Member -type NoteProperty -Name 'city' -Value $User.City
+                $Location | Add-Member -type NoteProperty -Name 'buildingName' -Value $(if ($User.StreetAddress -like '*`n*'){($User.StreetAddress -split "`n")[0]}else{$User.StreetAddress})
+                $Location | Add-Member -type NoteProperty -Name 'address1' -Value $(if ($User.StreetAddress -like '*`n*'){($User.StreetAddress -split "`n")[0]}else{$User.StreetAddress})
+                $Location | Add-Member -type NoteProperty -Name 'address2' -Value $(if ($User.StreetAddress -like '*`n*'){($User.StreetAddress -split "`n")[1]}else{''})
+                $Location | Add-Member -type NoteProperty -Name 'address3' -Value $(if ($User.StreetAddress -like '*`n*'){($User.StreetAddress -split "`n")[2]}else{''})
+                $Location | Add-Member -type NoteProperty -Name 'address4' -Value $(if ($User.StreetAddress -like '*`n*'){($User.StreetAddress -split "`n")[3]}else{''})
+                $Location | Add-Member -type NoteProperty -Name 'postalCode' -Value $User.PostalCode
+                $Locations += $Location
+            }
+            elseif (-not $Locations.uniqueidentifier.contains($uniqueIdentifier))
+            {
+                $Location = New-Object PSObject
+                $Location | Add-Member -type NoteProperty -Name 'uniqueIdentifier' -Value $uniqueIdentifier
+                $Location | Add-Member -type NoteProperty -Name 'name' -Value $(if ($User.StreetAddress -like '*`n*'){($User.StreetAddress -split "`n")[0].Replace("`r","")}else{$User.StreetAddress})
+                $Location | Add-Member -type NoteProperty -Name 'region' -Value "No Region Data"
+                $Location | Add-Member -type NoteProperty -Name 'country' -Value $User.co
+                $Location | Add-Member -type NoteProperty -Name 'state' -Value $User.State
+                $Location | Add-Member -type NoteProperty -Name 'city' -Value $User.City
+                $Location | Add-Member -type NoteProperty -Name 'buildingName' -Value $(if ($User.StreetAddress -like '*`n*'){($User.StreetAddress -split "`n")[0].Replace("`r","")}else{$User.StreetAddress})
+                $Location | Add-Member -type NoteProperty -Name 'address1' -Value $(if ($User.StreetAddress -like '*`n*'){($User.StreetAddress -split "`n")[0].Replace("`r","")}else{$User.StreetAddress})
+                $Location | Add-Member -type NoteProperty -Name 'address2' -Value $(if ($User.StreetAddress -like '*`n*'){if($($User.StreetAddress -split "`n")[1]){$($User.StreetAddress -split "`n")[1].Replace("`r","")}else{''}}else{''})
+                $Location | Add-Member -type NoteProperty -Name 'address3' -Value $(if ($User.StreetAddress -like '*`n*'){if($($User.StreetAddress -split "`n")[2]){$($User.StreetAddress -split "`n")[2].Replace("`r","")}else{''}}else{''})
+                $Location | Add-Member -type NoteProperty -Name 'address4' -Value $(if ($User.StreetAddress -like '*`n*'){if($($User.StreetAddress -split "`n")[3]){$($User.StreetAddress -split "`n")[3].Replace("`r","")}else{''}}else{''})
+                $Location | Add-Member -type NoteProperty -Name 'postalCode' -Value $User.PostalCode
+                $Locations += $Location
+            }
+            $UserLocations.Add($($User.SamAccountName),$uniqueIdentifier)
+        }
+    }
+
+    $JsonLocationArray = @()
+
+    foreach($Location in $Locations)
+    {
+        $LocUsers = @()
+        foreach($User in $ADUsers)
+        {
+            if($UserLocations[$($User.SamAccountName)] -eq $Location.uniqueIdentifier)
+            {
+                $LocUsers += "/imports/users/$UserFeedID/items/$($User.SamAccountName)"
+            }
+        }
+        $JSonObject = [pscustomobject]@{
+            uniqueIdentifier = $Location.uniqueIdentifier
+            name = $Location.name
+            region = $Location.region
+            country = $Location.country
+            state = $Location.state
+            city = $Location.city
+            buildingName = $Location.buildingName
+            address1 = $Location.address1
+            address2 = $Location.address2
+            address3 = $Location.address3
+            address4 = $Location.address4
+            postalCode = $Location.postalCode
+            users = $LocUsers
+        }
+        $JsonLocationArray += $JSonObject | ConvertTo-Json
+    }
+
+    $RowCount = 0
+
+    $PostHeaders = @{
+        "content-type" = "application/json"
+        "X-API-KEY" = "$APIKey"
+    }
+
+    $DeleteHeaders = @{
+        "X-API-KEY" = "$APIKey"
+    }
+
+    $uri = "$APIUri/apiv2/imports/Locations/$LocationFeedID/items"
+
+    #Prior to insert to the Location data, clear down the existing data.
+    Invoke-RestMethod -Headers $DeleteHeaders -Uri $uri -Method Delete
+
+    foreach($Body in $JsonLocationArray)
+    {
+        Invoke-RestMethod -Headers $PostHeaders -Uri $uri -Method Post -Body $Body | out-null
+        $RowCount++
+    }
+
+    Return "$RowCount locations added"
+}
+Export-Modulemember -function Invoke-DwAPIUploadUserLocationFeedFromAD
