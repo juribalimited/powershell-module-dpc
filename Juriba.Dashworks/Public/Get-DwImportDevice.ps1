@@ -1,11 +1,15 @@
 function Get-DwImportDevice {
     <#
         .SYNOPSIS
-        Gets a Dashworks device from the import API.
+        Gets one or more Dashworks devices from the import API.
 
         .DESCRIPTION
         Gets a Dashworks device from the import API.
-        Takes the ImportId and UniqueIdentifier as an input.
+        Takes the ImportId as an input.
+        Optionally takes a UnqiueIdentifier as an input and will return a single device with that UniqueIdentifier.
+        Optionally takes a Hostname as an input and will return all devices matching that hostname.
+        Optionally takes a Filter as an input and will return all devices matching that filter. See swagger documentation for examples of using filters.
+        If specified, only one of UniqueIdentifier, Hostname or Filter can be supplied. Omit all to return all devices for the import.
 
         .PARAMETER Instance
 
@@ -21,11 +25,19 @@ function Get-DwImportDevice {
 
         .PARAMETER UniqueIdentifier
 
-        UniqueIdentifier for the device.
+        UniqueIdentifier for the device. Cannot be used with Hostname or Filter.
 
         .PARAMETER ImportId
 
         ImportId for the device.
+
+        .PARAMETER Hostname
+
+        Hostname for the deivce. Cannot be used with UniqueIdentifier or Filter.
+
+        .PARAMETER Filter
+
+        Filter for device search. Cannot be used with Hostname or UniqueIdentifier.
 
         .PARAMETER InfoLevel
 
@@ -35,10 +47,20 @@ function Get-DwImportDevice {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-DwImportDevice -ImportId 1 -UniqueIdentifier "w123abc" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
-    #>
+        PS> Get-DwImportDevice -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
-    [CmdletBinding()]
+        .EXAMPLE
+        PS> Get-DwImportDevice -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
+
+        .EXAMPLE
+        PS> Get-DwImportDevice -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
+
+        .EXAMPLE
+        PS> Get-DwImportDevice -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
+
+         #>
+
+    [CmdletBinding(DefaultParameterSetName="UniuqeIdentifier")]
     param (
         [Parameter(Mandatory=$true)]
         [string]$Instance,
@@ -46,8 +68,12 @@ function Get-DwImportDevice {
         [int]$Port = 8443,
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
-        [parameter(Mandatory=$true)]
+        [parameter(Mandatory=$false, ParameterSetName="UniqueIdentifier")]
         [string]$UniqueIdentifier,
+        [parameter(Mandatory=$false, ParameterSetName="Hostname")]
+        [string]$Hostname,
+        [parameter(Mandatory=$false, ParameterSetName="Filter")]
+        [string]$Filter,
         [parameter(Mandatory=$true)]
         [int]$ImportId,
         [parameter(Mandatory=$false)]
@@ -55,16 +81,48 @@ function Get-DwImportDevice {
         [string]$InfoLevel = "Basic"
     )
 
-    $uri = "https://{0}:{1}/apiv2/imports/devices/{2}/items/{3}" -f $Instance, $Port, $ImportId, $UniqueIdentifier
+    $limit = 1000 # page size
+    $uri = "https://{0}:{1}/apiv2/imports/devices/{2}/items" -f $Instance, $Port, $ImportId
+
+    switch ($PSCmdlet.ParameterSetName) {
+        "UniqueIdentifier" {
+            $uri += "/{0}" -f $UniqueIdentifier
+        }
+        "Hostname" {
+            $uri += "?filter="
+            $uri += [System.Web.HttpUtility]::UrlEncode("eq(hostname,'{0}')" -f $Hostname)
+            $uri += "&limit={0}" -f $limit
+        }
+        "Filter" {
+            $uri += "?filter="
+            $uri += [System.Web.HttpUtility]::UrlEncode("{0}" -f $Filter)
+            $uri += "&limit={0}" -f $limit
+        }
+        Default {
+            $uri += "?limit={0}" -f $limit
+        }
+    }
+
     $headers = @{'x-api-key' = $APIKey}
 
-    $device = ''
+    $device = ""
     try {
         $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json"
         $device = switch($InfoLevel) {
             "Basic" { ($result.Content | ConvertFrom-Json).UniqueIdentifier }
-            "Full"  { $result.Content }
-
+            "Full"  { $result.Content | ConvertFrom-Json }
+        }
+        # check if result is paged, if so get remaining pages and add to result set
+        if ($result.Headers.ContainsKey("X-Pagination")) {
+            $totalPages = ($result.Headers."X-Pagination" | ConvertFrom-Json).totalPages
+            for ($page = 2; $page -le $totalPages; $page++) {
+                $pagedUri = $uri + "&page={0}" -f $page
+                $pagedResult = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $headers -ContentType "application/json"
+                $device += switch($InfoLevel) {
+                    "Basic" { ($pagedResult.Content | ConvertFrom-Json).UniqueIdentifier }
+                    "Full"  { $pagedResult.Content | ConvertFrom-Json }
+                }
+            }
         }
         return $device
     }

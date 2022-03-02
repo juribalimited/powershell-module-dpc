@@ -6,6 +6,9 @@ function Get-DwImportApplication {
         .DESCRIPTION
         Gets a Dashworks application from the import API.
         Takes the ImportId and UniqueIdentifier as an input.
+        Optionally takes a UnqiueIdentifier as an input and will return a single application with that UniqueIdentifier.
+        Optionally takes a Filter as an input and will return all applications matching that filter. See swagger documentation for examples of using filters.
+        If specified, only one of UniqueIdentifier or Filter can be supplied. Omit all to return all devices for the import.
 
         .PARAMETER Instance
 
@@ -27,6 +30,10 @@ function Get-DwImportApplication {
 
         ImportId for the application.
 
+        .PARAMETER Filter
+
+        Filter for application search. Cannot be used with Hostname or UniqueIdentifier.
+
         .PARAMETER InfoLevel
 
         Optional. Sets the level of information that this function returns. Accepts Basic or Full.
@@ -35,10 +42,17 @@ function Get-DwImportApplication {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-DwImportApplication -ImportId 1 -UniqueIdentifier "app123" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Get-DwImportApplication -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+
+        .EXAMPLE
+        PS> Get-DwImportApplication -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
+
+        .EXAMPLE
+        PS> Get-DwImportApplication -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Manufacturer, 'zxy123456')"
+
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName="UniuqeIdentifier")]
     param (
         [Parameter(Mandatory=$true)]
         [string]$Instance,
@@ -46,8 +60,10 @@ function Get-DwImportApplication {
         [int]$Port = 8443,
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
-        [parameter(Mandatory=$true)]
+        [parameter(Mandatory=$false, ParameterSetName="UniqueIdentifier")]
         [string]$UniqueIdentifier,
+        [parameter(Mandatory=$false, ParameterSetName="Filter")]
+        [string]$Filter,
         [parameter(Mandatory=$true)]
         [int]$ImportId,
         [parameter(Mandatory=$false)]
@@ -55,16 +71,42 @@ function Get-DwImportApplication {
         [string]$InfoLevel = "Basic"
     )
 
-    $uri = "https://{0}:{1}/apiv2/imports/applications/{2}/items/{3}" -f $Instance, $Port, $ImportId, $UniqueIdentifier
+    $limit = 50 # page size
+    $uri = "https://{0}:{1}/apiv2/imports/applications/{2}/items" -f $Instance, $Port, $ImportId
+
+    switch ($PSCmdlet.ParameterSetName) {
+        "UniqueIdentifier" {
+            $uri += "/{0}" -f $UniqueIdentifier
+        }
+        "Filter" {
+            $uri += "?filter="
+            $uri += [System.Web.HttpUtility]::UrlEncode("{0}" -f $Filter)
+            $uri += "&limit={0}" -f $limit
+        }
+        Default {
+            $uri += "?limit={0}" -f $limit
+        }
+    }
     $headers = @{'x-api-key' = $APIKey}
 
-    $application = ''
+    $application = ""
     try {
         $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json"
         $application = switch($InfoLevel) {
             "Basic" { ($result.Content | ConvertFrom-Json).UniqueIdentifier }
-            "Full"  { $result.Content }
-
+            "Full"  { $result.Content | ConvertFrom-Json }
+        }
+        # check if result is paged, if so get remaining pages and add to result set
+        if ($result.Headers.ContainsKey("X-Pagination")) {
+            $totalPages = ($result.Headers."X-Pagination" | ConvertFrom-Json).totalPages
+            for ($page = 2; $page -le $totalPages; $page++) {
+                $pagedUri = $uri + "&page={0}" -f $page
+                $pagedResult = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $headers -ContentType "application/json"
+                $application += switch($InfoLevel) {
+                    "Basic" { ($pagedResult.Content | ConvertFrom-Json).UniqueIdentifier }
+                    "Full"  { $pagedResult.Content | ConvertFrom-Json }
+                }
+            }
         }
         return $application
     }
