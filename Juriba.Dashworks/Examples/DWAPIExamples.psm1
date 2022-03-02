@@ -741,7 +741,7 @@ function Invoke-DwAPIUploadUserLocationFeedFromAD {
         [string]$APIKey,
 
         [parameter(Mandatory=$True)]
-        [string]$LocationFeedID = $null,
+        [string]$LocationFeedID,
 
         [parameter(Mandatory=$True)]
         [string]$UserFeedId,
