@@ -1,11 +1,11 @@
 #requires -Version 7
-function New-DwImportLocationFeed {
+function New-DwImportUserFeed {
     <#
         .SYNOPSIS
-        Creates a new location feed.
+        Creates a new user feed.
 
         .DESCRIPTION
-        Creates a new location feed using the import API.
+        Creates a new user feed using the import API.
         Takes the feed name and an enabled boolean.
 
         .PARAMETER Instance
@@ -18,7 +18,7 @@ function New-DwImportLocationFeed {
 
         .PARAMETER Name
 
-        The name of the new location feed.
+        The name of the new user feed.
 
         .PARAMETER Enabled
 
@@ -26,7 +26,7 @@ function New-DwImportLocationFeed {
 
         .EXAMPLE
 
-        PS> New-DwImportLocationFeed -Name "My New Import" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> New-DwImportUserFeed -Name "My New Import" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
 
     #>
     [CmdletBinding(SupportsShouldProcess)]
@@ -41,7 +41,7 @@ function New-DwImportLocationFeed {
         [bool]$Enabled = $true
     )
 
-    $uri = "{0}/apiv2/imports/locations" -f $Instance
+    $uri = "{0}/apiv2/imports/users" -f $Instance
     $headers = @{'x-api-key' = $APIKey}
 
     $payload = @{}
