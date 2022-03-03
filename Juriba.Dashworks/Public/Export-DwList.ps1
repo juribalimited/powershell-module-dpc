@@ -9,11 +9,7 @@ function Export-DwList {
 
         .PARAMETER Instance
 
-        Dashworks instance. For example, myinstance.dashworks.app
-
-        .PARAMETER Port
-
-        Dashworks API port number. Default = 8443
+        Dashworks instance. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
@@ -29,15 +25,13 @@ function Export-DwList {
 
         .EXAMPLE
 
-        PS> Export-DwList -ListId 1234 -ObjectType Device -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Export-DwList -ListId 1234 -ObjectType Device -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
 
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [string]$Instance,
-        [Parameter(Mandatory=$false)]
-        [int]$Port = 8443,
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
         [Parameter(Mandatory = $true)]
@@ -55,7 +49,7 @@ function Export-DwList {
         "Mailbox"       {"mailboxes"}
     }
 
-    $uri = 'https://{0}:{1}/apiv1/{2}?$listid={3}' -f $Instance, $Port, $path, $ListId
+    $uri = '{0}/apiv1/{1}?$listid={2}' -f $Instance, $path, $ListId
     $headers = @{'x-api-key' = $APIKey}
 
     try {
