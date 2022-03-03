@@ -10,11 +10,7 @@ function New-DwImportApplication {
 
         .PARAMETER Instance
 
-        Dashworks instance. For example, myinstance.dashworks.app
-
-        .PARAMETER Port
-
-        Dashworks API port number. Default = 8443
+        Dashworks instance. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
@@ -29,15 +25,13 @@ function New-DwImportApplication {
         Json payload with updated application details.
 
         .EXAMPLE
-        PS> New-DwImportApplication -ImportId 1 -JsonBody $jsonBody -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> New-DwImportApplication -ImportId 1 -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
 
     [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory=$true)]
         [string]$Instance,
-        [Parameter(Mandatory=$false)]
-        [int]$Port = 8443,
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
         [parameter(Mandatory=$true)]
@@ -51,7 +45,7 @@ function New-DwImportApplication {
         [string]$JsonBody
     )
 
-    $uri = "https://{0}:{1}/apiv2/imports/applications/{2}/items" -f $Instance, $Port, $ImportId
+    $uri = "{0}/apiv2/imports/applications/{1}/items" -f $Instance, $ImportId
     $headers = @{'x-api-key' = $APIKey}
 
     try {

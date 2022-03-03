@@ -10,11 +10,7 @@ function Remove-DwImportDeviceFeed {
 
         .PARAMETER Instance
 
-        Dashworks instance. For example, myinstance.dashworks.app
-
-        .PARAMETER Port
-
-        Dashworks API port number. Default = 8443
+        Dashworks instance. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
@@ -26,11 +22,11 @@ function Remove-DwImportDeviceFeed {
 
         .EXAMPLE
 
-        PS> Remove-DwImportDeviceFeed -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Remove-DwImportDeviceFeed -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
         .EXAMPLE
 
-        PS> Remove-DwImportDeviceFeed -Confirm:$false -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Remove-DwImportDeviceFeed -Confirm:$false -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
     [CmdletBinding(
@@ -40,15 +36,13 @@ function Remove-DwImportDeviceFeed {
     param (
         [Parameter(Mandatory=$true)]
         [string]$Instance,
-        [Parameter(Mandatory=$false)]
-        [int]$Port = 8443,
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
         [parameter(Mandatory=$true)]
         [int]$ImportId
     )
 
-    $uri = "https://{0}:{1}/apiv2/imports/devices/{2}" -f $Instance, $Port, $ImportId
+    $uri = "{0}/apiv2/imports/devices/{1}" -f $Instance, $ImportId
     $headers = @{'x-api-key' = $APIKey}
 
     try {

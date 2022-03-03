@@ -15,8 +15,6 @@ Script assumes the applications and devices already exist and will skip thsoe wh
 param (
     [Parameter(Mandatory=$true)]
     [string]$DwInstance,
-    [Parameter(Mandatory=$false)]
-    [int]$DwPort = 8443,
     [Parameter(Mandatory=$true)]
     [string]$DwAPIKey,
     [Parameter(Mandatory=$true)]
@@ -31,11 +29,10 @@ param (
 
 #Requires -Version 7
 #Requires -Module SqlServer
-#Requires -Module @{ ModuleName = 'Juriba.Dashworks'; ModuleVersion = '0.0.14' }
+#Requires -Module Juriba.Dashworks
 
 $DashworksParams = @{
     Instance = $DwInstance
-    Port = $DwPort
     APIKey = $DwAPIKey
 }
 
@@ -46,7 +43,7 @@ $MecmParams = @{
 }
 
 # Get DW feed
-$feed = Get-DwImportDeviceFeed @DashworksParams -FeedName $DwFeedName
+$feed = Get-DwImportDeviceFeed @DashworksParams -Name $DwFeedName
 # If it doesnt exist, create it
 if (-Not $feed) {
     $feed = New-DwImportDeviceFeed @DashworksParams -Name $DwFeedName -Enabled $true
@@ -72,7 +69,7 @@ foreach ($device in $groupedTable) {
     $existingDevice = Get-DwImportDevice @DashworksParams -ImportId $importId -UniqueIdentifier $deviceUniqueIdentifier
     if ($existingDevice) {
         # build json payload from grouped table results
-        $jsonBody = @{applications = @($device.Group | Select-Object @{Name='applicationDistHierId'; Expression={$importId}}, @{Name='applicationBusinessKey'; Expression={$_.ApplicationUniqueIdentifier}}, @{Name='installed'; Expression={$true}})} | ConvertTo-Json
+        $jsonBody = @{applications = @($device.Group | Select-Object @{Name='applicationDistHierId'; Expression={$importId}}, @{Name='applicationBusinessKey'; Expression={$_.ApplicationUniqueIdentifier}}, @{Name='entitled'; Expression={$true}})} | ConvertTo-Json
         # post to api
         $result = Set-DwImportDevice @DashworksParams -ImportId $importId -UniqueIdentifier $deviceUniqueIdentifier -JsonBody $jsonBody
         # check result, for an update we are expecting status code 204

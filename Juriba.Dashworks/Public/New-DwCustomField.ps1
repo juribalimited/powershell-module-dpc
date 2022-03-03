@@ -10,11 +10,7 @@ function New-DwCustomField {
 
     .PARAMETER Instance
 
-    Dashworks instance. For example, myinstance.dashworks.app
-
-    .PARAMETER Port
-
-    Dashworks API port number. Default = 8443
+    Dashworks instance. For example, https://myinstance.dashworks.app:8443
 
     .PARAMETER APIKey
 
@@ -46,7 +42,7 @@ function New-DwCustomField {
 
     .EXAMPLE
 
-    PS> New-DwCustomField -ObjectTypes Device, User -Name "MyNewCustomField" -CSVColumnHeader "mynewcustomfield" -Type Text -IsActive $true -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+    PS> New-DwCustomField -ObjectTypes Device, User -Name "MyNewCustomField" -CSVColumnHeader "mynewcustomfield" -Type Text -IsActive $true -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
 
@@ -54,8 +50,6 @@ function New-DwCustomField {
     param(
         [Parameter(Mandatory=$true)]
         [string]$Instance,
-        [Parameter(Mandatory=$false)]
-        [int]$Port = 8443,
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
         [Parameter(Mandatory=$true)]
@@ -95,7 +89,7 @@ function New-DwCustomField {
     $payload.Add("valueTypeId", $typeId)
 
     $jsonbody = $payload | ConvertTo-Json
-    $uri = "https://{0}:{1}/apiv1/custom-fields" -f $Instance, $Port
+    $uri = "{0}/apiv1/custom-fields" -f $Instance
     $headers = @{'x-api-key' = $APIKey }
 
     try {

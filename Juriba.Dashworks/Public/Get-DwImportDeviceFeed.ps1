@@ -10,11 +10,7 @@ function Get-DwImportDeviceFeed {
 
         .PARAMETER Instance
 
-        Dashworks instance. For example, myinstance.dashworks.app
-
-        .PARAMETER Port
-
-        Dashworks API port number. Default = 8443
+        Dashworks instance. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
@@ -24,34 +20,41 @@ function Get-DwImportDeviceFeed {
 
         Optional. The id for the device feed. Omit to get all device feeds.
 
-        .PARAMETER FeedName
+        .PARAMETER Name
 
         Optional. Name of device feed to find. Can only be used when ImportId is not specified.
 
         .EXAMPLE
 
-        PS> Get-DwImportDeviceFeed -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Get-DwImportDeviceFeed -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+
+        .EXAMPLE
+
+        PS> Get-DwImportDeviceFeed -Name "My Device Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
         [string]$Instance,
-        [Parameter(Mandatory=$false)]
-        [int]$Port = 8443,
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
-        [parameter(Mandatory=$false)]
+        [parameter(Mandatory=$false, ParameterSetName="ImportId")]
         [int]$ImportId,
-        [parameter(Mandatory=$false)]
-        [string]$FeedName
+        [parameter(Mandatory=$false, ParameterSetName="Name")]
+        [string]$Name
     )
 
-    if ($ImportId -and $FeedName) { throw "Cannot specify both ImportId and FeedName."}
-
-    $uri = "https://{0}:{1}/apiv2/imports/devices" -f $Instance, $Port
-    if ($ImportId) { $uri += "/{0}" -f $ImportId }
-    if ($FeedName) { $uri += "?filter=eq(name,'{0}')" -f $FeedName}
+    $uri = "{0}/apiv2/imports/devices" -f $Instance
+    switch ($PSCmdlet.ParameterSetName) {
+        "ImportId" {
+            $uri += "/{0}" -f $ImportId
+        }
+        "Name" {
+            $uri += "?filter="
+            $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Name)
+        }
+    }
 
     $headers = @{'x-api-key' = $APIKey}
 

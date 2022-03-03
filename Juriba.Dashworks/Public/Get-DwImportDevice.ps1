@@ -13,11 +13,7 @@ function Get-DwImportDevice {
 
         .PARAMETER Instance
 
-        Dashworks instance. For example, myinstance.dashworks.app
-
-        .PARAMETER Port
-
-        Dashworks API port number. Default = 8443
+        Dashworks instance. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
@@ -47,16 +43,16 @@ function Get-DwImportDevice {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-DwImportDevice -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+        PS> Get-DwImportDevice -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
         .EXAMPLE
-        PS> Get-DwImportDevice -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
+        PS> Get-DwImportDevice -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
 
         .EXAMPLE
-        PS> Get-DwImportDevice -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
+        PS> Get-DwImportDevice -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
 
         .EXAMPLE
-        PS> Get-DwImportDevice -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
+        PS> Get-DwImportDevice -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
 
          #>
 
@@ -64,8 +60,6 @@ function Get-DwImportDevice {
     param (
         [Parameter(Mandatory=$true)]
         [string]$Instance,
-        [Parameter(Mandatory=$false)]
-        [int]$Port = 8443,
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
         [parameter(Mandatory=$false, ParameterSetName="UniqueIdentifier")]
@@ -82,7 +76,7 @@ function Get-DwImportDevice {
     )
 
     $limit = 1000 # page size
-    $uri = "https://{0}:{1}/apiv2/imports/devices/{2}/items" -f $Instance, $Port, $ImportId
+    $uri = "{0}/apiv2/imports/devices/{1}/items" -f $Instance, $ImportId
 
     switch ($PSCmdlet.ParameterSetName) {
         "UniqueIdentifier" {

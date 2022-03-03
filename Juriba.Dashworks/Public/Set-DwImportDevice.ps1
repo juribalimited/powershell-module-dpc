@@ -10,11 +10,7 @@ function Set-DwImportDevice {
 
         .PARAMETER Instance
 
-        Dashworks instance. For example, myinstance.dashworks.app
-
-        .PARAMETER Port
-
-        Dashworks API port number. Default = 8443
+        Dashworks instance. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
@@ -33,7 +29,7 @@ function Set-DwImportDevice {
         Json payload with updated device details.
 
         .EXAMPLE
-        PS> Set-DwImportDevice -ImportId 1 -UniqueIdentifier "w123abc" -JsonBody $jsonBody -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Set-DwImportDevice -ImportId 1 -UniqueIdentifier "w123abc" -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
 
@@ -41,8 +37,6 @@ function Set-DwImportDevice {
     param (
         [Parameter(Mandatory=$true)]
         [string]$Instance,
-        [Parameter(Mandatory=$false)]
-        [int]$Port = 8443,
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
         [parameter(Mandatory=$true)]
@@ -58,7 +52,7 @@ function Set-DwImportDevice {
         [string]$JsonBody
     )
 
-    $uri = "https://{0}:{1}/apiv2/imports/devices/{2}/items/{3}" -f $Instance, $Port, $ImportId, $UniqueIdentifier
+    $uri = "{0}/apiv2/imports/devices/{1}/items/{2}" -f $Instance, $ImportId, $UniqueIdentifier
     $headers = @{'x-api-key' = $APIKey}
 
     try {
