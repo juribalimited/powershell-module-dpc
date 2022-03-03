@@ -6,8 +6,9 @@ those devices into Dashworks.
 
 .DESCRIPTION
 A sample script to query a CSV file for devices and import
-those devices into Dashworks. Script will either update or create
-the device.
+those devices into Dashworks. Script assumes that the CSV file
+columns match the json schema for the devices. Script will
+either update or create the device.
 
 #>
 
@@ -44,8 +45,7 @@ $importId = $feed.id
 
 Write-Information ("Using feed id {0}" -f $importId) -InformationAction Continue
 
-# Run query against MECM database
-# Write-Information ("MECM query returned {0} rows." -f $table.count) -InformationAction Continue
+# read data fom CSV file
 $csvFile = Import-Csv -Path $Path
 
 # build hashtable for job
@@ -73,7 +73,7 @@ $job = $csvFile | ForEach-Object -AsJob -ThrottleLimit 16 -Parallel {
     }
     else {
         $result = New-DwImportDevice @using:DashworksParams -ImportId $using:importId -JsonBody $jsonBody
-        #check result, for a new device we expect the return object to contain the device
+        # check result, for a new device we expect the return object to contain the device
         if ($result -And -Not $result.uniqueIdentifier) {
             Write-Error $result
         }
