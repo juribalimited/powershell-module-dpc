@@ -10,11 +10,7 @@ function Set-DwImportDeviceFeed {
 
         .PARAMETER Instance
 
-        Dashworks instance. For example, myinstance.dashworks.app
-
-        .PARAMETER Port
-
-        Dashworks API port number. Default = 8443
+        Dashworks instance. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
@@ -34,15 +30,13 @@ function Set-DwImportDeviceFeed {
 
         .EXAMPLE
 
-        PS> Set-DwImportDeviceFeed -ImportId 1 -Name "My New Import Name" -Enabled $false -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Set-DwImportDeviceFeed -ImportId 1 -Name "My New Import Name" -Enabled $false -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory=$true)]
         [string]$Instance,
-        [Parameter(Mandatory=$false)]
-        [int]$Port = 8443,
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
         [parameter(Mandatory=$true)]
@@ -57,7 +51,7 @@ function Set-DwImportDeviceFeed {
         throw "Either Name or Enabled must be specified."
     }
 
-    $uri = "https://{0}:{1}/apiv2/imports/devices/{2}" -f $Instance, $Port, $ImportId
+    $uri = "{0}/apiv2/imports/devices/{1}" -f $Instance, $ImportId
     $headers = @{'x-api-key' = $APIKey}
 
     $payload = @{}

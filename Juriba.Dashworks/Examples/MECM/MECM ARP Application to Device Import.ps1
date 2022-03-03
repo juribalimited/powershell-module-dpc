@@ -15,8 +15,6 @@ Script assumes the applications and devices already exist and will skip thsoe wh
 param (
     [Parameter(Mandatory=$true)]
     [string]$DwInstance,
-    [Parameter(Mandatory=$false)]
-    [int]$DwPort = 8443,
     [Parameter(Mandatory=$true)]
     [string]$DwAPIKey,
     [Parameter(Mandatory=$true)]
@@ -31,11 +29,10 @@ param (
 
 #Requires -Version 7
 #Requires -Module SqlServer
-#Requires -Module @{ ModuleName = 'Juriba.Dashworks'; ModuleVersion = '0.0.14' }
+#Requires -Module Juriba.Dashworks
 
 $DashworksParams = @{
     Instance = $DwInstance
-    Port = $DwPort
     APIKey = $DwAPIKey
 }
 
@@ -46,7 +43,7 @@ $MecmParams = @{
 }
 
 # Get DW feed
-$feed = Get-DwImportDeviceFeed @DashworksParams -FeedName $DwFeedName
+$feed = Get-DwImportDeviceFeed @DashworksParams -Name $DwFeedName
 # If it doesnt exist, create it
 if (-Not $feed) {
     $feed = New-DwImportDeviceFeed @DashworksParams -Name $DwFeedName -Enabled $true

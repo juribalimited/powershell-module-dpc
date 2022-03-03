@@ -15,8 +15,6 @@ the device.
 param (
     [Parameter(Mandatory=$true)]
     [string]$DwInstance,
-    [Parameter(Mandatory=$false)]
-    [int]$DwPort = 8443,
     [Parameter(Mandatory=$true)]
     [string]$DwAPIKey,
     [Parameter(Mandatory=$true)]
@@ -30,12 +28,11 @@ param (
 
 $DashworksParams = @{
     Instance = $DwInstance
-    Port = $DwPort
     APIKey = $DwAPIKey
 }
 
 # Get DW feed
-$feed = Get-DwImportDeviceFeed @DashworksParams -FeedName $DwFeedName
+$feed = Get-DwImportDeviceFeed @DashworksParams -Name $DwFeedName
 # If it doesnt exist, create it
 if (-Not $feed) {
     $feed = New-DwImportDeviceFeed @DashworksParams -Name $DwFeedName -Enabled $true
