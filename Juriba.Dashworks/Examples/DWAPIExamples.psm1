@@ -229,7 +229,7 @@ Function Convert-DwAPIDeviceFromInTune($IntuneDataTable){
     [OutputType([System.Data.DataTable])]
     $dataTable = New-Object System.Data.DataTable
 
-    $dataTable.Columns.Add("uniqueComputerIdentifier", [string]) | Out-Null
+    $dataTable.Columns.Add("uniqueIdentifier", [string]) | Out-Null
     $dataTable.Columns.Add("hostname", [string]) | Out-Null
     $dataTable.Columns.Add("operatingSystemName", [string]) | Out-Null
     $dataTable.Columns.Add("operatingSystemVersion", [string]) | Out-Null
