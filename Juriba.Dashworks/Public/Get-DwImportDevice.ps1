@@ -123,6 +123,8 @@ function Get-DwImportDevice {
                     "Full"  { $pagedResult.Content | ConvertFrom-Json }
                 }
             }
+            "Basic" { ($result.Content | ConvertFrom-Json).UniqueComputerIdentifier }
+            "Full"  { $result.Content }
         }
         return $device
     }
