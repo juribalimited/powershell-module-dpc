@@ -32,7 +32,7 @@ function Get-DwImportApplication {
 
         .PARAMETER Filter
 
-        Filter for application search. Cannot be used with Hostname or UniqueIdentifier.
+        Filter for application search.
 
         .PARAMETER InfoLevel
 
