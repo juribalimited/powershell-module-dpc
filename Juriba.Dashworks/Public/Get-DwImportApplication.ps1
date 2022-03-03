@@ -1,15 +1,14 @@
-function Get-DwImportDevice {
+function Get-DwImportApplication {
     <#
         .SYNOPSIS
-        Gets one or more Dashworks devices from the import API.
+        Gets a Dashworks application from the import API.
 
         .DESCRIPTION
-        Gets a Dashworks device from the import API.
-        Takes the ImportId as an input.
-        Optionally takes a UnqiueIdentifier as an input and will return a single device with that UniqueIdentifier.
-        Optionally takes a Hostname as an input and will return all devices matching that hostname.
-        Optionally takes a Filter as an input and will return all devices matching that filter. See swagger documentation for examples of using filters.
-        If specified, only one of UniqueIdentifier, Hostname or Filter can be supplied. Omit all to return all devices for the import.
+        Gets a Dashworks application from the import API.
+        Takes the ImportId and UniqueIdentifier as an input.
+        Optionally takes a UnqiueIdentifier as an input and will return a single application with that UniqueIdentifier.
+        Optionally takes a Filter as an input and will return all applications matching that filter. See swagger documentation for examples of using filters.
+        If specified, only one of UniqueIdentifier or Filter can be supplied. Omit all to return all devices for the import.
 
         .PARAMETER Instance
 
@@ -25,40 +24,33 @@ function Get-DwImportDevice {
 
         .PARAMETER UniqueIdentifier
 
-        UniqueIdentifier for the device. Cannot be used with Hostname or Filter.
+        UniqueIdentifier for the application.
 
         .PARAMETER ImportId
 
-        ImportId for the device.
-
-        .PARAMETER Hostname
-
-        Hostname for the deivce. Cannot be used with UniqueIdentifier or Filter.
+        ImportId for the application.
 
         .PARAMETER Filter
 
-        Filter for device search. Cannot be used with Hostname or UniqueIdentifier.
+        Filter for application search.
 
         .PARAMETER InfoLevel
 
         Optional. Sets the level of information that this function returns. Accepts Basic or Full.
-        Basic returns only the UniqueIdentifier, use when confirming a device exists.
-        Full returns the full json object for the device.
+        Basic returns only the UniqueIdentifier, use when confirming an application exists.
+        Full returns the full json object for the application.
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-DwImportDevice -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+        PS> Get-DwImportApplication -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
         .EXAMPLE
-        PS> Get-DwImportDevice -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
+        PS> Get-DwImportApplication -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
 
         .EXAMPLE
-        PS> Get-DwImportDevice -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
+        PS> Get-DwImportApplication -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Manufacturer, 'zxy123456')"
 
-        .EXAMPLE
-        PS> Get-DwImportDevice -Instance "myinstance.dashworks.app" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
-
-         #>
+    #>
 
     [CmdletBinding(DefaultParameterSetName="UniuqeIdentifier")]
     param (
@@ -70,8 +62,6 @@ function Get-DwImportDevice {
         [string]$APIKey,
         [parameter(Mandatory=$false, ParameterSetName="UniqueIdentifier")]
         [string]$UniqueIdentifier,
-        [parameter(Mandatory=$false, ParameterSetName="Hostname")]
-        [string]$Hostname,
         [parameter(Mandatory=$false, ParameterSetName="Filter")]
         [string]$Filter,
         [parameter(Mandatory=$true)]
@@ -81,17 +71,12 @@ function Get-DwImportDevice {
         [string]$InfoLevel = "Basic"
     )
 
-    $limit = 1000 # page size
-    $uri = "https://{0}:{1}/apiv2/imports/devices/{2}/items" -f $Instance, $Port, $ImportId
+    $limit = 50 # page size
+    $uri = "https://{0}:{1}/apiv2/imports/applications/{2}/items" -f $Instance, $Port, $ImportId
 
     switch ($PSCmdlet.ParameterSetName) {
         "UniqueIdentifier" {
             $uri += "/{0}" -f $UniqueIdentifier
-        }
-        "Hostname" {
-            $uri += "?filter="
-            $uri += [System.Web.HttpUtility]::UrlEncode("eq(hostname,'{0}')" -f $Hostname)
-            $uri += "&limit={0}" -f $limit
         }
         "Filter" {
             $uri += "?filter="
@@ -102,13 +87,12 @@ function Get-DwImportDevice {
             $uri += "?limit={0}" -f $limit
         }
     }
-
     $headers = @{'x-api-key' = $APIKey}
 
-    $device = ""
+    $application = ""
     try {
         $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json"
-        $device = switch($InfoLevel) {
+        $application = switch($InfoLevel) {
             "Basic" { ($result.Content | ConvertFrom-Json).UniqueIdentifier }
             "Full"  { $result.Content | ConvertFrom-Json }
         }
@@ -118,22 +102,23 @@ function Get-DwImportDevice {
             for ($page = 2; $page -le $totalPages; $page++) {
                 $pagedUri = $uri + "&page={0}" -f $page
                 $pagedResult = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $headers -ContentType "application/json"
-                $device += switch($InfoLevel) {
+                $application += switch($InfoLevel) {
                     "Basic" { ($pagedResult.Content | ConvertFrom-Json).UniqueIdentifier }
                     "Full"  { $pagedResult.Content | ConvertFrom-Json }
                 }
             }
         }
-        return $device
+        return $application
     }
     catch {
         if ($_.Exception.Response.StatusCode.Value__ -eq 404) {
-            # 404 means the device was not found, don't treat this as an error
-            # as we expect this function to be used to check if a device exists
-            Write-Verbose "device not found"
+            # 404 means the application was not found, don't treat this as an error
+            # as we expect this function to be used to check if a application exists
+            Write-Verbose "application not found"
         }
         else {
             Write-Error $_
         }
     }
+
 }

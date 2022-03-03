@@ -6,7 +6,7 @@ function Remove-DwImportDevice {
 
         .DESCRIPTION
         Deletes a device in the import API.
-        Takes the ImportId and UniqueComputerIdentifier as an input.
+        Takes the ImportId and UniqueIdentifier as an input.
 
         .PARAMETER Instance
 
@@ -20,16 +20,16 @@ function Remove-DwImportDevice {
 
         Dashworks API Key.
 
-        .PARAMETER UniqueComputerIdentifier
+        .PARAMETER UniqueIdentifier
 
-        UniqueComputerIdentifier for the device.
+        UniqueIdentifier for the device.
 
         .PARAMETER ImportId
 
         ImportId for the device.
 
         .EXAMPLE
-        PS> Remove-DwImportDevice -ImportId 1 -UniqueComputerIdentifier "w123abc" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Remove-DwImportDevice -ImportId 1 -UniqueIdentifier "w123abc" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
 
     #>
 
@@ -42,16 +42,16 @@ function Remove-DwImportDevice {
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
         [parameter(Mandatory=$true)]
-        [string]$UniqueComputerIdentifier,
+        [string]$UniqueIdentifier,
         [parameter(Mandatory=$true)]
         [int]$ImportId
     )
 
-    $uri = "https://{0}:{1}/apiv2/imports/devices/{2}/items/{3}" -f $Instance, $Port, $ImportId, $UniqueComputerIdentifier
+    $uri = "https://{0}:{1}/apiv2/imports/devices/{2}/items/{3}" -f $Instance, $Port, $ImportId, $UniqueIdentifier
     $headers = @{'x-api-key' = $APIKey}
 
     try {
-        if ($PSCmdlet.ShouldProcess($UniqueComputerIdentifier)) {
+        if ($PSCmdlet.ShouldProcess($UniqueIdentifier)) {
             $result = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $headers
             return $result
         }
