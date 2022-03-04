@@ -1,23 +1,23 @@
 #requires -Version 7
-function Get-DwImportUserFeed {
+function Get-DwImportDepartmentFeed {
     <#
         .SYNOPSIS
-        Gets user imports.
+        Gets department imports.
         .DESCRIPTION
-        Gets one or more user feeds.
+        Gets one or more department feeds.
         Use ImportId to get a specific feed or omit for all feeds.
         .PARAMETER Instance
         Dashworks instance. For example, https://myinstance.dashworks.app:8443
         .PARAMETER APIKey
         Dashworks API Key.
         .PARAMETER ImportId
-        Optional. The id for the user feed. Omit to get all user feeds.
+        Optional. The id for the department feed. Omit to get all department feeds.
         .PARAMETER Name
-        Optional. Name of user feed to find. Can only be used when ImportId is not specified.
+        Optional. Name of department feed to find. Can only be used when ImportId is not specified.
         .EXAMPLE
-        PS> Get-DwImportUserFeed -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Get-DwImportDepartmentFeed -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
         .EXAMPLE
-        PS> Get-DwImportUserFeed -Name "My User Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Get-DwImportDepartmentFeed -Name "My Department Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
     [CmdletBinding()]
     param (
@@ -31,7 +31,7 @@ function Get-DwImportUserFeed {
         [string]$Name
     )
 
-    $uri = "{0}/apiv2/imports/users" -f $Instance
+    $uri = "{0}/apiv2/imports/departments" -f $Instance
     switch ($PSCmdlet.ParameterSetName) {
         "ImportId" {
             $uri += "/{0}" -f $ImportId
