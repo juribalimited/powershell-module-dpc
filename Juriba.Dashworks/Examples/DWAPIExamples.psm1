@@ -1015,7 +1015,7 @@ function Invoke-DwAPIUploadUserDepartmentFeedFromAD {
 
     $JsonDepartmentArray = @()
     $SeenCompanies = @()
-    $SeenCompanies += '' 
+    $SeenCompanies += ''
 
     foreach($Department in $Departments)
     {
