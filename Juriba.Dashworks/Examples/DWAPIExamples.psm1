@@ -355,7 +355,7 @@ function Invoke-DwAPIUploadDeviceFeedDataTable{
     .Description
     Takes a System.Data.Datatable object with the columns required for the DwAPI device. Inserts these devices one at a time.
 
-    .Parameter APIUri
+    .Parameter Instance
     The URI to the Dashworks instance being examined.
 
     .Parameter APIKey
@@ -376,14 +376,14 @@ function Invoke-DwAPIUploadDeviceFeedDataTable{
 
     .Example
     # Get the device feed id for the named feed.
-    Write-DeviceFeedData -APIUri $uriRoot -DWDataTable $dtDashworksInput -FeedId $DeviceImportID -APIKey $APIKey
+    Write-DeviceFeedData -Instance $Instance -DWDataTable $dtDashworksInput -FeedId $DeviceImportID -APIKey $APIKey
     #>
 
     [OutputType([string])]
     [CmdletBinding(SupportsShouldProcess)]
     Param (
         [parameter(Mandatory=$True)]
-        [string]$APIUri,
+        [string]$Instance,
 
         [Parameter(Mandatory=$True)]
         [System.Data.DataTable]$DWDataTable,
@@ -407,7 +407,7 @@ function Invoke-DwAPIUploadDeviceFeedDataTable{
             return 'Device feed not found by name or ID'
         }
 
-        $FeedId = Get-DwAPIDeviceFeed -APIUri $APIUri -ApiKey $APIKey -FeedName $FeedName
+        $FeedId = Get-DwImportDeviceFeed -Instance $Instance -ApiKey $APIKey -Name $FeedName
 
         if (-not $FeedId)
         {
@@ -420,7 +420,7 @@ function Invoke-DwAPIUploadDeviceFeedDataTable{
         "X-API-KEY" = "$APIKey"
     }
 
-    $uri = "$APIUri/apiv2/imports/devices/$FeedId/items"
+    $uri = "{0}/apiv2/imports/devices/{1}/items" -f $Instance, $FeedId
 
     foreach($Row in $DWDataTable)
     {
@@ -451,7 +451,7 @@ function Invoke-DwAPIAUploadUserFeedDataTable {
     .Description
     Takes a System.Data.Datatable object with the columns required for the DwAPI device. Inserts these devices one at a time.
 
-    .Parameter APIUri
+    .Parameter Instance
     The URI to the Dashworks instance being examined.
 
     .Parameter APIKey
@@ -472,14 +472,14 @@ function Invoke-DwAPIAUploadUserFeedDataTable {
 
     .Example
     # Get the device feed id for the named feed.
-    Write-DeviceFeedData -APIUri $uriRoot -DWDataTable $dtDashworksInput -FeedId $DeviceImportID -APIKey $APIKey
+    Write-DeviceFeedData -Instance $Instance -DWDataTable $dtDashworksInput -FeedId $DeviceImportID -APIKey $APIKey
     #>
 
     [OutputType([string])]
     [CmdletBinding(SupportsShouldProcess)]
     Param (
         [parameter(Mandatory=$True)]
-        [string]$APIUri,
+        [string]$Instance,
 
         [Parameter(Mandatory=$True)]
         [System.Data.DataTable]$DWDataTable,
@@ -502,7 +502,7 @@ function Invoke-DwAPIAUploadUserFeedDataTable {
             return 'Device feed not found by name or ID'
         }
 
-        $FeedId = Get-DwAPIUserFeed -APIUri $APIUri -ApiKey $APIKey -FeedName $FeedName
+        $FeedId = Get-DwImportDeviceFeed -Instance $Instance -ApiKey $APIKey -Name $FeedName
 
         if (-not $FeedId)
         {
@@ -515,7 +515,7 @@ function Invoke-DwAPIAUploadUserFeedDataTable {
         "X-API-KEY" = "$APIKey"
     }
 
-    $uri = "$APIUri/apiv2/imports/users/$FeedId/items"
+    $uri = "{0}/apiv2/imports/users/{1}/items" -f $Instance, $FeedId
 
     foreach($Row in $DWDataTable)
     {
@@ -548,7 +548,7 @@ function Invoke-DwAPIAUploadUserFeedFromAD {
     Takes all users from Get-ADUser (optional server/cred parameters) transforms the fields into a datatable in the format required
     for the DW API and then uploads that user data to a named or numbered data feed.
 
-    .Parameter APIUri
+    .Parameter Instance
     The URI to the Dashworks instance being examined.
 
     .Parameter APIKey
@@ -572,12 +572,12 @@ function Invoke-DwAPIAUploadUserFeedFromAD {
 
     .Example
     # Get the device feed id for the named feed.
-    Invoke-DwAPIAUploadUserFeedFromAD -APIUri $uriRoot -APIKey $APIKey -FeedName "AD Users"
+    Invoke-DwAPIAUploadUserFeedFromAD -Instance $Instance -APIKey $APIKey -FeedName "AD Users"
     #>
 
     Param (
         [parameter(Mandatory=$True)]
-        [string]$APIUri,
+        [string]$Instance,
 
         [Parameter(Mandatory=$True)]
         [string]$APIKey,
@@ -670,7 +670,7 @@ function Invoke-DwAPIAUploadUserFeedFromAD {
             throw 'Device feed not found by name or ID'
         }
 
-        $FeedId = Get-DwAPIUserFeed -APIUri $APIUri -ApiKey $APIKey -FeedName $FeedName
+        $FeedId = Get-DwAPIUserFeed -Instance $Instance -ApiKey $APIKey -FeedName $FeedName
 
         if (-not $FeedId)
         {
@@ -683,7 +683,7 @@ function Invoke-DwAPIAUploadUserFeedFromAD {
         "X-API-KEY" = "$APIKey"
     }
 
-    $uri = "$APIUri/apiv2/imports/users/$FeedId/items"
+    $uri = "{0}/apiv2/imports/users/{1}/items" -f $Instance, $FeedId
 
     foreach($Row in $dataTable)
     {
@@ -706,7 +706,7 @@ function Invoke-DwAPIUploadUserLocationFeedFromAD {
     Takes all users from Get-ADUser (optional server/cred parameters) transforms the fields into a datatable in the format required
     for the DW API and then uploads that user data to a named or numbered data feed.
 
-    .Parameter APIUri
+    .Parameter Instance
     The URI to the Dashworks instance being examined.
 
     .Parameter APIKey
@@ -730,12 +730,12 @@ function Invoke-DwAPIUploadUserLocationFeedFromAD {
 
     .Example
     # Get the device feed id for the named feed.
-    Write-DeviceFeedData -APIUri $uriRoot -DWDataTable $dtDashworksInput -FeedId $DeviceImportID -APIKey $APIKey
+    Write-DeviceFeedData -Instance $Instance -DWDataTable $dtDashworksInput -FeedId $DeviceImportID -APIKey $APIKey
     #>
 
     Param (
         [parameter(Mandatory=$True)]
-        [string]$APIUri,
+        [string]$Instance,
 
         [Parameter(Mandatory=$True)]
         [string]$APIKey,
@@ -870,7 +870,7 @@ function Invoke-DwAPIUploadUserLocationFeedFromAD {
         "X-API-KEY" = "$APIKey"
     }
 
-    $uri = "$APIUri/apiv2/imports/Locations/$LocationFeedID/items"
+    $uri = "{0}/apiv2/imports/Locations/{1}/items" -f $Instance, $LocationFeedID
 
     #Prior to insert to the Location data, clear down the existing data.
     Invoke-RestMethod -Headers $DeleteHeaders -Uri $uri -Method Delete
@@ -884,3 +884,188 @@ function Invoke-DwAPIUploadUserLocationFeedFromAD {
     Return "$RowCount locations added"
 }
 Export-Modulemember -function Invoke-DwAPIUploadUserLocationFeedFromAD
+
+function Invoke-DwAPIUploadUserDepartmentFeedFromAD {
+    <#
+    .Synopsis
+    Pulls user data from Get-ADUser and upload to a DW User Department feed
+
+    .Description
+    Takes all users from Get-ADUser (optional server/cred parameters) transforms the fields into a datatable in the format required
+    for the DW API and then uploads that user data to a named or numbered data feed.
+
+    .Parameter Instance
+    The URI to the Dashworks instance being examined.
+
+    .Parameter APIKey
+    The APIKey for a user with access to the required resources.
+
+    .Parameter DepartmentFeedID
+    The id of the Department feed to be used.
+
+    .Parameter UserFeedId
+    The id of the user feed in question.
+
+    .Parameter ADServer
+    The name of a DC to connect Get-ADUser to.
+
+    .Parameter Credential
+    The credentials to use when calling Get-ADUser of type PSCredential.
+
+    .Outputs
+    Output type [string]
+    Text confirming the number of rows to be inserted.
+
+    .Example
+    # Get the device feed id for the named feed.
+    Write-DeviceFeedData -Instance $Instance -DWDataTable $dtDashworksInput -FeedId $DeviceImportID -APIKey $APIKey
+    #>
+
+    Param (
+        [parameter(Mandatory=$True)]
+        [string]$Instance,
+
+        [Parameter(Mandatory=$True)]
+        [string]$APIKey,
+
+        [parameter(Mandatory=$True)]
+        [string]$DepartmentFeedID,
+
+        [parameter(Mandatory=$True)]
+        [string]$UserFeedId,
+
+        [parameter(Mandatory=$False)]
+        [string]$ADServer,
+
+        [parameter(Mandatory=$False)]
+        [PSCredential]$Credential
+    )
+
+    $Properties = @("Department","Company")
+
+    if ($ADServer)
+    {
+        if ($Credential)
+        {
+            $ADUsers = get-aduser -Filter * -Properties $properties -Server $ADServer -Credential $Credential
+        }
+        else
+        {
+            $ADUsers = get-aduser -Filter * -Properties $properties -Server $ADServer
+        }
+    }else{
+        if ($Credential)
+        {
+            $ADUsers = get-aduser -Filter * -Properties $properties -Credential $Credential
+        }
+        else
+        {
+            $ADUsers = get-aduser -Filter * -Properties $properties
+        }
+    }
+
+    $Departments = @()
+    $UserDepartments = @{}
+
+    foreach($User in $ADUsers)
+    {
+        $uniqueIdentifier=$null
+        $CompanyUID=$null
+
+        if ("{0}{1}" -f $User.Company, $User.Department -ne "")
+        {
+            $stringAsStream = [System.IO.MemoryStream]::new()
+            $writer = [System.IO.StreamWriter]::new($stringAsStream)
+            $writer.write("$($User.Company)#$($User.Department)")
+            $writer.Flush()
+            $stringAsStream.Position = 0
+            $uniqueIdentifier = (Get-FileHash -InputStream $stringAsStream | Select-Object -property Hash).Hash
+
+            if ($User.Company)
+            {
+                $stringAsStream = [System.IO.MemoryStream]::new()
+                $writer = [System.IO.StreamWriter]::new($stringAsStream)
+                $writer.write($User.Company)
+                $writer.Flush()
+                $stringAsStream.Position = 0
+                $CompanyUID = (Get-FileHash -InputStream $stringAsStream | Select-Object -property Hash).Hash
+            }
+
+            if ($null -eq $Departments.uniqueidentifier)
+            {
+                $Department = New-Object PSObject
+                $Department | Add-Member -type NoteProperty -Name 'uniqueIdentifier' -Value $uniqueIdentifier
+                $Department | Add-Member -type NoteProperty -Name 'Department' -Value $User.Department
+                $Department | Add-Member -type NoteProperty -Name 'CompanyUID' -Value $CompanyUID
+                $Department | Add-Member -type NoteProperty -Name 'Company' -Value $User.Company
+                $Departments += $Department
+            }
+            elseif (-not $Departments.uniqueidentifier.contains($uniqueIdentifier))
+            {
+                $Department = New-Object PSObject
+                $Department | Add-Member -type NoteProperty -Name 'uniqueIdentifier' -Value $uniqueIdentifier
+                $Department | Add-Member -type NoteProperty -Name 'Department' -Value $User.Department
+                $Department | Add-Member -type NoteProperty -Name 'CompanyUID' -Value $CompanyUID
+                $Department | Add-Member -type NoteProperty -Name 'Company' -Value $User.Company
+                $Departments += $Department
+            }
+            $UserDepartments.Add($($User.SamAccountName),$uniqueIdentifier)
+        }
+    }
+
+    $JsonDepartmentArray = @()
+    $SeenCompanies = @()
+    $SeenCompanies += '' 
+
+    foreach($Department in $Departments)
+    {
+        $DeptUsers = @()
+        foreach($User in $ADUsers)
+        {
+            if($UserDepartments[$($User.SamAccountName)] -eq $Department.uniqueIdentifier)
+            {
+                $DeptUsers += "/imports/users/$UserFeedID/items/$($User.SamAccountName)"
+            }
+        }
+        if (-not $SeenCompanies.Contains($Department.CompanyUID))
+        {
+            $JSonObject = [pscustomobject]@{
+                uniqueIdentifier = $Department.CompanyUID
+                name = $Department.Company
+            }
+            $JsonDepartmentArray += $JSonObject | ConvertTo-Json
+        }
+        $JSonObject = [pscustomobject]@{
+            uniqueIdentifier = $Department.uniqueIdentifier
+            name = $Department.Department
+            parentUniqueIdentifier = $Department.CompanyUID
+            users = $DeptUsers
+        }
+        $JsonDepartmentArray += $JSonObject | ConvertTo-Json
+    }
+
+    $RowCount = 0
+
+    $PostHeaders = @{
+        "content-type" = "application/json"
+        "X-API-KEY" = "$APIKey"
+    }
+
+    $DeleteHeaders = @{
+        "X-API-KEY" = "$APIKey"
+    }
+
+    $uri = "{0}/apiv2/imports/Departments/{1}/items" -f $Instance, $DepartmentFeedID
+
+    #Prior to insert to the Location data, clear down the existing data.
+    Invoke-RestMethod -Headers $DeleteHeaders -Uri $uri -Method Delete
+
+    foreach($Body in $JsonLocationArray)
+    {
+        Invoke-RestMethod -Headers $PostHeaders -Uri $uri -Method Post -Body $Body | out-null
+        $RowCount++
+    }
+
+    Return "$RowCount locations added"
+}
+Export-Modulemember -function Invoke-DwAPIUploadUserDepartmentFeedFromAD
