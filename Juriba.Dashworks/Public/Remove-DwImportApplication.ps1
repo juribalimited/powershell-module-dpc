@@ -1,11 +1,11 @@
 #Requires -Version 7
-function Remove-DwImportDevice {
+function Remove-DwImportApplication {
     <#
         .SYNOPSIS
-        Deletes a device in the import API.
+        Deletes an application in the import API.
 
         .DESCRIPTION
-        Deletes a device in the import API.
+        Deletes an application in the import API.
         Takes the ImportId and UniqueIdentifier as an input.
 
         .PARAMETER Instance
@@ -18,14 +18,14 @@ function Remove-DwImportDevice {
 
         .PARAMETER UniqueIdentifier
 
-        UniqueIdentifier for the device.
+        UniqueIdentifier for the application.
 
         .PARAMETER ImportId
 
-        ImportId for the device.
+        ImportId for the application.
 
         .EXAMPLE
-        PS> Remove-DwImportDevice -ImportId 1 -UniqueIdentifier "w123abc" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Remove-DwImportApplication -ImportId 1 -UniqueIdentifier "app123" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
 
@@ -41,7 +41,7 @@ function Remove-DwImportDevice {
         [int]$ImportId
     )
 
-    $uri = "{0}/apiv2/imports/devices/{1}/items/{2}" -f $Instance, $ImportId, $UniqueIdentifier
+    $uri = "{0}/apiv2/imports/applications/{1}/items/{2}" -f $Instance, $ImportId, $UniqueIdentifier
     $headers = @{'x-api-key' = $APIKey}
 
     try {

@@ -1,11 +1,11 @@
 #Requires -Version 7
-function New-DwImportDevice {
+function New-DwImportApplication {
     <#
         .SYNOPSIS
-        Creates a new Dashworks device using the import API.
+        Creates a new Dashworks application using the import API.
 
         .DESCRIPTION
-        Creates a new Dashworks device using the import API.
+        Creates a new Dashworks application using the import API.
         Takes the ImportId and JsonBody as an input.
 
         .PARAMETER Instance
@@ -18,14 +18,14 @@ function New-DwImportDevice {
 
         .PARAMETER ImportId
 
-        ImportId for the device.
+        ImportId for the application.
 
         .PARAMETER JsonBody
 
-        Json payload with updated device details.
+        Json payload with updated application details.
 
         .EXAMPLE
-        PS> New-DwImportDevice -ImportId 1 -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> New-DwImportApplication -ImportId 1 -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
 
     [CmdletBinding(SupportsShouldProcess)]
@@ -45,7 +45,7 @@ function New-DwImportDevice {
         [string]$JsonBody
     )
 
-    $uri = "{0}/apiv2/imports/devices/{2}/items" -f $Instance, $ImportId
+    $uri = "{0}/apiv2/imports/applications/{1}/items" -f $Instance, $ImportId
     $headers = @{'x-api-key' = $APIKey}
 
     try {

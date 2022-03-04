@@ -1,11 +1,11 @@
 #Requires -Version 7
-function Set-DwImportDevice {
+function Set-DwImportApplication {
     <#
         .SYNOPSIS
-        Updates a device in the import API.
+        Updates a application in the import API.
 
         .DESCRIPTION
-        Updates a device in the import API.
+        Updates a application in the import API.
         Takes the ImportId, UniqueIdentifier and jsonBody as an input.
 
         .PARAMETER Instance
@@ -18,18 +18,18 @@ function Set-DwImportDevice {
 
         .PARAMETER UniqueIdentifier
 
-        UniqueIdentifier for the device.
+        UniqueIdentifier for the application.
 
         .PARAMETER ImportId
 
-        ImportId for the device.
+        ImportId for the application.
 
         .PARAMETER JsonBody
 
-        Json payload with updated device details.
+        Json payload with updated application details.
 
         .EXAMPLE
-        PS> Set-DwImportDevice -ImportId 1 -UniqueIdentifier "w123abc" -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Set-DwImportApplication -ImportId 1 -UniqueIdentifier "app123" -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
 
@@ -52,7 +52,7 @@ function Set-DwImportDevice {
         [string]$JsonBody
     )
 
-    $uri = "{0}/apiv2/imports/devices/{1}/items/{2}" -f $Instance, $ImportId, $UniqueIdentifier
+    $uri = "{0}/apiv2/imports/applications/{1}/items/{2}" -f $Instance, $ImportId, $UniqueIdentifier
     $headers = @{'x-api-key' = $APIKey}
 
     try {
