@@ -100,7 +100,7 @@ foreach($User in $ADUsers)
     $uniqueIdentifier=$null
     if ("$($User.StreetAddress)$($User.City)$($User.State)$($User.PostalCode)$($User.co)" -ne "")
     {
-        
+
         $uniqueIdentifier = Get-StringHash -StringToHash "$($User.StreetAddress)$($User.City)$($User.State)$($User.PostalCode)$($User.co)"
 
         if ($null -eq $Locations.uniqueidentifier)

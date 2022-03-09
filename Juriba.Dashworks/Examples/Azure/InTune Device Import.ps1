@@ -299,7 +299,7 @@ function Invoke-DwImportDeviceFeedDataTable{
     $uri = "{0}/apiv2/imports/devices/{1}/items" -f $Instance, $ImportId
 
     $RowCount = 0
-    foreach($Row in $DWDataTable)
+    foreach($Row in $DWDeviceDataTable)
     {
         $Body = $null
         $Body = $Row | Select-Object * -ExcludeProperty ItemArray, Table, RowError, RowState, HasErrors | ConvertTo-Json

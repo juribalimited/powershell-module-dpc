@@ -121,7 +121,7 @@
 
     if (-not ($ImportId))
     {
-        if (-not ($FeedName))
+        if (-not ($Name))
         {
             throw 'User feed not found by name or ID'
         }

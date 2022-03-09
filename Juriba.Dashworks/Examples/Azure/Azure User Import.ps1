@@ -303,7 +303,7 @@ function Invoke-DwImportUserFeedDataTable {
     {
         $Body = $null
         $Body = $Row | Select-Object * -ExcludeProperty ItemArray, Table, RowError, RowState, HasErrors | ConvertTo-Json
- 
+
         Invoke-RestMethod -Headers $Postheaders -Uri $uri -Method Post -Body $Body | out-null
 
         $RowCount++
