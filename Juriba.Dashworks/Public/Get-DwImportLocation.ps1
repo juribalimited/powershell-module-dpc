@@ -29,7 +29,7 @@ function Get-DwImportLocation {
 
         .PARAMETER LocationName
 
-        Name for the location. 
+        Name for the location.
 
         .PARAMETER Filter
 

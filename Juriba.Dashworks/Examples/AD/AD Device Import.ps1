@@ -77,7 +77,7 @@ foreach($Device in $ADComputers)
     $NewRow.operatingSystemVersion = $Device.OperatingSystemVersion
     $NewRow.firstSeenDate = $Device.Created
     $NewRow.lastSeenDate = if ([datetime]::FromFileTime($Device.lastlogontimestamp) -gt '1753-01-01'){[datetime]::FromFileTime($Device.lastlogontimestamp)}else{[DBNull]::Value}
- 
+
     $dataTable.Rows.Add($NewRow)
 }
 
