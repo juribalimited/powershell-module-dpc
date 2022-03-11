@@ -1,15 +1,15 @@
-function Get-DwImportDevice {
+function Get-DwImportLocation {
     <#
         .SYNOPSIS
         Gets one or more Dashworks devices from the import API.
 
         .DESCRIPTION
-        Gets a Dashworks device from the import API.
+        Gets a Dashworks Location from the import API.
         Takes the ImportId as an input.
-        Optionally takes a UnqiueIdentifier as an input and will return a single device with that UniqueIdentifier.
-        Optionally takes a Hostname as an input and will return all devices matching that hostname.
-        Optionally takes a Filter as an input and will return all devices matching that filter. See swagger documentation for examples of using filters.
-        If specified, only one of UniqueIdentifier, Hostname or Filter can be supplied. Omit all to return all devices for the import.
+        Optionally takes a UnqiueIdentifier as an input and will return a single location with that UniqueIdentifier.
+        Optionally takes a Hostname as an input and will return all location matching that hostname.
+        Optionally takes a Filter as an input and will return all location matching that filter. See swagger documentation for examples of using filters.
+        If specified, only one of UniqueIdentifier, Hostname or Filter can be supplied. Omit all to return all locations for the import.
 
         .PARAMETER Instance
 
@@ -21,38 +21,29 @@ function Get-DwImportDevice {
 
         .PARAMETER UniqueIdentifier
 
-        UniqueIdentifier for the device. Cannot be used with Hostname or Filter.
+        UniqueIdentifier for the location. Cannot be used with LocationName or Filter.
 
         .PARAMETER ImportId
 
-        ImportId for the device.
+        ImportId for the location.
 
-        .PARAMETER Hostname
+        .PARAMETER LocationName
 
-        Hostname for the device. Cannot be used with UniqueIdentifier or Filter.
+        Name for the location. 
 
         .PARAMETER Filter
 
-        Filter for device search. Cannot be used with Hostname or UniqueIdentifier.
+        Filter for location search.
 
         .PARAMETER InfoLevel
 
         Optional. Sets the level of information that this function returns. Accepts Basic or Full.
-        Basic returns only the UniqueIdentifier, use when confirming a device exists.
-        Full returns the full json object for the device.
+        Basic returns only the UniqueIdentifier, use when confirming a location exists.
+        Full returns the full json object for the location.
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-DwImportDevice -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
-
-        .EXAMPLE
-        PS> Get-DwImportDevice -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
-
-        .EXAMPLE
-        PS> Get-DwImportDevice -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
-
-        .EXAMPLE
-        PS> Get-DwImportDevice -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
+        PS> Get-DwImportLocation -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Region, 'EU')"
 
          #>
 
@@ -64,8 +55,8 @@ function Get-DwImportDevice {
         [string]$APIKey,
         [parameter(Mandatory=$false, ParameterSetName="UniqueIdentifier")]
         [string]$UniqueIdentifier,
-        [parameter(Mandatory=$false, ParameterSetName="Hostname")]
-        [string]$Hostname,
+        [parameter(Mandatory=$false, ParameterSetName="LocationName")]
+        [string]$LocationName,
         [parameter(Mandatory=$false, ParameterSetName="Filter")]
         [string]$Filter,
         [parameter(Mandatory=$true)]
@@ -76,20 +67,20 @@ function Get-DwImportDevice {
     )
 
     $limit = 1000 # page size
-    $uri = "{0}/apiv2/imports/devices/{1}/items" -f $Instance, $ImportId
+    $uri = "{0}/apiv2/imports/locations/{1}/items" -f $Instance, $ImportId
 
     switch ($PSCmdlet.ParameterSetName) {
         "UniqueIdentifier" {
             $uri += "/{0}" -f $UniqueIdentifier
         }
-        "Hostname" {
+        "LocationName" {
             $uri += "?filter="
-            $uri += [System.Web.HttpUtility]::UrlEncode("eq(hostname,'{0}')" -f $Hostname)
+            $uri += [uri]::EscapeDataString("eq(name,'{0}')" -f $LocationName)
             $uri += "&limit={0}" -f $limit
         }
         "Filter" {
             $uri += "?filter="
-            $uri += [System.Web.HttpUtility]::UrlEncode("{0}" -f $Filter)
+            $uri += [uri]::EscapeDataString("{0}" -f $Filter)
             $uri += "&limit={0}" -f $limit
         }
         Default {
@@ -122,9 +113,9 @@ function Get-DwImportDevice {
     }
     catch {
         if ($_.Exception.Response.StatusCode.Value__ -eq 404) {
-            # 404 means the device was not found, don't treat this as an error
+            # 404 means the location was not found, don't treat this as an error
             # as we expect this function to be used to check if a device exists
-            Write-Verbose "device not found"
+            Write-Verbose "Location not found"
         }
         else {
             Write-Error $_

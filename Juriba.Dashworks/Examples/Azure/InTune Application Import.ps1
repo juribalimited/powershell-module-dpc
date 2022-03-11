@@ -84,17 +84,28 @@ Function Get-AzureAccessToken{
     $accessToken = Get-AzAccessToken -TenantId $TenantId -ClientId $ClientId -ClientSecret $ClientSecret
     #>
 }
-Function Get-IntuneDeviceTable([string]$accessToken){
+
+Function Get-AzDataTable{
+    Param (
+        [parameter(Mandatory=$True)]
+        [string]$accessToken,
+
+        [parameter(Mandatory=$True)]
+        [string]$GraphEndpoint
+    )
 
     <#
     .Synopsis
-    Get a datatable containing all InTune device data.
+    Get a datatable containing all data returned by the endpoint.
 
     .Description
-    Uses the /deviceManagement/managedDevices Graph endpoint to pull all device information into a data table for insersion into a SQL database.
+    Uses the /Graph endpoint to pull all information into a data table for insersion into a SQL database.
 
     .Parameter accessToken
     The access token for the session you are pulling information from.
+
+    .Parameter GraphEndpoint
+    The Graph endpoint you are pulling information from.
 
     .Outputs
     Output type [system.data.datatable]
@@ -112,17 +123,17 @@ Function Get-IntuneDeviceTable([string]$accessToken){
 
     $dtResults = New-Object System.Data.DataTable
 
-    $uri='https://graph.microsoft.com/v1.0/deviceManagement/managedDevices'
+    $uri=$GraphEndpoint
 
     $CreateTable = $True
 
     Do
     {
-        $devices = Invoke-RestMethod -Headers @{Authorization = "Bearer $($accessToken)" } -Uri $uri -Method Get
+        $GraphData = Invoke-RestMethod -Headers @{Authorization = "Bearer $($accessToken)" } -Uri $uri -Method Get
 
         $ScriptBlock=$null
 
-        foreach($object_properties in $($devices.Value[0] | Get-Member | where-object{$_.MemberType -eq "NoteProperty"}))
+        foreach($object_properties in $($GraphData.Value[0] | Get-Member | where-object{($_.MemberType -eq "NoteProperty") -and ($_.Name -ne '@odata.type')}))
         {
             if($CreateTable)
             {
@@ -145,7 +156,7 @@ Function Get-IntuneDeviceTable([string]$accessToken){
 
         $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($ScriptBlock)
 
-        foreach($entry in $devices.Value)
+        foreach($entry in $GraphData.Value)
         {
             $DataRow = $dtResults.NewRow()
 
@@ -163,44 +174,25 @@ Function Get-IntuneDeviceTable([string]$accessToken){
 
     return @(,($dtResults))
 }
-Function Convert-DwAPIDeviceFromInTune($IntuneDataTable){
+
+Function Convert-DwImportAppsFromInTune($IntuneAppTable){
     [OutputType([System.Data.DataTable])]
     $dataTable = New-Object System.Data.DataTable
 
     $dataTable.Columns.Add("uniqueIdentifier", [string]) | Out-Null
-    $dataTable.Columns.Add("hostname", [string]) | Out-Null
-    $dataTable.Columns.Add("operatingSystemName", [string]) | Out-Null
-    $dataTable.Columns.Add("operatingSystemVersion", [string]) | Out-Null
-    $dataTable.Columns.Add("computerManufacturer", [string]) | Out-Null
-    $dataTable.Columns.Add("computerModel", [string]) | Out-Null
-    $dataTable.Columns.Add("firstSeenDate", [datetime]) | Out-Null
-    $dataTable.Columns.Add("lastSeenDate", [datetime]) | Out-Null
-    $dataTable.Columns.Add("serialNumber", [string]) | Out-Null
-    $dataTable.Columns.Add("memoryKb", [string]) | Out-Null
-    $dataTable.Columns.Add("macAddress", [string]) | Out-Null
-    $dataTable.Columns.Add("totalHDDSpaceMb", [string]) | Out-Null
-    $dataTable.Columns.Add("targetDriveFreeSpaceMb", [string]) | Out-Null
+    $dataTable.Columns.Add("manufacturer", [string]) | Out-Null
+    $dataTable.Columns.Add("name", [string]) | Out-Null
+    $dataTable.Columns.Add("version", [string]) | Out-Null
 
-
-    foreach($Row in $IntuneDataTable.Rows)
+    foreach($Row in $IntuneAppTable.Rows)
     {
         $NewRow = $null
         $NewRow = $dataTable.NewRow()
 
         $NewRow.uniqueIdentifier = $Row.id
-        $NewRow.hostname = $Row.deviceName
-        $NewRow.operatingSystemName = $Row.operatingSystem
-        $NewRow.operatingSystemVersion = $Row.osVersion
-        $NewRow.computerManufacturer = $Row.manufacturer
-        $NewRow.computerModel = $Row.model
-        if ($Row.enrolledDateTime -gt '1753-01-01'){$NewRow.firstSeenDate = $Row.enrolledDateTime}
-        if ($Row.lastSyncDateTime -gt '1753-01-01'){$NewRow.lastSeenDate = $Row.lastSyncDateTime}
-        $NewRow.serialNumber = $Row.serialNumber
-        $NewRow.memoryKb = if($Row.physicalMemoryInBytes){($Row.physicalMemoryInBytes)/1024}else{[DBNULL]::Value}
-        $NewRow.macAddress = If($Row.ethernetMacAddress){$Row.ethernetMacAddress}elseif($Row.wiFiMacAddress){$Row.wiFiMacAddress}else{[DBNULL]::Value}
-        $NewRow.totalHDDSpaceMb = If($Row.totalStorageSpaceInBytes){$Row.totalStorageSpaceInBytes/(1024*1024)}else{[DBNULL]::Value}
-        $NewRow.targetDriveFreeSpaceMb = If($Row.freeStorageSpaceInBytes){$Row.freeStorageSpaceInBytes/(1024*1024)}else{[DBNULL]::Value}
-
+        $NewRow.manufacturer = $Row.publisher
+        $NewRow.name = $Row.displayName
+        $NewRow.version = $Row.lastModifiedDateTime
         $dataTable.Rows.Add($NewRow)
     }
 
@@ -225,7 +217,7 @@ Function Convert-DwAPIDeviceFromInTune($IntuneDataTable){
     $dtDashworksInput = Convert-DWDeviceFromInTune -IntuneDataTable $dtInTuneData
     #>
 }
-function Invoke-DwImportDeviceFeedDataTable{
+function Invoke-DwImportAppFeedDataTable{
     <#
     .Synopsis
     Loops a correctly formatted data table inserting all of the rows it contains.
@@ -263,7 +255,7 @@ function Invoke-DwImportDeviceFeedDataTable{
         [string]$Instance,
 
         [Parameter(Mandatory=$True)]
-        [System.Data.DataTable]$DWDeviceDataTable,
+        [System.Data.DataTable]$DWAppDataTable,
 
         [Parameter(Mandatory=$True)]
         [string]$APIKey,
@@ -280,14 +272,14 @@ function Invoke-DwImportDeviceFeedDataTable{
     {
         if (-not $FeedName)
         {
-            return 'Device feed not found by name or ID'
+            return 'Application feed not found by name or ID'
         }
 
-        $ImportId = Get-DwImportDeviceFeed -Instance $Instance -ApiKey $APIKey -Name $FeedName
+        $ImportId = Get-DwImportApplicationFeed -Instance $Instance -ApiKey $APIKey -Name $FeedName
 
         if (-not $ImportId)
         {
-            return 'Device feed not found by name or ID'
+            return 'Application feed not found by name or ID'
         }
     }
 
@@ -296,25 +288,26 @@ function Invoke-DwImportDeviceFeedDataTable{
         "X-API-KEY" = "$APIKey"
     }
 
-    $uri = "{0}/apiv2/imports/devices/{1}/items" -f $Instance, $ImportId
-
+    $uri = "{0}/apiv2/imports/applications/{1}/items" -f $Instance, $ImportId
+    $stopwatch =  [system.diagnostics.stopwatch]::StartNew()
     $RowCount = 0
-    foreach($Row in $DWDeviceDataTable)
+    foreach($Row in $DWAppDataTable)
     {
         $Body = $null
-        $Body = $Row | Select-Object * -ExcludeProperty ItemArray, Table, RowError, RowState, HasErrors | ConvertTo-Json
+        $Body = $Row | Select-Object * -ExcludeProperty ItemArray, Table, RowError, RowState, HasErrors | ConvertTo-Json -EscapeHandling EscapeNonAscii
+        $CallTime += Measure-Command {
         Invoke-RestMethod -Headers $Postheaders -Uri $uri -Method Post -Body $Body | out-null
-
+        }
         $RowCount++
     }
-
-    Return "$RowCount devices added"
+    $stopwatch.Stop()
+    Return "$RowCount applications processed in $($CallTime.TotalMilliseconds)ms processing loop took $($stopwatch.ElapsedMilliseconds)ms"
 }
 
 $AZToken = Get-AzureAccessToken -TenantId $TenantId -ClientId $ClientId -ClientSecret $ClientSecret
 
-$IntuneDeviceTable = Get-IntuneDeviceTable -accessToken $AZToken
+$IntuneAppTable = Get-AzDataTable -accessToken $AZToken -GraphEndpoint "https://graph.microsoft.com/v1.0/deviceAppManagement/mobileApps"
 
-$DWImportDeviceTable = Convert-DwAPIDeviceFromInTune -IntuneDataTable $IntuneDeviceTable
+$DWImportAppTable = Convert-DwImportAppsFromInTune -IntuneAppTable $IntuneAppTable
 
-Invoke-DwImportDeviceFeedDataTable -Instance $Instance -APIKey $APIKey -ImportId $ImportID -DWDeviceDataTable $DWImportDeviceTable
+Invoke-DwImportAppFeedDataTable -Instance $Instance -APIKey $APIKey -ImportId $ImportID -DWAppDataTable $DWImportAppTable
