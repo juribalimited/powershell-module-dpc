@@ -35,6 +35,10 @@ function New-DwCustomField {
     .PARAMETER IsActive
 
     Set the new custom field to active or inactive. Defaults to Active.
+    
+    .PARAMETER AllowUpdate
+
+    Optional. Sets the type of updates allowed for this custom field. Either Directly or ETL. Defaults to Directly.
 
     .OUTPUTS
 
@@ -42,7 +46,7 @@ function New-DwCustomField {
 
     .EXAMPLE
 
-    PS> New-DwCustomField -ObjectTypes Device, User -Name "MyNewCustomField" -CSVColumnHeader "mynewcustomfield" -Type Text -IsActive $true -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+    PS> New-DwCustomField -ObjectTypes Device, User -Name "MyNewCustomField" -CSVColumnHeader "mynewcustomfield" -Type Text -IsActive $true -AllowUpdate ETL -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
 
@@ -69,7 +73,7 @@ function New-DwCustomField {
         [bool]$IsActive = $true,
         [Parameter(Mandatory=$false)]
         [ValidateSet("Directly", "ETL")]
-        [string[]]$AllowUpdate = "Directly"
+        [string]$AllowUpdate = "Directly"
     )
 
     $typeId = switch($Type) {
