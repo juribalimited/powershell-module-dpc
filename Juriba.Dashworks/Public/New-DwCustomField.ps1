@@ -35,7 +35,7 @@ function New-DwCustomField {
     .PARAMETER IsActive
 
     Set the new custom field to active or inactive. Defaults to Active.
-    
+
     .PARAMETER AllowUpdate
 
     Optional. Sets the type of updates allowed for this custom field. Either Directly or ETL. Defaults to Directly.
