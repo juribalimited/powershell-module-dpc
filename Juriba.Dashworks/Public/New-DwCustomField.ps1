@@ -66,7 +66,10 @@ function New-DwCustomField {
         [ValidateSet("Device", "User", "Application", "Mailbox")]
         [string[]]$ObjectTypes,
         [Parameter(Mandatory=$false)]
-        [bool]$IsActive = $true
+        [bool]$IsActive = $true,
+        [Parameter(Mandatory=$false)]
+        [ValidateSet("Directly", "ETL")]
+        [string[]]$AllowUpdate = "Directly"
     )
 
     $typeId = switch($Type) {
@@ -75,6 +78,11 @@ function New-DwCustomField {
         "LargeText" {3}
         "Number"    {5}
         "Date"      {4}
+    }
+
+    $updateSourceId = switch($AllowUpdate) {
+        "Directly" {1}
+        "ETL" {2}
     }
 
     $payload = @{}
@@ -87,6 +95,7 @@ function New-DwCustomField {
     $payload.Add("isUserField", ($ObjectTypes -contains "User"))
     $payload.Add("name", $Name)
     $payload.Add("valueTypeId", $typeId)
+    $payload.Add("updateSourceId", $updateSourceId)
 
     $jsonbody = $payload | ConvertTo-Json
     $uri = "{0}/apiv1/custom-fields" -f $Instance
