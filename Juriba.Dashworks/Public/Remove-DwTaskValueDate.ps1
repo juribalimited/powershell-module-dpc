@@ -19,7 +19,7 @@ function Remove-DwTaskValueDate {
         The type of object being updated.
 
         .EXAMPLE
-        PS> Set-DwTaskValueDate -Instance $APIServer -APIKey $APIKey -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85 -Value '2022-01-01' -SlotId 34
+        PS> Remove-DwTaskValueDate -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85
     #>
 
     [CmdletBinding(SupportsShouldProcess)]
@@ -55,17 +55,17 @@ function Remove-DwTaskValueDate {
         'content-type' = 'application/Json'
         }
 
-    $Params = @{
-        'projectid'=$ProjectID
-        'taskid'=$TaskID
+    $params = @{
+        'projectid' = $ProjectID
+        'taskid' = $TaskID
         }
 
 
-    $Body = $Params | ConvertTo-Json
+    $body = $params | ConvertTo-Json
 
     try {
         if ($PSCmdlet.ShouldProcess($ObjectKey)) {
-            $response = Invoke-WebRequest -uri $uri -Headers $headers -Body $Body -Method PUT
+            $response = Invoke-WebRequest -Uri $uri -Headers $headers -Body $body -Method PUT
             $results = ($response.Content | ConvertFrom-Json).results
             return $results
         }
