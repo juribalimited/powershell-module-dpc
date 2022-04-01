@@ -19,12 +19,12 @@ function Set-DwTaskValueText {
         The string to set the task to.
         .PARAMETER ObjectType
         The type of object being updated.
-        
+
         .EXAMPLE
         PS> Set-DwRadioButtonTaskValue -Instance $APIServer -APIKey $APIKey -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85 -Value $successValue
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$true)]
         [string]$Instance,
@@ -70,9 +70,11 @@ function Set-DwTaskValueText {
     $Body = $Params | ConvertTo-Json
 
     try {
-        $response = Invoke-WebRequest -uri $uri -Headers $headers -Body $Body -Method PUT
-        $results = ($response.Content | ConvertFrom-Json).results
-        return $results
+        if ($PSCmdlet.ShouldProcess($ObjectKey)) {
+            $response = Invoke-WebRequest -uri $uri -Headers $headers -Body $Body -Method PUT
+            $results = ($response.Content | ConvertFrom-Json).results
+            return $results
+        }
     }
     catch {
         Write-Error $_

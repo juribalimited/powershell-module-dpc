@@ -17,12 +17,12 @@ function Remove-DwTaskValueDate {
         The projectId of the task being updated.
         .PARAMETER ObjectType
         The type of object being updated.
-        
+
         .EXAMPLE
         PS> Set-DwTaskValueDate -Instance $APIServer -APIKey $APIKey -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85 -Value '2022-01-01' -SlotId 34
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$true)]
         [string]$Instance,
@@ -64,9 +64,11 @@ function Remove-DwTaskValueDate {
     $Body = $Params | ConvertTo-Json
 
     try {
-        $response = Invoke-WebRequest -uri $uri -Headers $headers -Body $Body -Method PUT
-        $results = ($response.Content | ConvertFrom-Json).results
-        retrn $results
+        if ($PSCmdlet.ShouldProcess($ObjectKey)) {
+            $response = Invoke-WebRequest -uri $uri -Headers $headers -Body $Body -Method PUT
+            $results = ($response.Content | ConvertFrom-Json).results
+            return $results
+        }
     }
     catch {
         Write-Error $_
