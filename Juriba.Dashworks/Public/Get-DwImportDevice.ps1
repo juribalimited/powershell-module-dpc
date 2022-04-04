@@ -56,7 +56,7 @@ function Get-DwImportDevice {
 
          #>
 
-    [CmdletBinding(DefaultParameterSetName="UniqueIdentifier")]
+    [CmdletBinding(DefaultParameterSetName="Default")]
     param (
         [Parameter(Mandatory=$true)]
         [string]$Instance,
@@ -75,7 +75,7 @@ function Get-DwImportDevice {
         [string]$InfoLevel = "Basic"
     )
 
-    $limit = 1000 # page size
+    $limit = 50 # page size
     $uri = "{0}/apiv2/imports/devices/{1}/items" -f $Instance, $ImportId
 
     switch ($PSCmdlet.ParameterSetName) {
