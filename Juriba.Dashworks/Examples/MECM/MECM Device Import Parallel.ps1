@@ -31,21 +31,6 @@ param (
 #Requires -Module SqlServer
 #Requires -Module Juriba.Dashworks
 
-function Get-W11SupportedCPUCustomField {
-    param (
-        [string] $body
-    )
-    if (-Not $global:lookupTable) {
-        $global:lookupTable = Import-Csv -Path .\Juriba.Dashworks\Examples\Reference\Lkp-CPU-W11-Support.csv -Encoding utf8 
-    }
-
-    $manufacturer = $body.processorManufacturer
-    $model = $body.processorModel
-
-    
-
-}
-
 $DashworksParams = @{
     Instance = $DwInstance
     APIKey = $DwAPIKey
@@ -68,33 +53,52 @@ $importId = $feed.id
 Write-Information ("Using feed id {0}" -f $importId) -InformationAction Continue
 
 # Run query against MECM database
-$table = Invoke-Sqlcmd @MecmParams -InputFile "$PSScriptRoot\MECM Device Query.sql"
+$table = Invoke-Sqlcmd @MecmParams -InputFile "$PSScriptRoot\MECM Device Query mstest chassis.sql"
 
 Write-Information ("MECM query returned {0} rows." -f $table.count) -InformationAction Continue
 
-$i = 0
-foreach ($row in $table){
-    $i++
+# build hashtable for job
+$origin = @{}
+$table | Foreach-Object {$origin.($_.uniqueIdentifier) = 0}
+
+# create synced hashtable
+$sync = [System.Collections.Hashtable]::Synchronized($origin)
+
+$job = $table | ForEach-Object -AsJob -ThrottleLimit 16 -Parallel {
+    $syncCopy = $using:sync
+
+    Import-Module .\Juriba.Dashworks\Juriba.Dashworks.psd1
     # convert table row to json, exclude attributes we dont need
-    $jsonBody = $row | Select-Object * -ExcludeProperty ItemArray, Table, RowError, RowState, HasErrors, OwnerDomain, OwnerUsername | ConvertTo-Json
-    $uniqueIdentifier = $row.uniqueIdentifier
-    Write-Progress -Activity "Importing Devices to Dashworks" -Status ("Processing device: {0}" -f $uniqueIdentifier) -PercentComplete (($i/$table.Count*100))
+    $jsonBody = $_ | Select-Object * -ExcludeProperty ItemArray, Table, RowError, RowState, HasErrors, OwnerDomain, OwnerUsername | ConvertTo-Json
+    $uniqueIdentifier = $_.uniqueIdentifier
 
-    Get-W11SupportedCPUCustomField -Body $jsonBody
-
-    $existingDevice = Get-DwImportDevice @DashworksParams -ImportId $importId -UniqueIdentifier $uniqueIdentifier
+    $existingDevice = Get-DwImportDevice @using:DashworksParams -ImportId $using:importId -UniqueIdentifier $uniqueIdentifier
     if ($existingDevice) {
-        $result = Set-DwImportDevice @DashworksParams -ImportId $importId -UniqueIdentifier $uniqueIdentifier -JsonBody $jsonBody
+        $result = Set-DwImportDevice @using:DashworksParams -ImportId $using:importId -UniqueIdentifier $uniqueIdentifier -JsonBody $jsonBody
         # check result, for an update we are expecting status code 204
         if ($result.StatusCode -ne 204) {
             Write-Error $result
         }
     }
     else {
-        $result = New-DwImportDevice @DashworksParams -ImportId $importId -JsonBody $jsonBody
-        #check result, for a new device we expect the return object to contain the device
-        if (-Not $result.uniqueIdentifier) {
+        $result = New-DwImportDevice @using:DashworksParams -ImportId $using:importId -JsonBody $jsonBody
+        # check result, for a new device we expect the return object to contain the device
+        if ($result -And -Not $result.uniqueIdentifier) {
             Write-Error $result
         }
     }
+    # Mark process as completed
+    $syncCopy[$_.uniqueIdentifier] = 1
 }
+
+
+while($job.State -eq 'Running')
+{
+    $pctComplete = (($sync.GetEnumerator().Where({$_.Value -eq 1}).Count) / $sync.Count) * 100
+    Write-Progress -Activity "Importing Devices to Dashworks" -PercentComplete $pctComplete
+
+    # Wait to refresh to not overload gui
+    Start-Sleep -Seconds 0.25
+}
+
+

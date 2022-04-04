@@ -31,21 +31,6 @@ param (
 #Requires -Module SqlServer
 #Requires -Module Juriba.Dashworks
 
-function Get-W11SupportedCPUCustomField {
-    param (
-        [string] $body
-    )
-    if (-Not $global:lookupTable) {
-        $global:lookupTable = Import-Csv -Path .\Juriba.Dashworks\Examples\Reference\Lkp-CPU-W11-Support.csv -Encoding utf8 
-    }
-
-    $manufacturer = $body.processorManufacturer
-    $model = $body.processorModel
-
-    
-
-}
-
 $DashworksParams = @{
     Instance = $DwInstance
     APIKey = $DwAPIKey
@@ -68,7 +53,7 @@ $importId = $feed.id
 Write-Information ("Using feed id {0}" -f $importId) -InformationAction Continue
 
 # Run query against MECM database
-$table = Invoke-Sqlcmd @MecmParams -InputFile "$PSScriptRoot\MECM Device Query.sql"
+$table = Invoke-Sqlcmd @MecmParams -InputFile "$PSScriptRoot\MECM Device Query mstest chassis.sql"
 
 Write-Information ("MECM query returned {0} rows." -f $table.count) -InformationAction Continue
 
@@ -79,8 +64,6 @@ foreach ($row in $table){
     $jsonBody = $row | Select-Object * -ExcludeProperty ItemArray, Table, RowError, RowState, HasErrors, OwnerDomain, OwnerUsername | ConvertTo-Json
     $uniqueIdentifier = $row.uniqueIdentifier
     Write-Progress -Activity "Importing Devices to Dashworks" -Status ("Processing device: {0}" -f $uniqueIdentifier) -PercentComplete (($i/$table.Count*100))
-
-    Get-W11SupportedCPUCustomField -Body $jsonBody
 
     $existingDevice = Get-DwImportDevice @DashworksParams -ImportId $importId -UniqueIdentifier $uniqueIdentifier
     if ($existingDevice) {
