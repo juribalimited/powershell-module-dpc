@@ -47,7 +47,7 @@ Set-Location "$env:SMS_ADMIN_UI_PATH\..\"
 import-module '.\ConfigurationManager.psd1'
 
 #This works for SCCM -> may need adjustment of the SMS WMI provider is not present.
-$CMServer=(Get-WmiObject -class SMS_ProviderLocation -Namespace root\SMS).Machine
+$CMServer=(Get-CimInstance -class SMS_ProviderLocation -Namespace root\SMS).Machine
 
 #Set the drive path in order to allow use of the MECM Cmdlets
 $Drv = Get-PSDrive -Name "DW1" -ErrorAction SilentlyContinue
@@ -59,14 +59,14 @@ Set-Location DW1:\
 
 
 #Pull the list that requires processing
-$List = export-DwList -Instance $APIServer -APIKey $APIKey -ListId $listID -ObjectType $ObjectType
+$List = export-DwList -Instance $DwInstance -APIKey $DwAPIKey -ListId $listID -ObjectType $ObjectType
 
 #Get the details of the collection the items are to be added to.
 $CMCollection = Get-CMCollection -Name $TargetCollectionName
 
 forEach($row in $List)
 {
-    if ($ObjectType = 'Device')
+    if ($ObjectType -eq 'Device')
     {
         $CMdevice = Get-CMDevice -Name $Row.Hostname
         #write-output "Adding $($Row.Hostname) $($CMdevice.ResourceID) to $($CMCollection.Name)"
@@ -75,34 +75,33 @@ forEach($row in $List)
     {
         $DomainUser = $Row.Domain + "\" + $Row.Username
         $CMUser = Get-CMUser -Name $DomainUser
-        #write-output "Adding DomainUser $($CMUser.ResourceID) to $($CMCollection.Name)"      
+        #write-output "Adding DomainUser $($CMUser.ResourceID) to $($CMCollection.Name)"
     }
 
-    
     try
     {
         #Add the object to the collection, on success set the task value to the provided success value
-        if ($ObjectType = 'Device')
+        if ($ObjectType -eq 'Device')
         {
             Add-CMDeviceCollectionDirectMembershipRule -CollectionId $CMCollection.CollectionID -ResourceId $CMdevice.ResourceID
-            Set-DwRadioButtonTaskValue -Instance $APIServer -APIKey $APIKey -ObjectKey $($row.'Device Key') -ObjectType $ObjectType -TaskId $TaskID -ProjectId $ProjectID -Value $successValue
+            Set-DwRadioButtonTaskValue -Instance $DwInstance -APIKey $DwAPIKey -ObjectKey $($row.'Device Key') -ObjectType $ObjectType -TaskId $TaskID -ProjectId $ProjectID -Value $successValue
         }
         else
         {
             Add-CMUserCollectionDirectMembershipRule -CollectionId $CMCollection.CollectionID -ResourceId $CMUser.ResourceID
-            Set-DwRadioButtonTaskValue -Instance $APIServer -APIKey $APIKey -ObjectKey $($row.'User Key') -ObjectType $ObjectType -TaskId $TaskID -ProjectId $ProjectID -Value $successValue
+            Set-DwRadioButtonTaskValue -Instance $DwInstance -APIKey $DwAPIKey -ObjectKey $($row.'User Key') -ObjectType $ObjectType -TaskId $TaskID -ProjectId $ProjectID -Value $successValue
         }
     }
     catch
     {
         #On failure, set the task value to the provided fail value and continue.
-        if ($ObjectType = 'Device')
-        {    
-            Set-DwRadioButtonTaskValue -Instance $APIServer -APIKey $APIKey -ObjectKey $($row.'Device Key') -ObjectType $ObjectType -TaskId $TaskID -ProjectId $ProjectID -Value $failValue
+        if ($ObjectType -eq 'Device')
+        {
+            Set-DwRadioButtonTaskValue -Instance $DwInstance -APIKey $DwAPIKey -ObjectKey $($row.'Device Key') -ObjectType $ObjectType -TaskId $TaskID -ProjectId $ProjectID -Value $failValue
         }
         else
         {
-            Set-DwRadioButtonTaskValue -Instance $APIServer -APIKey $APIKey -ObjectKey $($row.'User Key') -ObjectType $ObjectType -TaskId $TaskID -ProjectId $ProjectID -Value $failValue   
+            Set-DwRadioButtonTaskValue -Instance $DwInstance -APIKey $DwAPIKey -ObjectKey $($row.'User Key') -ObjectType $ObjectType -TaskId $TaskID -ProjectId $ProjectID -Value $failValue
         }
     }
 }
