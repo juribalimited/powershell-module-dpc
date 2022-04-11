@@ -21,7 +21,7 @@ function Set-DwTaskValueText {
         The type of object being updated.
 
         .EXAMPLE
-        PS> Set-DwRadioButtonTaskValue -Instance $APIServer -APIKey $APIKey -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85 -Value $successValue
+        PS> Set-DwTaskValueText -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85 -Value "Success"
     #>
 
     [CmdletBinding(SupportsShouldProcess)]
@@ -61,17 +61,17 @@ function Set-DwTaskValueText {
         }
 
 
-    $Params = @{
+    $params = @{
         'value'=$Value
         'projectid'=$ProjectID
         'taskid'=$TaskID
         }
 
-    $Body = $Params | ConvertTo-Json
+    $body = $params | ConvertTo-Json
 
     try {
         if ($PSCmdlet.ShouldProcess($ObjectKey)) {
-            $response = Invoke-WebRequest -uri $uri -Headers $headers -Body $Body -Method PUT
+            $response = Invoke-WebRequest -Uri $uri -Headers $headers -Body $body -Method PUT
             $results = ($response.Content | ConvertFrom-Json).results
             return $results
         }

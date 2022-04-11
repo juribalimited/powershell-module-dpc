@@ -23,7 +23,7 @@ function Set-DwTaskValueDate {
         The type of object being updated.
 
         .EXAMPLE
-        PS> Set-DwTaskValueDate -Instance $APIServer -APIKey $APIKey -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85 -Value '2022-01-01' -SlotId 34
+        PS> Set-DwTaskValueDate -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85 -Value '2022-01-01' -SlotId 34
     #>
 
     [CmdletBinding(SupportsShouldProcess)]
@@ -65,7 +65,7 @@ function Set-DwTaskValueDate {
         }
 
 
-    $Params = @{
+    $params = @{
         'value'=$Value
         'projectid'=$ProjectID
         'taskid'=$TaskID
@@ -73,14 +73,14 @@ function Set-DwTaskValueDate {
 
     if ($SlotId)
     {
-        $Params.add("slotid",$SlotID)
+        $params.add("slotid",$SlotID)
     }
 
-    $Body = $Params | ConvertTo-Json
+    $body = $params | ConvertTo-Json
 
     try {
         if ($PSCmdlet.ShouldProcess($ObjectKey)) {
-            $response = Invoke-WebRequest -uri $uri -Headers $headers -Body $Body -Method PUT
+            $response = Invoke-WebRequest -Uri $uri -Headers $headers -Body $body -Method PUT
             $results = ($response.Content | ConvertFrom-Json).results
             return $results
         }
