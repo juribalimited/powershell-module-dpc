@@ -84,12 +84,12 @@ forEach($row in $List)
         if ($ObjectType -eq 'Device')
         {
             Add-CMDeviceCollectionDirectMembershipRule -CollectionId $CMCollection.CollectionID -ResourceId $CMdevice.ResourceID
-            Set-DwRadioButtonTaskValue -Instance $DwInstance -APIKey $DwAPIKey -ObjectKey $($row.'Device Key') -ObjectType $ObjectType -TaskId $TaskID -ProjectId $ProjectID -Value $successValue
+            Set-DwTaskValueSelect -Instance $DwInstance -APIKey $DwAPIKey -ObjectKey $($row.'Device Key') -ObjectType $ObjectType -TaskId $TaskID -ProjectId $ProjectID -Value $successValue
         }
         else
         {
             Add-CMUserCollectionDirectMembershipRule -CollectionId $CMCollection.CollectionID -ResourceId $CMUser.ResourceID
-            Set-DwRadioButtonTaskValue -Instance $DwInstance -APIKey $DwAPIKey -ObjectKey $($row.'User Key') -ObjectType $ObjectType -TaskId $TaskID -ProjectId $ProjectID -Value $successValue
+            Set-DwTaskValueSelect -Instance $DwInstance -APIKey $DwAPIKey -ObjectKey $($row.'User Key') -ObjectType $ObjectType -TaskId $TaskID -ProjectId $ProjectID -Value $successValue
         }
     }
     catch
