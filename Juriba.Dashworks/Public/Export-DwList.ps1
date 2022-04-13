@@ -38,15 +38,17 @@ function Export-DwList {
         [ValidateNotNullOrEmpty()]
         [int]$ListId,
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Device", "User", "Application", "Mailbox")]
+        [ValidateSet("Device", "User", "Application", "Mailbox", "DeviceApplication", "UserApplication")]
         [string]$ObjectType
     )
 
     $path = switch($ObjectType) {
-        "Device"        {"devices"}
-        "User"          {"users"}
-        "Application"   {"applications"}
-        "Mailbox"       {"mailboxes"}
+        "Device"            {"devices"}
+        "User"              {"users"}
+        "Application"       {"applications"}
+        "Mailbox"           {"mailboxes"}
+        "DeviceApplication" {"deviceapplications"}
+        "UserApplication"   {"userapplications"}
     }
 
     $uri = '{0}/apiv1/{1}?$listid={2}' -f $Instance, $path, $ListId

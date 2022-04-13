@@ -66,7 +66,7 @@ function Remove-DwTaskValueDate {
     try {
         if ($PSCmdlet.ShouldProcess($ObjectKey)) {
             $response = Invoke-WebRequest -Uri $uri -Headers $headers -Body $body -Method PUT
-            $results = ($response.Content | ConvertFrom-Json).results
+            $results = ($response.Content | ConvertFrom-Json).message
             return $results
         }
     }
