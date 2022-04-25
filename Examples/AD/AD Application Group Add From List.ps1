@@ -45,6 +45,8 @@ $AppGrpTaskID = 14051
 $ObjectType = 'Application'
 $List = Export-DwList -Instance $DwInstance -APIKey $DwAPIKey -ListId $listID -ObjectType $ObjectTypeApplication
 
+$AppKeys = (($List | select-object -Property "Application Key" -Unique).'Application Key')
+
 $AppKeys | foreach-Object -Parallel {
     
     $AppKey=$_
