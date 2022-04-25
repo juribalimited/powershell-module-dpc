@@ -7,7 +7,7 @@ Function New-DwTag {
     .DESCRIPTION
 
     Creates a new list tag using Dashworks API v1.
-    
+
     #>
 
     [CmdletBinding(SupportsShouldProcess)]
@@ -19,7 +19,7 @@ Function New-DwTag {
         [Parameter(Mandatory = $true)]
         [string]$Name
     )
-    
+
     $body = @{
         tag = $Name
     } | ConvertTo-Json

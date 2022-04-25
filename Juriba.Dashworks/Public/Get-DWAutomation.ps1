@@ -16,7 +16,7 @@ Function Get-DwAutomation {
         [Parameter(Mandatory = $true)]
         [string]$APIKey
     )
-    
+
     $uri = "{0}/apiv1/admin/automations" -f $Instance
     $headers = @{'x-api-key' = $APIKey }
 

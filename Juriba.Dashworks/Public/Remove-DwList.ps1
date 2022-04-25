@@ -1,4 +1,5 @@
 Function Remove-DwList {
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
         [string]$Instance,
@@ -25,6 +26,7 @@ Function Remove-DwList {
     $headers = @{ 'X-API-KEY' = $ApiKey }
     $uri = "{0}/apiv1/lists/{1}/{2}"  -f  $instance, $endpoint, $ListId
 
-    Invoke-WebRequest -Uri $uri -Headers $headers -Method DELETE
-
+    if ($PSCmdlet.ShouldProcess($ListId)) {
+        Invoke-WebRequest -Uri $uri -Headers $headers -Method DELETE
+    }
 }

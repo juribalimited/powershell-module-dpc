@@ -51,5 +51,4 @@ Function Invoke-DwAutomation {
     if ($PSCmdlet.ShouldProcess($Name)) {
         Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -Body $body -ContentType 'application/json'
     }
-    
 }

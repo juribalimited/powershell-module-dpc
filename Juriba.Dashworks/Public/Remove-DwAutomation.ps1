@@ -19,7 +19,7 @@ Function Remove-DwAutomation {
         [Parameter(Mandatory = $true)]
         [int]$AutomationId
     )
-    
+
     $body = @{
         automationIds = @($AutomationId)
     } | ConvertTo-Json

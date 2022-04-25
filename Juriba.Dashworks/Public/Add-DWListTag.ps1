@@ -7,7 +7,7 @@ Function Add-DwListTag {
     .DESCRIPTION
 
     Adds an existing tag to a list using Dashworks API v1.
-    
+
     #>
 
     [CmdletBinding(SupportsShouldProcess)]
@@ -34,7 +34,7 @@ Function Add-DwListTag {
         "Application" { $endpoint = "applications" }
         "Mailbox" { $endpoint = "mailboxes" }
     }
-    
+
     $body = @{
         tag = $Tag
     } | ConvertTo-Json
