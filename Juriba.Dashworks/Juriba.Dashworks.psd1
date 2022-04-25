@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.Dashworks.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.0.24.0'
+    ModuleVersion     = '0.0.26.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -70,42 +70,64 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
+    # PS> (Get-ChildItem -Path .\Juriba.Dashworks\Public\*.ps1).Basename | Join-String -Separator ",`r`n" -SingleQuote
     FunctionsToExport = @(
-                            'Export-DwList',
-                            'Get-DwCustomField',
-                            'Get-DwImportApplication',
-                            'Get-DwImportApplicationFeed',
-                            'Get-DwImportDepartmentFeed',
-                            'Get-DwImportDevice',
-                            'Get-DwImportDeviceFeed',
-                            'Get-DwImportLocation',
-                            'Get-DwImportLocationFeed',
-                            'Get-DwImportUser',
-                            'Get-DwImportUserFeed',
-                            'New-DwCustomField',
-                            'New-DwImportApplication',
-                            'New-DwImportApplicationFeed',
-                            'New-DwImportDepartmentFeed',
-                            'New-DwImportDevice',
-                            'New-DwImportDeviceFeed',
-                            'New-DwImportLocationFeed',
-                            'New-DwImportUser',
-                            'New-DwImportUserFeed',
-                            'Remove-DwImportApplication',
-                            'Remove-DwImportDepartmentFeed',
-                            'Remove-DwImportDevice',
-                            'Remove-DwImportDeviceFeed',
-                            'Remove-DwImportLocationFeed',
-                            'Remove-DwImportUser',
-                            'Remove-DwImportUserFeed',
-                            'Remove-DwTaskValueDate',
-                            'Set-DwImportApplication',
-                            'Set-DwImportDevice',
-                            'Set-DwImportDeviceFeed',
-                            'Set-DwTaskValueDate',
-                            'Set-DwTaskValueText',
-                            'Set-DwTaskValueSelect'
-                        )
+        'Add-DwListTag',
+        'Export-DwList',
+        'Get-DwAutomation',
+        'Get-DwCustomField',
+        'Get-DwDashboard',
+        'Get-DwImportApplication',
+        'Get-DwImportApplicationFeed',
+        'Get-DwImportDepartmentFeed',
+        'Get-DwImportDevice',
+        'Get-DwImportDeviceFeed',
+        'Get-DwImportLocation',
+        'Get-DwImportLocationFeed',
+        'Get-DwImportUser',
+        'Get-DwImportUserFeed',
+        'Get-DwList',
+        'Get-DwSessionUser',
+        'Invoke-DwAutomation',
+        'New-DwAutomation',
+        'New-DwAutomationAction',
+        'New-DwCustomField',
+        'New-DwDashboard',
+        'New-DwDashboardBarWidget',
+        'New-DwDashboardCardWidget',
+        'New-DwDashboardHalfDonutWidget',
+        'New-DwDashboardSection',
+        'New-DwDashboardTableWidget',
+        'New-DwImportApplication',
+        'New-DwImportApplicationFeed',
+        'New-DwImportDepartmentFeed',
+        'New-DwImportDevice',
+        'New-DwImportDeviceFeed',
+        'New-DwImportLocationFeed',
+        'New-DwImportUser',
+        'New-DwImportUserFeed',
+        'New-DwList',
+        'New-DwTag',
+        'Remove-DwAutomation',
+        'Remove-DwCustomField',
+        'Remove-DwDashboard',
+        'Remove-DwImportApplication',
+        'Remove-DwImportDepartmentFeed',
+        'Remove-DwImportDevice',
+        'Remove-DwImportDeviceFeed',
+        'Remove-DwImportLocationFeed',
+        'Remove-DwImportUserFeed',
+        'Remove-DWList',
+        'Remove-DwTaskValueDate',
+        'Set-DwDashboardSection',
+        'Set-DwImportApplication',
+        'Set-DwImportDevice',
+        'Set-DwImportDeviceFeed',
+        'Set-DwImportUser',
+        'Set-DwTaskValueDate',
+        'Set-DwTaskValueSelect',
+        'Set-DwTaskValueText'
+        )
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     # CmdletsToExport   = '*'
