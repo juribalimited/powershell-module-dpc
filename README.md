@@ -51,7 +51,7 @@ Get-DwImportDevice -APIKey $apikey ...
 
 We recommend storing API Keys securely using something like [Microsoft.PowerShell.SecretManagement](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.secretmanagement/?view=ps-modules).
 
-For more information on using API Keys see [API Keys](https://docs.juriba.com/dashworks/dashworks-api/api-keys) in the Dashworks docs.
+For more information on using API Keys see [API Keys](https://docs.juriba.com/dashworks/dashworks-api/api-keys/get-api-key) in the Dashworks docs.
 
 ### Examples
 

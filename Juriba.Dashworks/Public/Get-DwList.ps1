@@ -20,13 +20,11 @@ Function Get-DwList {
         "Mailbox" { $endpoint = "mailboxes" }
     }
 
-    $contentType = "application/json"
+    #$contentType = "application/json"
     $headers = @{ 'X-API-KEY' = $ApiKey }
     $uri = "{0}/apiv1/lists/{1}"  -f  $instance, $endpoint
 
-    $result = Invoke-WebRequest -Uri $uri -Headers $headers -Method GET -ContentType $contentType
+    $result = Invoke-WebRequest -Uri $uri -Headers $headers -Method GET # -ContentType $contentType
 
     return ($result.content | ConvertFrom-Json)
-
-
 }

@@ -25,7 +25,7 @@ Function Remove-DwTag {
     )
 
     $body = @{
-        tag = $Name
+        tag = $Tag
     } | ConvertTo-Json
 
     $uri = "{0}/apiv1/tags" -f $Instance

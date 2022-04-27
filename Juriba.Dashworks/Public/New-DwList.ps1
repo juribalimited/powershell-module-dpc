@@ -10,7 +10,7 @@ Function New-DwList {
         [Parameter(Mandatory = $true)]
         [guid]$UserId,
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Dynamic", "Static", "DynamicPivot")]
+        [ValidateSet("Dynamic", "Static", "Dynamic Pivot")]
         [string]$ListType,
         [Parameter(Mandatory = $true)]
         [string]$QueryString,
@@ -31,7 +31,6 @@ Function New-DwList {
 
     switch ($ListType) {
         "Static" { throw "not implemented" }
-        "DynamicPivot" { throw "not implemented" }
     }
 
     $body = @{
