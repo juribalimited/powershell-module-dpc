@@ -37,12 +37,6 @@ $ObjectTypeApplication = switch($ObjectType) {
     "User"   {"userapplications"}
 }
 
-$DwInstance = 'https://master.internal.juriba.com:8443'
-$DwAPIKey = 'ppk+RarkCC966ghZkMxr1uT3uMSphnt+e+rjV8Q+ATDtnBjFvcHHw/BK1c9Jqa7tCUEfPApKiGLwDmpvMiRUyw=='
-$listID = 5499
-$ProjectID = 85
-$AppGrpTaskID = 14051
-$ObjectType = 'Application'
 $List = Export-DwList -Instance $DwInstance -APIKey $DwAPIKey -ListId $listID -ObjectType $ObjectTypeApplication
 
 $AppKeys = (($List | select-object -Property "Application Key" -Unique).'Application Key')
