@@ -1,11 +1,21 @@
 Function Get-DwList {
+    <#
+    .SYNOPSIS
+
+    Returns existing Lists.
+
+    .DESCRIPTION
+
+    Returns existing lists using Dashworks API v1.
+
+    #>
     param(
         [Parameter(Mandatory=$true)]
         [string]$Instance,
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Device", "User", "Application", "Mailbox", "ApplicationUser", "ApplciationDevice")]
+        [ValidateSet("Device", "User", "Application", "Mailbox", "ApplicationUser", "ApplicationDevice")]
         [string]$ObjectType
     )
 

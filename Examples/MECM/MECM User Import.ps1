@@ -53,7 +53,7 @@ $importId = $feed.id
 Write-Information ("Using feed id {0}" -f $importId) -InformationAction Continue
 
 # Run query against MECM database
-$table = Invoke-Sqlcmd @MecmParams -InputFile "$PSScriptRoot\MECM User Query.sql"
+$table = Invoke-Sqlcmd @MecmParams -InputFile "$PSScriptRoost\MECM User Query.sql"
 
 Write-Information ("MECM query returned {0} rows." -f $table.count) -InformationAction Continue
 
