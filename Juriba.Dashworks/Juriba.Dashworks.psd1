@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.Dashworks.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.0.24.0'
+    ModuleVersion     = '0.0.25.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
