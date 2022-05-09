@@ -29,7 +29,8 @@ Function New-DwTag {
 
     try {
         if ($PSCmdlet.ShouldProcess($Name)) {
-            Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body $body -ContentType 'application/json'
+            $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body $body -ContentType 'application/json'
+            return ($result.Content | ConvertTo-Json)
         }
     }
     catch {

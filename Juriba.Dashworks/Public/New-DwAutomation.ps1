@@ -122,7 +122,6 @@ Function New-DwAutomation {
             if ($result.StatusCode -eq 201)
             {
                 $id = ($result.content | ConvertFrom-Json).id
-                Write-Information ("Created AutomationId: {0}" -f $id) -InformationAction Continue
                 return $id
             }
             else {
