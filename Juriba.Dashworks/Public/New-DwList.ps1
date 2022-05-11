@@ -1,4 +1,53 @@
 Function New-DwList {
+    <#
+        .SYNOPSIS
+        Creates a new list.
+
+        .DESCRIPTION
+        Uses ApiV1 to create a new list.
+
+        .PARAMETER Instance
+
+        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+
+        .PARAMETER APIKey
+
+        Dashworks API Key.
+
+        .PARAMETER Name
+
+        Name for the new list.
+
+        .PARAMETER UserId
+
+        UserId for the user who will own this list. See Get-DwSessionUser.
+
+        .PARAMETER ListType
+
+        The type of list to create. Accepts one of: "Dynamic", "Static" or "Dynamic Pivot"
+
+        .PARAMETER QueryString
+
+        The query string for the new list. The easiest way to generate this is to create the list you want in the UI then, using broswer
+        dev tools, capture the POST request when saving the list. Use the QueryString property from the captured request payload.
+        Note that $ characters may need escaping if PowerShell interprets them as variables.
+
+        .PARAMETER ObjectType
+
+        Base object type for the new list. Accepts one of: "Device", "User", "Application", "Mailbox", "ApplicationUser", "ApplciationDevice"
+
+        .EXAMPLE
+
+        PS> New-DwList
+            -Instance "https://myinstance.dashworks.app:8443"
+            -APIKey "xxxxx"
+            -Name "My New List"
+            -UserId ((Get-DwSessionUser).userId)
+            -ListType Dynamic
+            -QueryString "`$filter=&`$select=hostname,chassisCategory,oSCategory,ownerDisplayName,bootupDate&`$pinleft=&`$pinright=&`$archiveditems=false"
+            -ObjectType "Device"
+
+    #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$true)]
