@@ -52,7 +52,7 @@ Function New-DwDashboardBarWidget {
             "categoriseByMaximumValues" = 10
         } | ConvertTo-Json
 
-        $contentType = "application / json"
+        $contentType = "application/json"
         $headers = @{ 'X-API-KEY' = $ApiKey }
         $uri = "{0}/apiv1/dashboard/{1}/section/{2}/widget"  -f  $instance, $DashboardId, $SectionId
 
