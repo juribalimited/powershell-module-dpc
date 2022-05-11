@@ -43,7 +43,7 @@ Function New-DwDashboardHalfDonutWidget {
             "cardTypeIsAggregate"       = $false
             "splitBy"                   = $SplitBy
             "aggregateBy"               = ""
-            "orderByDescending"         = if ($OrderByDescending) { $true }else { $false }
+            "orderByDescending"         = $OrderByDescending
             "orderById"                 = if ($OrderByField) { if ($OrderByField -eq "Count") { 2 }else { 1 } }else { $null }
             "orderByField"              = $OrderByField
             "showLegend"                = $true
