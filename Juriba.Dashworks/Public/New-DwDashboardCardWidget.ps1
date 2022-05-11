@@ -48,7 +48,7 @@ Function New-DwDashboardCardWidget {
             "categorisationViewType"    = "None"
             "categoriseByMaximumValues" = $null
         } | ConvertTo-Json
-        ContentType = "application / json"
+        ContentType = "application/json"
         Headers     = @{
             'X-API-KEY' = $APIKey
         }
