@@ -18,7 +18,7 @@ Function New-DwDashboardSection {
         Body        = @{
             "width" = $Width
         } | ConvertTo-Json
-        ContentType = "application / json"
+        ContentType = "application/json"
         Headers     = @{
             'X-API-KEY' = $APIKey
         }
