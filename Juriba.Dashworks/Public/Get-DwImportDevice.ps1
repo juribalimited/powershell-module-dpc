@@ -97,7 +97,10 @@ function Get-DwImportDevice {
         }
     }
 
-    $headers = @{'x-api-key' = $APIKey}
+    $headers = @{
+        'x-api-key' = $APIKey
+        'cache-control' = 'no-cache'
+    }
 
     $device = ""
     try {
