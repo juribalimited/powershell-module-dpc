@@ -36,7 +36,7 @@ Function Set-DwDashboardWidgetColour {
     $uri = "{0}/apiv1/dashboard/{1}/section/{2}/widget/{3}" -f $Instance, $DashboardId, $SectionId, $WidgetId
 
     try {
-        if ($PSCmdlet.ShouldProcess($Name)) {
+        if ($PSCmdlet.ShouldProcess($WidgetId)) {
             $result = Invoke-WebRequest -Uri $uri -Headers $headers -Method PUT -ContentType $contentType -Body $JsonBody
             return $result
         }
