@@ -43,7 +43,7 @@ Function Add-DwListTag {
     $headers = @{ 'x-api-key' = $APIKey }
 
     try {
-        if ($PSCmdlet.ShouldProcess($Name)) {
+        if ($PSCmdlet.ShouldProcess($Tag)) {
             Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body $body -ContentType 'application/json'
         }
     }

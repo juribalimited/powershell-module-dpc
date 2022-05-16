@@ -23,7 +23,7 @@ Function Remove-DwDashboard {
     $uri = "{0}/apiv1/dashboard/{1}" -f $Instance, $DashboardId
     $headers = @{'x-api-key' = $APIKey }
 
-    if ($PSCmdlet.ShouldProcess($AutomationId)) {
+    if ($PSCmdlet.ShouldProcess($DashboardId)) {
         Invoke-WebRequest -Uri $uri -Method DELETE -Headers $headers -ContentType 'application/json'
     }
 }

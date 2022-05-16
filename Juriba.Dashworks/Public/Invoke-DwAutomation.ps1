@@ -48,7 +48,7 @@ Function Invoke-DwAutomation {
     $uri = "{0}/apiv1/admin/automations/run-command" -f $Instance
     $headers = @{'x-api-key' = $APIKey }
 
-    if ($PSCmdlet.ShouldProcess($Name)) {
+    if ($PSCmdlet.ShouldProcess($Ids -Join ",")) {
         Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -Body $body -ContentType 'application/json'
     }
 }

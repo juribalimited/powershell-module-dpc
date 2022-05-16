@@ -1,5 +1,4 @@
 Function Set-DwDashboardSection {
-    [Alias("Update-DWDashboardSection")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$true)]
