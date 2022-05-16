@@ -23,7 +23,7 @@ Function Remove-DwCustomField {
     $uri = "{0}/apiv1/custom-fields/{1}" -f $Instance, $CustomFieldId
     $headers = @{'x-api-key' = $APIKey }
 
-    if ($PSCmdlet.ShouldProcess($AutomationId)) {
+    if ($PSCmdlet.ShouldProcess($CustomFieldId)) {
         Invoke-WebRequest -Uri $uri -Method DELETE -Headers $headers -ContentType 'application/json'
     }
 }
