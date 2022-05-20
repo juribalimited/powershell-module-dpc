@@ -1,11 +1,15 @@
 ﻿<#
+    .SYNOPSIS
+    Store server details and credentials in a data table for use in
+	importing devices From ServiceNow into a Dashworks Device Feed.
 
-
-
+    .DESCRIPTION
+    Creates a database of the name given in the same path as the script.
+	Stores the gioven credentials in a datatable created for that purpose.
 #>
 
-$DLLPath = ".\System.Data.SQLite.dll"
-$DBPath = ".\DWCSN1.db"
+$DLLPath = "$PSScriptRoot\System.Data.SQLite.dll"
+$DBPath = "$PSScriptRoot\DWCSN.db"
 
 #ServiceNow Configuration Settings
 $ServiceNow_ServerURL = 'https://XXXX.service-now.com'

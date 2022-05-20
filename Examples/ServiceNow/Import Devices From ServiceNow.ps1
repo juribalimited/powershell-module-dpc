@@ -467,8 +467,8 @@ function Invoke-DwImportDeviceFeedDataTable{
 }
 
 
-$DLLPath = ".\sqlite3.dll"
-$DBPath = ".\DWCSN.db"
+$DLLPath = "$PSScriptRoot\sqlite3.dll"
+$DBPath = "$PSScriptRoot\DWCSN.db"
 $FeedName = "XXXXX"
 
 Get-ServiceNowTableSQLite -tableName 'cmdb_ci_computer' -DLLPath $DLLPath -DBPath $DBPath
