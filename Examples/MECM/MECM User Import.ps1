@@ -61,13 +61,14 @@ $i = 0
 foreach ($row in $table){
     $i++
     # convert table row to json, exclude attributes we dont need
-    $jsonBody = $row | Select-Object * -ExcludeProperty ItemArray, Table, RowError, RowState, HasErrors, OwnerDomain, OwnerUsername | ConvertTo-Json
+    $jsonBody = $row | Select-Object * -ExcludeProperty ItemArray, Table, RowError, RowState, HasErrors | ConvertTo-Json
+    $username = $row.username
 
-    Write-Progress -Activity "Importing Devices to Dashworks" -Status ("Processing device: {0}" -f $uniqueIdentifier) -PercentComplete (($i/$table.Count*100))
+    Write-Progress -Activity "Importing Users to Dashworks" -Status ("Processing user: {0}" -f $username) -PercentComplete (($i/$table.Count*100))
 
     $existingUser = Get-DwImportUser @DashworksParams -ImportId $importId -Username $username
     if ($existingUser) {
-        $result = Set-DwImportUser @DashworksParams -ImportId $importId -UniqueIdentifier $uniqueIdentifier -JsonBody $jsonBody
+        $result = Set-DwImportUser @DashworksParams -ImportId $importId -Useranme $username -JsonBody $jsonBody
         # check result, for an update we are expecting status code 204
         if ($result.StatusCode -ne 204) {
             Write-Error $result

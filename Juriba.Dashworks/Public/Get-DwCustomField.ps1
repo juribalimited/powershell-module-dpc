@@ -26,7 +26,7 @@ function Get-DwCustomField {
 
     #>
 
-    [CmdletBinding(SupportsShouldProcess)]
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [string]$Instance,
@@ -34,19 +34,16 @@ function Get-DwCustomField {
         [string]$APIKey
     )
 
-
     $uri = "{0}/apiv1/custom-fields" -f $Instance
     $headers = @{'x-api-key' = $APIKey }
 
     try {
-        if ($PSCmdlet.ShouldProcess($Name)) {
-            $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType 'application/json'
-            if ($result.StatusCode -eq 200) {
-                return ($result.Content | ConvertFrom-Json)
-            }
-            else {
-                Write-Error $_
-            }
+        $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType 'application/json'
+        if ($result.StatusCode -eq 200) {
+            return ($result.Content | ConvertFrom-Json)
+        }
+        else {
+            Write-Error $_
         }
     }
     catch {
