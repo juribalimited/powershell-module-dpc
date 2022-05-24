@@ -21,7 +21,7 @@ $ServiceNow_ClientSecret = 'XXXXXXXX'
 
 #Dashworks Configuration Settings
 $Dashworks_ServerURL = 'https://XXXX.dashworks.app:8443'
-$Dashworks_APIKey = '/e7OM/m/t87iN+QH2dZeg/TN8W1hockhNgae5BVKdlVlPExOdYVkP3t67RohZYs3FY0kX7XVh9RLu/XyQF0Rog=='
+$Dashworks_APIKey = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 
 
 if ($ServiceNow_AuthType -eq 'OAuth')

@@ -467,7 +467,7 @@ function Invoke-DwImportDeviceFeedDataTable{
 }
 
 
-$DLLPath = "$PSScriptRoot\sqlite3.dll"
+$DLLPath = "$PSScriptRoot\System.Data.SQLite.dll"
 $DBPath = "$PSScriptRoot\DWCSN.db"
 $FeedName = "XXXXX"
 
