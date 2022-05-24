@@ -66,19 +66,24 @@ foreach ($row in $table){
 
     Write-Progress -Activity "Importing Users to Dashworks" -Status ("Processing user: {0}" -f $username) -PercentComplete (($i/$table.Count*100))
 
-    $existingUser = Get-DwImportUser @DashworksParams -ImportId $importId -Username $username
-    if ($existingUser) {
-        $result = Set-DwImportUser @DashworksParams -ImportId $importId -Useranme $username -JsonBody $jsonBody
-        # check result, for an update we are expecting status code 204
-        if ($result.StatusCode -ne 204) {
-            Write-Error $result
+    try {
+        $existingUser = Get-DwImportUser @DashworksParams -ImportId $importId -Username $username
+        if ($existingUser) {
+            $result = Set-DwImportUser @DashworksParams -ImportId $importId -UniqueIdentifier $username -JsonBody $jsonBody
+            # check result, for an update we are expecting status code 204
+            if ($result.StatusCode -ne 204) {
+                Write-Error ("{0}|{1}" -f $username, $result)
+            }
+        }
+        else {
+            $result = New-DwImportUser @DashworksParams -ImportId $importId -JsonBody $jsonBody
+            #check result, for a new user we expect the return object to contain the user
+            if (-Not $result.username) {
+                Write-Error ("{0}|{1}" -f $username, $result)
+            }
         }
     }
-    else {
-        $result = New-DwImportUser @DashworksParams -ImportId $importId -JsonBody $jsonBody
-        #check result, for a new user we expect the return object to contain the user
-        if (-Not $result.username) {
-            Write-Error $result
-        }
+    catch {
+        Write-Error ("{0}|{1}" -f $username, $_)
     }
 }
