@@ -7,7 +7,7 @@ WHERE LUH.IsDeleted = 0
 CREATE CLUSTERED INDEX IX_tmp_LU_SoftwareHash ON #LU_SoftwareHash(SoftwarePropertiesHash)
 
 
-SELECT ISNULL(CAST(LUH.SoftwareID AS NVARCHAR(255)),CAST(CAST(CAST(HASHBYTES('MD5',RUA.CompanyName00+RUA.ProductName00+RUA.ProductVersion00) AS UNIQUEIDENTIFIER) AS NVARCHAR(36)) AS NVARCHAR(255))) ApplicationUniqueIdentifier
+SELECT DISTINCT ISNULL(CAST(LUH.SoftwareID AS NVARCHAR(255)),CAST(CAST(CAST(HASHBYTES('MD5',RUA.CompanyName00+RUA.ProductName00+RUA.ProductVersion00) AS UNIQUEIDENTIFIER) AS NVARCHAR(36)) AS NVARCHAR(255))) ApplicationUniqueIdentifier
 	,SD.ItemKey DeviceUniqueIdentifier
 	--,CASE WHEN CHARINDEX('\', RUA.LastUserName00) > 0 THEN LEFT(RUA.LastUserName00,CHARINDEX('\', RUA.LastUserName00) - 1) END UserDomain
 	--,CASE WHEN CHARINDEX('\', RUA.LastUserName00) > 0 THEN RIGHT(RUA.LastUserName00,LEN(RUA.LastUserName00) - CHARINDEX('\', RUA.LastUserName00)) END UserDomain
