@@ -40,7 +40,7 @@ Function New-DwDashboardCardWidget {
             "orderByDescending"         = $null
             "orderById"                 = $null
             "orderByField"              = $null
-            "showLegend"                = $false
+            "legend"                    = 5
             "orientationIsVertical"     = $false
             "layout"                    = "IconAndText"
             "displayDataLabels"         = $false

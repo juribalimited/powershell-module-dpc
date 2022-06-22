@@ -46,7 +46,7 @@ Function New-DwDashboardHalfDonutWidget {
             "orderByDescending"         = $OrderByDescending
             "orderById"                 = if ($OrderByField) { if ($OrderByField -eq "Count") { 2 }else { 1 } }else { $null }
             "orderByField"              = $OrderByField
-            "showLegend"                = $true
+            "legend"                    = 5
             "orientationIsVertical"     = $false
             "layout"                    = $null
             "displayDataLabels"         = $false
