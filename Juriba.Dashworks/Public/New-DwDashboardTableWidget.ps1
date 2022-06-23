@@ -48,7 +48,7 @@ Function New-DwDashboardTableWidget {
             "orderByDescending"         = $OrderByDescending
             "orderById"                 = if ($OrderByField) { if ($OrderByField -eq "Count") { 2 }else { 1 } }else { $null }
             "orderByField"              = $OrderByField
-            "showLegend"                = $false
+            "legend"                    = 5
             "orientationIsVertical"     = $true
             "layout"                    = "IconAndText"
             "displayDataLabels"         = $false
