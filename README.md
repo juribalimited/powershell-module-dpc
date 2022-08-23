@@ -26,7 +26,7 @@ Update-Module Juriba.Dashworks
 
 ### Dashworks Instance
 
-Before using the PowerShell cmdlets in this module you will need to know the URL for your Dashworks instance, specifically the base URL for the API. This key is passed to all cmdlets using the -Instance parameter. For example:
+Before using the PowerShell cmdlets in this module you will need to know the URL for your Dashworks instance, specifically the base URL for the API. This URL is passed to all cmdlets using the -Instance parameter. For example:
 
 ```powershell
 Get-DwImportDevice -Instance https://mydashworksinstance.dashworks.juriba.app ...
@@ -51,10 +51,12 @@ Get-DwImportDevice -APIKey $apikey ...
 
 We recommend storing API Keys securely using something like [Microsoft.PowerShell.SecretManagement](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.secretmanagement/?view=ps-modules).
 
-For more information on using API Keys see [API Keys](https://docs.juriba.com/dashworks/dashworks-api/api-keys/get-api-key) in the Dashworks docs.
+For more information on using API Keys see [API Keys](https://docs.juriba.com/dashworks/next/dashworks-api/api-keys/get-api-key) in the Dashworks docs.
 
 ### Examples
 
 The [Examples](./Examples) folder contains a number of examples demonstrating how each of the cmdlets can be used to work with data from various sources, such as MECM and Active Directory.
 
-More documentation for each example can be found in the [Dashworks API docs](https://docs.juriba.com/dashworks/dashworks-api/data-import-examples).
+### Further Information
+
+See [Import API](https://docs.juriba.com/dashworks/next/dashworks-api/import-api/overview) for more information about using the Data Import API endpoints.
