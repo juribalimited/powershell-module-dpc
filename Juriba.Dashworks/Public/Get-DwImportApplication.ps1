@@ -48,7 +48,7 @@ function Get-DwImportApplication {
 
     #>
 
-    [CmdletBinding(DefaultParameterSetName="UniuqeIdentifier")]
+    [CmdletBinding(DefaultParameterSetName="UniqueIdentifier")]
     param (
         [Parameter(Mandatory=$true)]
         [string]$Instance,
