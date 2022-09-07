@@ -168,9 +168,9 @@ Function Get-AzDataTable{
         #$devicesDatatable = $devices.value | Out-DataTable
         #$devicesDatatable.Columns.Add("DistHierId", [int], $DistHierId) | Out-Null
 
-        $uri = $devices.'@odata.nextLink'
+        $uri = $GraphData.'@odata.nextLink'
     }
-    while ($null -ne $users.'@odata.nextLink')
+    while ($null -ne $GraphData.'@odata.nextLink')
 
     return @(,($dtResults))
 }
