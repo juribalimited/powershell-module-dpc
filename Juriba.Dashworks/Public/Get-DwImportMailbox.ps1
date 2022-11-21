@@ -1,15 +1,15 @@
-function Get-DwImportDevice {
+function Get-DwImportMailbox {
     <#
         .SYNOPSIS
-        Gets one or more Dashworks devices from the import API.
+        Gets one or more Dashworks mailboxes from the import API.
 
         .DESCRIPTION
-        Gets a Dashworks device from the import API.
+        Gets one or more Dashworks mailboxes from the import API.
         Takes the ImportId as an input.
-        Optionally takes a UnqiueIdentifier as an input and will return a single device with that UniqueIdentifier.
-        Optionally takes a Hostname as an input and will return all devices matching that hostname.
-        Optionally takes a Filter as an input and will return all devices matching that filter. See swagger documentation for examples of using filters.
-        If specified, only one of UniqueIdentifier, Hostname or Filter can be supplied. Omit all to return all devices for the import.
+        Optionally takes a UnqiueIdentifier as an input and will return a single mailbox with that UniqueIdentifier.
+        Optionally takes a Hostname as an input and will return all mailboxes matching that hostname.
+        Optionally takes a Filter as an input and will return all mailboxes matching that filter. See swagger documentation for examples of using filters.
+        If specified, only one of UniqueIdentifier, Hostname or Filter can be supplied. Omit all to return all mailboxes for the import.
 
         .PARAMETER Instance
 
@@ -21,38 +21,38 @@ function Get-DwImportDevice {
 
         .PARAMETER UniqueIdentifier
 
-        UniqueIdentifier for the device. Cannot be used with Hostname or Filter.
+        UniqueIdentifier for the mailbox. Cannot be used with Hostname or Filter.
 
         .PARAMETER ImportId
 
-        ImportId for the device.
+        ImportId for the mailbox(es).
 
         .PARAMETER Hostname
 
-        Hostname for the device. Cannot be used with UniqueIdentifier or Filter.
+        Hostname for the mailbox. Cannot be used with UniqueIdentifier or Filter.
 
         .PARAMETER Filter
 
-        Filter for device search. Cannot be used with Hostname or UniqueIdentifier.
+        Filter for mailbox search. Cannot be used with Hostname or UniqueIdentifier.
 
         .PARAMETER InfoLevel
 
         Optional. Sets the level of information that this function returns. Accepts Basic or Full.
-        Basic returns only the UniqueIdentifier, use when confirming a device exists.
-        Full returns the full json object for the device.
+        Basic returns only the UniqueIdentifier, use when confirming a mailbox exists.
+        Full returns the full json object for the mailbox.
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-DwImportDevice -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+        PS> Get-DwImportMailbox -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
         .EXAMPLE
-        PS> Get-DwImportDevice -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
+        PS> Get-DwImportMailbox -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
 
         .EXAMPLE
-        PS> Get-DwImportDevice -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
+        PS> Get-DwImportMailbox -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
 
         .EXAMPLE
-        PS> Get-DwImportDevice -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
+        PS> Get-DwImportMailbox -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
 
          #>
 
@@ -76,7 +76,7 @@ function Get-DwImportDevice {
     )
 
     $limit = 50 # page size
-    $uri = "{0}/apiv2/imports/devices/{1}/items" -f $Instance, $ImportId
+    $uri = "{0}/apiv2/imports/mailboxes/{1}/items" -f $Instance, $ImportId
 
     switch ($PSCmdlet.ParameterSetName) {
         "UniqueIdentifier" {
@@ -102,10 +102,10 @@ function Get-DwImportDevice {
         'cache-control' = 'no-cache'
     }
 
-    $device = ""
+    $mailbox = ""
     try {
         $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json"
-        $device = switch($InfoLevel) {
+        $mailbox = switch($InfoLevel) {
             "Basic" { ($result.Content | ConvertFrom-Json).UniqueIdentifier }
             "Full"  { $result.Content | ConvertFrom-Json }
         }
@@ -115,21 +115,22 @@ function Get-DwImportDevice {
             for ($page = 2; $page -le $totalPages; $page++) {
                 $pagedUri = $uri + "&page={0}" -f $page
                 $pagedResult = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $headers -ContentType "application/json"
-                $device += switch($InfoLevel) {
+                $mailbox += switch($InfoLevel) {
                     "Basic" { ($pagedResult.Content | ConvertFrom-Json).UniqueIdentifier }
                     "Full"  { $pagedResult.Content | ConvertFrom-Json }
                 }
             }
         }
-        return $device
+        return $mailbox
     }
     catch {
-        Write-Error $_.Exception.Response
-        <#
         if ($_.Exception.Response.StatusCode.Value__ -eq 404) {
-            # 404 means the device was not found, don't treat this as an error
-            # as we expect this function to be used to check if a device exists
-            Write-Verbose "device not found"
-        } #>
+            # 404 means the mailbox was not found, don't treat this as an error
+            # as we expect this function to be used to check if a mailbox exists
+            Write-Verbose "mailbox not found"
+        }
+        else {
+            Write-Error $_
+        }
     }
 }
