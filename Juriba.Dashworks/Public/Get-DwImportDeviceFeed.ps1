@@ -39,21 +39,18 @@ function Get-DwImportDeviceFeed {
         [string]$Instance,
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
-        [parameter(Mandatory=$false, ParameterSetName="ImportId")]
+        [parameter(Mandatory=$false)]
         [int]$ImportId,
-        [parameter(Mandatory=$false, ParameterSetName="Name")]
+        [parameter(Mandatory=$false)]
         [string]$Name
     )
 
     $uri = "{0}/apiv2/imports/devices" -f $Instance
-    switch ($PSCmdlet.ParameterSetName) {
-        "ImportId" {
-            $uri += "/{0}" -f $ImportId
-        }
-        "Name" {
-            $uri += "?filter="
-            $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Name)
-        }
+
+    if ($ImportId) {$uri += "/{0}" -f $ImportId}
+    if ($Name) {
+        $uri += "?filter="
+        $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Name)
     }
 
     $headers = @{'x-api-key' = $APIKey}
