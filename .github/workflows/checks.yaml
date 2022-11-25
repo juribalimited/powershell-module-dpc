@@ -17,5 +17,5 @@ jobs:
         run: Install-Module PSScriptAnalyzer -Force
         shell: pwsh
       - name: 'Run PSScriptAnalyzer'
-        run: Invoke-ScriptAnalyzer -Path .\Juriba.Dashworks -Recurse -EnableExit | Format-List
+        run: Invoke-ScriptAnalyzer -Path .\Juriba.Dashworks -Recurse -EnableExit | Format-List -Property ScriptName, RuleName, Severity, Line, Column, Message
         shell: pwsh
