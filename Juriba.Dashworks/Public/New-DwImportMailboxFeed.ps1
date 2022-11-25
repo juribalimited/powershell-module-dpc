@@ -45,7 +45,7 @@ function New-DwImportMailboxFeed {
 
         .EXAMPLE
 
-        PS> New-DwImportMailboxFeed -Name "My New Import" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -SendOnBehalfPermissions 5 -MailboxPermissions 2 -MailboxExtendedRights 5 
+        PS> New-DwImportMailboxFeed -Name "My New Import" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -SendOnBehalfPermissions 5 -MailboxPermissions 2 -MailboxExtendedRights 5
 
     #>
     [CmdletBinding(SupportsShouldProcess)]

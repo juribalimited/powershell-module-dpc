@@ -85,13 +85,13 @@ function Set-DwImportMailboxFeed {
     $headers = @{'x-api-key' = $APIKey}
 
     $payload = @{}
-    if ($name) { 
+    if ($name) {
         $payload.Add("name", $Name)
         if ($VerboseLogging) {$payload.Add("verboseLogging", $VerboseLogging)}
         if ($ImportEntireForest) {$payload.Add("importEntireForest", $ImportEntireForest)}
         if ($SendOnBehalfPermissions) {$payload.Add("sendOnBehalfPermissions", $SendOnBehalfPermissions)}
         if ($MailboxPermissions) {$payload.Add("mailboxPermissions", $MailboxPermissions)}
-        if ($MailboxExtendedRights) {$payload.Add("mailboxExtendedRights", $MailboxExtendedRights)}       
+        if ($MailboxExtendedRights) {$payload.Add("mailboxExtendedRights", $MailboxExtendedRights)}
     }
     if ($PSCmdlet.ParameterSetName -eq 'FeedEnabled') { $payload.Add("enabled", $Enabled) }
 
