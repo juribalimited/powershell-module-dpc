@@ -1,11 +1,11 @@
 #requires -Version 7
-function Get-DwImportDeviceFeed {
+function Get-DwImportMailboxFeed {
     <#
         .SYNOPSIS
-        Gets device imports.
+        Gets mailbox imports.
 
         .DESCRIPTION
-        Gets one or more device feeds.
+        Gets one or more mailbox feeds.
         Use ImportId to get a specific feed or omit for all feeds.
 
         .PARAMETER Instance
@@ -18,19 +18,19 @@ function Get-DwImportDeviceFeed {
 
         .PARAMETER ImportId
 
-        Optional. The id for the device feed. Omit to get all device feeds.
+        Optional. The id for the mailbox feed. Omit to get all mailbox feeds.
 
         .PARAMETER Name
 
-        Optional. Name of device feed to find. Can only be used when ImportId is not specified.
+        Optional. Name of mailbox feed to find. Can only be used when ImportId is not specified.
 
         .EXAMPLE
 
-        PS> Get-DwImportDeviceFeed -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Get-DwImportMailboxFeed -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
         .EXAMPLE
 
-        PS> Get-DwImportDeviceFeed -Name "My Device Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Get-DwImportMailboxFeed -Name "My Mailbox Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
     [CmdletBinding()]
@@ -39,15 +39,13 @@ function Get-DwImportDeviceFeed {
         [string]$Instance,
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
-        [parameter(Mandatory=$false,
-        ParameterSetName="ImportId")]
+        [parameter(Mandatory=$false)]
         [int]$ImportId,
-        [parameter(Mandatory=$false,
-        ParameterSetName="Name")]
+        [parameter(Mandatory=$false)]
         [string]$Name
     )
 
-    $uri = "{0}/apiv2/imports/devices" -f $Instance
+    $uri = "{0}/apiv2/imports/mailboxes" -f $Instance
 
     if ($ImportId) {$uri += "/{0}" -f $ImportId}
     if ($Name) {

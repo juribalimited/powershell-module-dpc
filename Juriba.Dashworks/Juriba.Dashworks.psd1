@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.Dashworks.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.0.29.0'
+    ModuleVersion     = '0.0.30.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -86,6 +86,8 @@
         'Get-DwImportLocationFeed',
         'Get-DwImportUser',
         'Get-DwImportUserFeed',
+        'Get-DwImportMailbox',
+        'Get-DwImportMailboxFeed',
         'Get-DwList',
         'Get-DwSessionUser',
         'Get-DwTag',
@@ -107,6 +109,8 @@
         'New-DwImportLocationFeed',
         'New-DwImportUser',
         'New-DwImportUserFeed',
+        'New-DwImportMailbox',
+        'New-DwImportMailboxFeed',
         'New-DwList',
         'New-DwTag',
         'Remove-DwAutomation',
@@ -118,6 +122,8 @@
         'Remove-DwImportDeviceFeed',
         'Remove-DwImportLocationFeed',
         'Remove-DwImportUserFeed',
+        'Remove-DwImportMailbox',
+        'Remove-DwImportMailboxFeed',
         'Remove-DwList',
         'Remove-DwTag',
         'Remove-DwTaskValueDate',
@@ -126,6 +132,8 @@
         'Set-DwImportApplication',
         'Set-DwImportDevice',
         'Set-DwImportDeviceFeed',
+        'Set-DwImportMailbox',
+        'Set-DwImportMailboxFeed',
         'Set-DwImportUser',
         'Set-DwTaskValueDate',
         'Set-DwTaskValueSelect',
