@@ -39,9 +39,11 @@ function Get-DwImportDeviceFeed {
         [string]$Instance,
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
-        [parameter(Mandatory=$false)]
+        [parameter(Mandatory=$false,
+        ParameterSetName="ImportId")]
         [int]$ImportId,
-        [parameter(Mandatory=$false)]
+        [parameter(Mandatory=$false,
+        ParameterSetName="Name")]
         [string]$Name
     )
 

@@ -6,8 +6,7 @@ function Get-DwImportMailbox {
         .DESCRIPTION
         Gets one or more Dashworks mailboxes from the import API.
         Takes the ImportId as an input.
-        Optionally takes a UnqiueIdentifier as an input and will return a single mailbox with that UniqueIdentifier.
-        Optionally takes a Hostname as an input and will return all mailboxes matching that hostname.
+        Optionally takes a UniqueIdentifier as an input and will return a single mailbox with that UniqueIdentifier.
         Optionally takes a Filter as an input and will return all mailboxes matching that filter. See swagger documentation for examples of using filters.
         If specified, only one of UniqueIdentifier, Hostname or Filter can be supplied. Omit all to return all mailboxes for the import.
 
@@ -64,8 +63,6 @@ function Get-DwImportMailbox {
         [string]$APIKey,
         [parameter(Mandatory=$false, ParameterSetName="UniqueIdentifier")]
         [string]$UniqueIdentifier,
-        [parameter(Mandatory=$false, ParameterSetName="Hostname")]
-        [string]$Hostname,
         [parameter(Mandatory=$false, ParameterSetName="Filter")]
         [string]$Filter,
         [parameter(Mandatory=$true)]
@@ -81,11 +78,6 @@ function Get-DwImportMailbox {
     switch ($PSCmdlet.ParameterSetName) {
         "UniqueIdentifier" {
             $uri += "/{0}" -f $UniqueIdentifier
-        }
-        "Hostname" {
-            $uri += "?filter="
-            $uri += [System.Web.HttpUtility]::UrlEncode("eq(hostname,'{0}')" -f $Hostname)
-            $uri += "&limit={0}" -f $limit
         }
         "Filter" {
             $uri += "?filter="
