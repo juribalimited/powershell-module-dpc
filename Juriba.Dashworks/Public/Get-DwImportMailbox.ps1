@@ -26,10 +26,6 @@ function Get-DwImportMailbox {
 
         ImportId for the mailbox(es).
 
-        .PARAMETER Hostname
-
-        Hostname for the mailbox. Cannot be used with UniqueIdentifier or Filter.
-
         .PARAMETER Filter
 
         Filter for mailbox search. Cannot be used with Hostname or UniqueIdentifier.
