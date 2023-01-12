@@ -13,11 +13,11 @@ function Get-DwApplicationV1 {
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Dw. For example, https://myinstance.dashworks.app:8443
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
-        Optional. API key to be provided if not authenticating using Connect-Dw.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
 
         .EXAMPLE
         PS> Get-DwImportApplication -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
@@ -62,6 +62,6 @@ function Get-DwApplicationV1 {
             }
         }
     } else {
-        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Dw before proceeding."
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }

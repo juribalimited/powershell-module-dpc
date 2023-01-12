@@ -18,11 +18,11 @@ function Get-DwImportMailboxFeedV2 {
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Dw. For example, https://myinstance.dashworks.app:8443
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
-        Optional. API key to be provided if not authenticating using Connect-Dw.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
 
         .EXAMPLE
 
@@ -66,6 +66,6 @@ function Get-DwImportMailboxFeedV2 {
             Write-Error $_
         }  
     } else {
-        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Dw before proceeding."
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }

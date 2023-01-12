@@ -1,5 +1,5 @@
 #requires -Version 7
-function Disconnect-Dw {
+function Disconnect-Juriba {
         <#
         .SYNOPSIS
         Removes and deletes connection object from session.
@@ -9,13 +9,13 @@ function Disconnect-Dw {
 
         .EXAMPLE
 
-        PS> Disconnect-Dw
+        PS> Disconnect-Juriba
 
     #>
     if (Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') {
         return "Removed API connection to {0}." -f $dwConnection.instance
         Remove-Variable 'dwConnection' -Scope 'Global'
     } else {
-        Write-Error "No existing dwConnection found."
+        Write-Error "No existing Juriba Connection found."
     }
 }

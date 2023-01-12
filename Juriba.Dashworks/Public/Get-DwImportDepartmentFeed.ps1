@@ -7,9 +7,9 @@ function Get-DwImportDepartmentFeed {
         Gets one or more department feeds.
         Use ImportId to get a specific feed or omit for all feeds.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Dw. For example, https://myinstance.dashworks.app:8443
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
         .PARAMETER APIKey
-        Optional. API key to be provided if not authenticating using Connect-Dw.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ImportId
         Optional. The id for the department feed. Omit to get all department feeds.
         .PARAMETER Name
@@ -59,6 +59,6 @@ function Get-DwImportDepartmentFeed {
         }
 
     } else {
-        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Dw before proceeding."
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }

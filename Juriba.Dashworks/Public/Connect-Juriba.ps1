@@ -1,5 +1,5 @@
 #requires -Version 7
-function Connect-Dw {
+function Connect-Juriba {
         <#
         .SYNOPSIS
         Creates a connection object and stores globally within the current PS Session to be consumed by other functions within the module
@@ -9,7 +9,7 @@ function Connect-Dw {
 
         .PARAMETER APIKey
 
-        Optional. API key to be provided if not authenticating using Connect-Dw.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
 
         .PARAMETER Instance
 
@@ -17,7 +17,7 @@ function Connect-Dw {
 
         .EXAMPLE
 
-        PS> Connect-Dw -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Connect-Juriba -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
     param(

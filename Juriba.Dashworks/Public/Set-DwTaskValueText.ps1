@@ -6,9 +6,9 @@ function Set-DwTaskValueText {
         Updates a project task.
         Takes TaskId, ProjectID and ObjectKey and Value as inputs.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Dw. For example, https://myinstance.dashworks.app:8443
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
         .PARAMETER APIKey
-        Optional. API key to be provided if not authenticating using Connect-Dw.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER TaskId
         TaskId of the task to be updated.
         .PARAMETER ProjectId
@@ -85,6 +85,6 @@ function Set-DwTaskValueText {
             Write-Error $_
         }
     } else {
-        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Dw before proceeding."
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }

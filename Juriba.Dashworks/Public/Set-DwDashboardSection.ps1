@@ -54,6 +54,6 @@ Function Set-DwDashboardSection {
             Invoke-RestMethod @request | Out-Null
         }
     } else {
-        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Dw before proceeding."
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }
