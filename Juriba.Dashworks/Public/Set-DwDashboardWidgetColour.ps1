@@ -12,9 +12,9 @@ Function Set-DwDashboardWidgetColour {
 
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$Instance,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [Parameter(Mandatory = $true)]
         [int]$DashboardId,
@@ -30,18 +30,27 @@ Function Set-DwDashboardWidgetColour {
         [parameter(Mandatory=$true)]
         [string]$JsonBody
     )
-
-    $contentType = "application/json"
-    $headers = @{ 'X-API-KEY' = $ApiKey }
-    $uri = "{0}/apiv1/dashboard/{1}/section/{2}/widget/{3}" -f $Instance, $DashboardId, $SectionId, $WidgetId
-
-    try {
-        if ($PSCmdlet.ShouldProcess($WidgetId)) {
-            $result = Invoke-WebRequest -Uri $uri -Headers $headers -Method PUT -ContentType $contentType -Body $JsonBody
-            return $result
-        }
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
     }
-    catch {
-        Write-Error $_
+
+    if ($APIKey -and $Instance) {
+        $contentType = "application/json"
+        $headers = @{ 'X-API-KEY' = $ApiKey }
+        $uri = "{0}/apiv1/dashboard/{1}/section/{2}/widget/{3}" -f $Instance, $DashboardId, $SectionId, $WidgetId
+    
+        try {
+            if ($PSCmdlet.ShouldProcess($WidgetId)) {
+                $result = Invoke-WebRequest -Uri $uri -Headers $headers -Method PUT -ContentType $contentType -Body $JsonBody
+                return $result
+            }
+        }
+        catch {
+            Write-Error $_
+        }
+
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Dw before proceeding."
     }
 }

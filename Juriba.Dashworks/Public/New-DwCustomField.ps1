@@ -10,11 +10,11 @@ function New-DwCustomField {
 
     .PARAMETER Instance
 
-    Dashworks instance. For example, https://myinstance.dashworks.app:8443
+    Optional. Dashworks instance to be provided if not authenticating using Connect-Dw. For example, https://myinstance.dashworks.app:8443
 
     .PARAMETER APIKey
 
-    Dashworks API Key.
+    Optional. API key to be provided if not authenticating using Connect-Dw.
 
     .PARAMETER Name
 
@@ -52,9 +52,9 @@ function New-DwCustomField {
 
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$Instance,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -76,54 +76,64 @@ function New-DwCustomField {
         [string]$AllowUpdate = "Directly"
     )
 
-    $typeId = switch($Type) {
-        "Text"      {1}
-        "MultiText" {2}
-        "LargeText" {3}
-        "Number"    {5}
-        "Date"      {4}
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
     }
 
-    $updateSourceId = switch($AllowUpdate) {
-        "Directly" {1}
-        "ETL" {2}
-    }
-
-    $payload = @{}
-    $payload.Add("allowExternalUpdate", $true)
-    $payload.Add("csvUpdateColumnHeader", $CSVColumnHeader)
-    $payload.Add("IsActive", $IsActive)
-    $payload.Add("isApplicationField", ($ObjectTypes -contains "Application"))
-    $payload.Add("isComputerField", ($ObjectTypes -contains "Device"))
-    $payload.Add("isMailboxField",($ObjectTypes -contains "Mailbox"))
-    $payload.Add("isUserField", ($ObjectTypes -contains "User"))
-    $payload.Add("name", $Name)
-    $payload.Add("valueTypeId", $typeId)
-    $payload.Add("updateSourceId", $updateSourceId)
-
-    $jsonbody = $payload | ConvertTo-Json
-    $uri = "{0}/apiv1/custom-fields" -f $Instance
-    $headers = @{'x-api-key' = $APIKey }
-
-    try {
-        if ($PSCmdlet.ShouldProcess($Name)) {
-            $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body $jsonbody -ContentType 'application/json'
-            if ($result.StatusCode -eq 200) {
-                Write-Information "Custom field created" -InformationAction Continue
+    if ($APIKey -and $Instance) {
+        $typeId = switch($Type) {
+            "Text"      {1}
+            "MultiText" {2}
+            "LargeText" {3}
+            "Number"    {5}
+            "Date"      {4}
+        }
+    
+        $updateSourceId = switch($AllowUpdate) {
+            "Directly" {1}
+            "ETL" {2}
+        }
+    
+        $payload = @{}
+        $payload.Add("allowExternalUpdate", $true)
+        $payload.Add("csvUpdateColumnHeader", $CSVColumnHeader)
+        $payload.Add("IsActive", $IsActive)
+        $payload.Add("isApplicationField", ($ObjectTypes -contains "Application"))
+        $payload.Add("isComputerField", ($ObjectTypes -contains "Device"))
+        $payload.Add("isMailboxField",($ObjectTypes -contains "Mailbox"))
+        $payload.Add("isUserField", ($ObjectTypes -contains "User"))
+        $payload.Add("name", $Name)
+        $payload.Add("valueTypeId", $typeId)
+        $payload.Add("updateSourceId", $updateSourceId)
+    
+        $jsonbody = $payload | ConvertTo-Json
+        $uri = "{0}/apiv1/custom-fields" -f $Instance
+        $headers = @{'x-api-key' = $APIKey }
+    
+        try {
+            if ($PSCmdlet.ShouldProcess($Name)) {
+                $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body $jsonbody -ContentType 'application/json'
+                if ($result.StatusCode -eq 200) {
+                    Write-Information "Custom field created" -InformationAction Continue
+                }
+                else {
+                    throw "Error in custom field creation"
+                }
             }
-            else {
-                throw "Error in custom field creation"
+        }
+        catch {
+            if ($_.Exception.Response.StatusCode.Value__ -eq 409)
+            {
+                Write-Error ("{0}" -f (($_ | ConvertFrom-Json).detail))
+            }
+            else
+            {
+                Write-Error $_
             }
         }
-    }
-    catch {
-        if ($_.Exception.Response.StatusCode.Value__ -eq 409)
-        {
-            Write-Error ("{0}" -f (($_ | ConvertFrom-Json).detail))
-        }
-        else
-        {
-            Write-Error $_
-        }
+
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Dw before proceeding."
     }
 }

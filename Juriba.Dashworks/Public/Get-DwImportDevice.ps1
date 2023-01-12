@@ -13,11 +13,11 @@ function Get-DwImportDevice {
 
         .PARAMETER Instance
 
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Dw. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Dw.
 
         .PARAMETER UniqueIdentifier
 
@@ -58,9 +58,9 @@ function Get-DwImportDevice {
 
     [CmdletBinding(DefaultParameterSetName="Default")]
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$Instance,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [parameter(Mandatory=$false, ParameterSetName="UniqueIdentifier")]
         [string]$UniqueIdentifier,
@@ -74,62 +74,71 @@ function Get-DwImportDevice {
         [ValidateSet("Basic", "Full")]
         [string]$InfoLevel = "Basic"
     )
-
-    $limit = 50 # page size
-    $uri = "{0}/apiv2/imports/devices/{1}/items" -f $Instance, $ImportId
-
-    switch ($PSCmdlet.ParameterSetName) {
-        "UniqueIdentifier" {
-            $uri += "/{0}" -f $UniqueIdentifier
-        }
-        "Hostname" {
-            $uri += "?filter="
-            $uri += [System.Web.HttpUtility]::UrlEncode("eq(hostname,'{0}')" -f $Hostname)
-            $uri += "&limit={0}" -f $limit
-        }
-        "Filter" {
-            $uri += "?filter="
-            $uri += [System.Web.HttpUtility]::UrlEncode("{0}" -f $Filter)
-            $uri += "&limit={0}" -f $limit
-        }
-        Default {
-            $uri += "?limit={0}" -f $limit
-        }
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
     }
 
-    $headers = @{
-        'x-api-key' = $APIKey
-        'cache-control' = 'no-cache'
-    }
-
-    $device = ""
-    try {
-        $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json"
-        $device = switch($InfoLevel) {
-            "Basic" { ($result.Content | ConvertFrom-Json).UniqueIdentifier }
-            "Full"  { $result.Content | ConvertFrom-Json }
-        }
-        # check if result is paged, if so get remaining pages and add to result set
-        if ($result.Headers.ContainsKey("X-Pagination")) {
-            $totalPages = ($result.Headers."X-Pagination" | ConvertFrom-Json).totalPages
-            for ($page = 2; $page -le $totalPages; $page++) {
-                $pagedUri = $uri + "&page={0}" -f $page
-                $pagedResult = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $headers -ContentType "application/json"
-                $device += switch($InfoLevel) {
-                    "Basic" { ($pagedResult.Content | ConvertFrom-Json).UniqueIdentifier }
-                    "Full"  { $pagedResult.Content | ConvertFrom-Json }
-                }
+    if ($APIKey -and $Instance) {
+        $limit = 50 # page size
+        $uri = "{0}/apiv2/imports/devices/{1}/items" -f $Instance, $ImportId
+    
+        switch ($PSCmdlet.ParameterSetName) {
+            "UniqueIdentifier" {
+                $uri += "/{0}" -f $UniqueIdentifier
+            }
+            "Hostname" {
+                $uri += "?filter="
+                $uri += [System.Web.HttpUtility]::UrlEncode("eq(hostname,'{0}')" -f $Hostname)
+                $uri += "&limit={0}" -f $limit
+            }
+            "Filter" {
+                $uri += "?filter="
+                $uri += [System.Web.HttpUtility]::UrlEncode("{0}" -f $Filter)
+                $uri += "&limit={0}" -f $limit
+            }
+            Default {
+                $uri += "?limit={0}" -f $limit
             }
         }
-        return $device
-    }
-    catch {
-        Write-Error $_.Exception.Response
-        <#
-        if ($_.Exception.Response.StatusCode.Value__ -eq 404) {
-            # 404 means the device was not found, don't treat this as an error
-            # as we expect this function to be used to check if a device exists
-            Write-Verbose "device not found"
-        } #>
+    
+        $headers = @{
+            'x-api-key' = $APIKey
+            'cache-control' = 'no-cache'
+        }
+    
+        $device = ""
+        try {
+            $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json"
+            $device = switch($InfoLevel) {
+                "Basic" { ($result.Content | ConvertFrom-Json).UniqueIdentifier }
+                "Full"  { $result.Content | ConvertFrom-Json }
+            }
+            # check if result is paged, if so get remaining pages and add to result set
+            if ($result.Headers.ContainsKey("X-Pagination")) {
+                $totalPages = ($result.Headers."X-Pagination" | ConvertFrom-Json).totalPages
+                for ($page = 2; $page -le $totalPages; $page++) {
+                    $pagedUri = $uri + "&page={0}" -f $page
+                    $pagedResult = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $headers -ContentType "application/json"
+                    $device += switch($InfoLevel) {
+                        "Basic" { ($pagedResult.Content | ConvertFrom-Json).UniqueIdentifier }
+                        "Full"  { $pagedResult.Content | ConvertFrom-Json }
+                    }
+                }
+            }
+            return $device
+        }
+        catch {
+            Write-Error $_.Exception.Response
+            <#
+            if ($_.Exception.Response.StatusCode.Value__ -eq 404) {
+                # 404 means the device was not found, don't treat this as an error
+                # as we expect this function to be used to check if a device exists
+                Write-Verbose "device not found"
+            } #>
+        }
+
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Dw before proceeding."
     }
 }

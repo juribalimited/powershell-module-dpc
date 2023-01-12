@@ -10,11 +10,11 @@ function Get-DwImportDeviceFeed {
 
         .PARAMETER Instance
 
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Dw. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Dw.
 
         .PARAMETER ImportId
 
@@ -35,9 +35,9 @@ function Get-DwImportDeviceFeed {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$Instance,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [parameter(Mandatory=$false,
         ParameterSetName="ImportId")]
@@ -47,22 +47,31 @@ function Get-DwImportDeviceFeed {
         [string]$Name
     )
 
-    $uri = "{0}/apiv2/imports/devices" -f $Instance
-
-    if ($ImportId) {$uri += "/{0}" -f $ImportId}
-    if ($Name) {
-        $uri += "?filter="
-        $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Name)
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
     }
 
-    $headers = @{'x-api-key' = $APIKey}
+    if ($APIKey -and $Instance) {
+        $uri = "{0}/apiv2/imports/devices" -f $Instance
 
-    try {
-        $result = Invoke-RestMethod -Uri $uri -Method GET -Headers $headers
-        return $result
+        if ($ImportId) {$uri += "/{0}" -f $ImportId}
+        if ($Name) {
+            $uri += "?filter="
+            $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Name)
+        }
+    
+        $headers = @{'x-api-key' = $APIKey}
+    
+        try {
+            $result = Invoke-RestMethod -Uri $uri -Method GET -Headers $headers
+            return $result
+        }
+        catch {
+            Write-Error $_
+        }
+    
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Dw before proceeding."
     }
-    catch {
-        Write-Error $_
-    }
-
 }

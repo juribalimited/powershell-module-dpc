@@ -8,11 +8,11 @@ Function New-DwList {
 
         .PARAMETER Instance
 
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Dw. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Dw.
 
         .PARAMETER Name
 
@@ -50,9 +50,9 @@ Function New-DwList {
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$Instance,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [Parameter(Mandatory = $true)]
         [string]$Name,
@@ -67,40 +67,46 @@ Function New-DwList {
         [ValidateSet("Device", "User", "Application", "Mailbox", "ApplicationUser", "ApplciationDevice")]
         [string]$ObjectType
     )
-
-    $endpoint = ""
-    switch ($ObjectType) {
-        "ApplicationUser" { throw "not implemented" }
-        "ApplicationDevice" { throw "not implemented" }
-        "Device" { $endpoint = "devices"}
-        "User" { $endpoint = "users "}
-        "Application" { $endpoint = "applications" }
-        "Mailbox" { $endpoint = "mailboxes" }
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
     }
 
-    switch ($ListType) {
-        "Static" { throw "not implemented" }
+    if ($APIKey -and $Instance) {
+        $endpoint = ""
+        switch ($ObjectType) {
+            "ApplicationUser" { throw "not implemented" }
+            "ApplicationDevice" { throw "not implemented" }
+            "Device" { $endpoint = "devices"}
+            "User" { $endpoint = "users "}
+            "Application" { $endpoint = "applications" }
+            "Mailbox" { $endpoint = "mailboxes" }
+        }
+    
+        switch ($ListType) {
+            "Static" { throw "not implemented" }
+        }
+    
+        $body = @{
+            "listName"                      = $Name
+            "userId"                        = $UserId
+            "queryString"                   = $QueryString
+            "listType"                      = $ListType
+            "sharedAdministerAccessType"    = "Owner"
+            "sharedEditAccessType"          = "Owner"
+            "sharedReadAccessType"          = "Everyone"
+        } | ConvertTo-Json
+    
+        $contentType = "application/json"
+        $headers = @{ 'X-API-KEY' = $ApiKey }
+        $uri = "{0}/apiv1/lists/{1}"  -f  $instance, $endpoint
+    
+        if ($PSCmdlet.ShouldProcess($Name)) {
+            $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body $body -Method POST -ContentType $contentType
+    
+            return ($result.content | ConvertFrom-Json)
+        }
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Dw before proceeding."
     }
-
-    $body = @{
-        "listName"                      = $Name
-        "userId"                        = $UserId
-        "queryString"                   = $QueryString
-        "listType"                      = $ListType
-        "sharedAdministerAccessType"    = "Owner"
-        "sharedEditAccessType"          = "Owner"
-        "sharedReadAccessType"          = "Everyone"
-    } | ConvertTo-Json
-
-    $contentType = "application/json"
-    $headers = @{ 'X-API-KEY' = $ApiKey }
-    $uri = "{0}/apiv1/lists/{1}"  -f  $instance, $endpoint
-
-    if ($PSCmdlet.ShouldProcess($Name)) {
-        $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body $body -Method POST -ContentType $contentType
-
-        return ($result.content | ConvertFrom-Json)
-    }
-
-
 }

@@ -9,7 +9,7 @@ function Connect-Dw {
 
         .PARAMETER APIKey
 
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Dw.
 
         .PARAMETER Instance
 

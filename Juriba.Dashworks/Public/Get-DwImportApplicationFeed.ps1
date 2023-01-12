@@ -7,9 +7,9 @@ function Get-DwImportApplicationFeed {
         Gets one or more application feeds.
         Use ImportId to get a specific feed or omit for all feeds.
         .PARAMETER Instance
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Dw. For example, https://myinstance.dashworks.app:8443
         .PARAMETER APIKey
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Dw.
         .PARAMETER ImportId
         Optional. The id for the application feed. Omit to get all application feeds.
         .PARAMETER Name
@@ -21,35 +21,43 @@ function Get-DwImportApplicationFeed {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$Instance,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [parameter(Mandatory=$false, ParameterSetName="ImportId")]
         [int]$ImportId,
         [parameter(Mandatory=$false, ParameterSetName="Name")]
         [string]$Name
     )
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
+    }
 
-    $uri = "{0}/apiv2/imports/applications" -f $Instance
-    switch ($PSCmdlet.ParameterSetName) {
-        "ImportId" {
-            $uri += "/{0}" -f $ImportId
+    if ($APIKey -and $Instance) {
+        $uri = "{0}/apiv2/imports/applications" -f $Instance
+        switch ($PSCmdlet.ParameterSetName) {
+            "ImportId" {
+                $uri += "/{0}" -f $ImportId
+            }
+            "Name" {
+                $uri += "?filter="
+                $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Name)
+            }
         }
-        "Name" {
-            $uri += "?filter="
-            $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Name)
+    
+        $headers = @{'x-api-key' = $APIKey}
+    
+        try {
+            $result = Invoke-RestMethod -Uri $uri -Method GET -Headers $headers
+            return $result
         }
-    }
+        catch {
+            Write-Error $_
+        }
 
-    $headers = @{'x-api-key' = $APIKey}
-
-    try {
-        $result = Invoke-RestMethod -Uri $uri -Method GET -Headers $headers
-        return $result
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Dw before proceeding."
     }
-    catch {
-        Write-Error $_
-    }
-
 }

@@ -11,17 +11,26 @@ Function Get-DwAutomation {
     #>
 
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [string]$Instance,
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [string]$APIKey
     )
 
-    $uri = "{0}/apiv1/admin/automations" -f $Instance
-    $headers = @{'x-api-key' = $APIKey }
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
+    }
 
-    $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType 'application/json'
+    if ($APIKey -and $Instance) {
+        $uri = "{0}/apiv1/admin/automations" -f $Instance
+        $headers = @{'x-api-key' = $APIKey }
+    
+        $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType 'application/json'
+    
+        return (($result.content | ConvertFrom-Json ).results)
 
-    return (($result.content | ConvertFrom-Json ).results)
-
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Dw before proceeding."
+    }
 }
