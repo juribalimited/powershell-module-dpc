@@ -20,6 +20,8 @@ function Connect-Juriba {
         PS> Connect-Juriba -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidGlobalVars", "")]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingConvertToSecureStringWithPlainText", "")]
     param(
         [Parameter(Mandatory=$true)]
         [string]$Instance,
