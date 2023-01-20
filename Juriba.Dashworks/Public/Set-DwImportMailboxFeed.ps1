@@ -10,11 +10,11 @@ function Set-DwImportMailboxFeed {
 
         .PARAMETER Instance
 
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
 
         .PARAMETER ImportId
 
@@ -55,9 +55,9 @@ function Set-DwImportMailboxFeed {
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$Instance,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [parameter(Mandatory=$true)]
         [int]$ImportId,
@@ -76,40 +76,48 @@ function Set-DwImportMailboxFeed {
         [parameter(ParameterSetName = 'FeedEnabled', Mandatory = $false)]
         [bool]$Enabled
     )
-
-    if (-Not $Name -And -Not $PSCmdlet.ParameterSetName -eq 'FeedEnabled') {
-        throw "Either Name or Enabled must be specified."
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
     }
 
-    $uri = "{0}/apiv2/imports/mailboxes/{1}" -f $Instance, $ImportId
-    $headers = @{'x-api-key' = $APIKey}
-
-    $payload = @{}
-    if ($name) {
-        $payload.Add("name", $Name)
-        if ($VerboseLogging) {$payload.Add("verboseLogging", $VerboseLogging)}
-        if ($ImportEntireForest) {$payload.Add("importEntireForest", $ImportEntireForest)}
-        if ($SendOnBehalfPermissions) {$payload.Add("sendOnBehalfPermissions", $SendOnBehalfPermissions)}
-        if ($MailboxPermissions) {$payload.Add("mailboxPermissions", $MailboxPermissions)}
-        if ($MailboxExtendedRights) {$payload.Add("mailboxExtendedRights", $MailboxExtendedRights)}
-    }
-    if ($PSCmdlet.ParameterSetName -eq 'FeedEnabled') { $payload.Add("enabled", $Enabled) }
-
-    $jsonBody = $payload | ConvertTo-Json
-
-    try {
-        if ($PSCmdlet.ShouldProcess($ImportId)) {
-            $result = Invoke-RestMethod -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body $jsonBody
-            return $result
+    if ($APIKey -and $Instance) {
+        if (-Not $Name -And -Not $PSCmdlet.ParameterSetName -eq 'FeedEnabled') {
+            throw "Either Name or Enabled must be specified."
         }
-    }
-    catch {
-        if ($_.Exception.Response.StatusCode.Value__ -eq 409)
-        {
-            Write-Error ("{0}" -f "Update conflicted with another feed. Check if another feed exists with the same name.")
+    
+        $uri = "{0}/apiv2/imports/mailboxes/{1}" -f $Instance, $ImportId
+        $headers = @{'x-api-key' = $APIKey}
+    
+        $payload = @{}
+        if ($name) {
+            $payload.Add("name", $Name)
+            if ($VerboseLogging) {$payload.Add("verboseLogging", $VerboseLogging)}
+            if ($ImportEntireForest) {$payload.Add("importEntireForest", $ImportEntireForest)}
+            if ($SendOnBehalfPermissions) {$payload.Add("sendOnBehalfPermissions", $SendOnBehalfPermissions)}
+            if ($MailboxPermissions) {$payload.Add("mailboxPermissions", $MailboxPermissions)}
+            if ($MailboxExtendedRights) {$payload.Add("mailboxExtendedRights", $MailboxExtendedRights)}
         }
-        else {
-            Write-Error $_
+        if ($PSCmdlet.ParameterSetName -eq 'FeedEnabled') { $payload.Add("enabled", $Enabled) }
+    
+        $jsonBody = $payload | ConvertTo-Json
+    
+        try {
+            if ($PSCmdlet.ShouldProcess($ImportId)) {
+                $result = Invoke-RestMethod -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body $jsonBody
+                return $result
+            }
         }
+        catch {
+            if ($_.Exception.Response.StatusCode.Value__ -eq 409)
+            {
+                Write-Error ("{0}" -f "Update conflicted with another feed. Check if another feed exists with the same name.")
+            }
+            else {
+                Write-Error $_
+            }
+        }
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }

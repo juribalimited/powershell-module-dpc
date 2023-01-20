@@ -10,12 +10,18 @@ Function Get-DwSessionUser {
 
     #>
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$Instance,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$APIKey
     )
 
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
+    }
+
+    if ($APIKey -and $Instance) {
         $contentType = "application/json"
         $headers = @{ 'X-API-KEY' = $ApiKey }
         $uri = "{0}/apiv1/security/userprofile" -f $Instance
@@ -24,4 +30,7 @@ Function Get-DwSessionUser {
 
         return ( $result.content | ConvertFrom-Json )
 
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
+}

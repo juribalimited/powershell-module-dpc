@@ -10,7 +10,7 @@ function Remove-DwImportDepartmentFeed {
 
         .PARAMETER Instance
 
-        Dashworks instance. For example, myinstance.dashworks.app
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER Port
 
@@ -18,7 +18,7 @@ function Remove-DwImportDepartmentFeed {
 
         .PARAMETER APIKey
 
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
 
         .PARAMETER ImportId
 
@@ -38,24 +38,33 @@ function Remove-DwImportDepartmentFeed {
         ConfirmImpact = 'High'
     )]
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$Instance,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [parameter(Mandatory=$true)]
         [int]$ImportId
     )
-
-    $uri = "{0}/apiv2/imports/departments/{1}" -f $Instance, $ImportId
-    $headers = @{'x-api-key' = $APIKey}
-
-    try {
-        if ($PSCmdlet.ShouldProcess($ImportId)) {
-            $result = Invoke-RestMethod -Uri $uri -Method DELETE -Headers $headers
-            return $result
-        }
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
     }
-    catch {
-        Write-Error $_
+
+    if ($APIKey -and $Instance) {
+        $uri = "{0}/apiv2/imports/departments/{1}" -f $Instance, $ImportId
+        $headers = @{'x-api-key' = $APIKey}
+    
+        try {
+            if ($PSCmdlet.ShouldProcess($ImportId)) {
+                $result = Invoke-RestMethod -Uri $uri -Method DELETE -Headers $headers
+                return $result
+            }
+        }
+        catch {
+            Write-Error $_
+        }
+
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }

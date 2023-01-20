@@ -6,9 +6,9 @@ function Set-DwTaskValueText {
         Updates a project task.
         Takes TaskId, ProjectID and ObjectKey and Value as inputs.
         .PARAMETER Instance
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
         .PARAMETER APIKey
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER TaskId
         TaskId of the task to be updated.
         .PARAMETER ProjectId
@@ -26,9 +26,9 @@ function Set-DwTaskValueText {
 
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$Instance,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
@@ -46,37 +46,45 @@ function Set-DwTaskValueText {
         [ValidateSet("Device", "User", "Application", "Mailbox")]
         [string]$ObjectType
     )
-
-    $path = switch($ObjectType) {
-        "Device"        {"device"}
-        "User"          {"user"}
-        "Application"   {"application"}
-        "Mailbox"       {"mailbox"}
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
     }
 
-    $uri = '{0}/apiv1/{1}/{2}/projectTasksValueText' -f $Instance, $path, $ObjectKey
-    $headers = @{
-        'x-api-key' = $APIKey
-        'content-type' = 'application/Json'
+    if ($APIKey -and $Instance) {
+        $path = switch($ObjectType) {
+            "Device"        {"device"}
+            "User"          {"user"}
+            "Application"   {"application"}
+            "Mailbox"       {"mailbox"}
         }
-
-
-    $params = @{
-        'value'=$Value
-        'projectid'=$ProjectID
-        'taskid'=$TaskID
+    
+        $uri = '{0}/apiv1/{1}/{2}/projectTasksValueText' -f $Instance, $path, $ObjectKey
+        $headers = @{
+            'x-api-key' = $APIKey
+            'content-type' = 'application/Json'
+            }
+    
+    
+        $params = @{
+            'value'=$Value
+            'projectid'=$ProjectID
+            'taskid'=$TaskID
+            }
+    
+        $body = $params | ConvertTo-Json
+    
+        try {
+            if ($PSCmdlet.ShouldProcess($ObjectKey)) {
+                $response = Invoke-WebRequest -Uri $uri -Headers $headers -Body $body -Method PUT
+                $results = ($response.Content | ConvertFrom-Json).message
+                return $results
+            }
         }
-
-    $body = $params | ConvertTo-Json
-
-    try {
-        if ($PSCmdlet.ShouldProcess($ObjectKey)) {
-            $response = Invoke-WebRequest -Uri $uri -Headers $headers -Body $body -Method PUT
-            $results = ($response.Content | ConvertFrom-Json).message
-            return $results
+        catch {
+            Write-Error $_
         }
-    }
-    catch {
-        Write-Error $_
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }

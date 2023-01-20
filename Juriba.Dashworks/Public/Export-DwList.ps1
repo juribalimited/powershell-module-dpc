@@ -9,11 +9,11 @@ function Export-DwList {
 
         .PARAMETER Instance
 
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
 
         .PARAMETER ListId
 
@@ -30,9 +30,9 @@ function Export-DwList {
 
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$Instance,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
@@ -51,38 +51,48 @@ function Export-DwList {
         "UserApplication"   {"userapplications"}
     }
 
-    $uri = '{0}/apiv1/{1}?$listid={2}' -f $Instance, $path, $ListId
-    $headers = @{'x-api-key' = $APIKey}
-
-    try {
-        $response = Invoke-WebRequest -uri $uri -Headers $headers -Method GET
-        $results = ($response.Content | ConvertFrom-Json).results
-        $metadata = ($response.Content | ConvertFrom-Json).metadata
-        #check for an error in the metadata
-        if ($metadata.errorMessage) {
-            throw $metadata.errorMessage
-        }
-        #check for columns in metadata, missing columns indicates an issue with the list
-        if (-not $metadata.columns) {
-            throw "list did not return column metadata"
-        }
-
-        #build mapping using column headers from metadata and data from results
-        $c = @()
-        $metadata.columns | ForEach-Object {
-            # handle readiness columns which return a nested object, here we are extracting the ragStatus (i.e. the name of the status)
-            if ($_.displayType -eq "Readiness") {
-                $cn = [scriptblock]::Create('$_.{0}.ragStatus' -f $_.columnName)
-                $c += @{Name=$_.translatedColumnName; Expression=$cn}
-            }
-            else {
-                $c += @{Name=$_.translatedColumnName; Expression=$_.columnName}
-            }
-        }
-        #return results with mapped headers
-        return ($results | Select-Object -Property $c)
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
     }
-    catch {
-        Write-Error $_
+
+    if ($APIKey -and $Instance) {
+        $uri = '{0}/apiv1/{1}?$listid={2}' -f $Instance, $path, $ListId
+        $headers = @{'x-api-key' = $APIKey}
+    
+        try {
+            $response = Invoke-WebRequest -uri $uri -Headers $headers -Method GET
+            $results = ($response.Content | ConvertFrom-Json).results
+            $metadata = ($response.Content | ConvertFrom-Json).metadata
+            #check for an error in the metadata
+            if ($metadata.errorMessage) {
+                throw $metadata.errorMessage
+            }
+            #check for columns in metadata, missing columns indicates an issue with the list
+            if (-not $metadata.columns) {
+                throw "list did not return column metadata"
+            }
+    
+            #build mapping using column headers from metadata and data from results
+            $c = @()
+            $metadata.columns | ForEach-Object {
+                # handle readiness columns which return a nested object, here we are extracting the ragStatus (i.e. the name of the status)
+                if ($_.displayType -eq "Readiness") {
+                    $cn = [scriptblock]::Create('$_.{0}.ragStatus' -f $_.columnName)
+                    $c += @{Name=$_.translatedColumnName; Expression=$cn}
+                }
+                else {
+                    $c += @{Name=$_.translatedColumnName; Expression=$_.columnName}
+                }
+            }
+            #return results with mapped headers
+            return ($results | Select-Object -Property $c)
+        }
+        catch {
+            Write-Error $_
+        }
+
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }

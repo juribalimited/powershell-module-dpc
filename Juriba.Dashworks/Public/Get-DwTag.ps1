@@ -11,20 +11,29 @@ Function Get-DwTag {
     #>
 
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [string]$Instance,
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [string]$APIKey
     )
-
-    $uri = "{0}/apiv1/tags" -f $Instance
-    $headers = @{ 'x-api-key' = $APIKey }
-
-    try {
-        $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType 'application/json'
-        return ( $result.Content | ConvertFrom-Json )
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
     }
-    catch {
-            Write-Error $_
+
+    if ($APIKey -and $Instance) {
+        $uri = "{0}/apiv1/tags" -f $Instance
+        $headers = @{ 'x-api-key' = $APIKey }
+    
+        try {
+            $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType 'application/json'
+            return ( $result.Content | ConvertFrom-Json )
+        }
+        catch {
+                Write-Error $_
+        }
+
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }
