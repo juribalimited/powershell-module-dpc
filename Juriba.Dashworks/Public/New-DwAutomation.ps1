@@ -10,11 +10,11 @@ Function New-DwAutomation {
 
     .PARAMETER Instance
 
-    Dashworks instance. For example, https://myinstance.dashworks.app:8443
+    Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
 
     .PARAMETER APIKey
 
-    Dashworks API Key.
+    Optional. API key to be provided if not authenticating using Connect-Juriba.
 
     .PARAMETER Name
 
@@ -56,9 +56,9 @@ Function New-DwAutomation {
 
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [string]$Instance,
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [string]$APIKey,
         [Parameter(Mandatory = $true)]
         [string]$Name,
@@ -78,58 +78,68 @@ Function New-DwAutomation {
         [string]$Schedule
     )
 
-    switch ($Schedule) {
-        "Manual" {
-            $scheduleTypeId = 1
-            $sqlAgentJobName = $null
-        }
-        "AfterTransform" {
-            $scheduleTypeId = 2
-            $sqlAgentJobName = $null
-        }
-        "Daily" {
-            $scheduleTypeId = 3
-            $sqlAgentJobName = "Dashworks Daily"
-        }
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
     }
 
-    $objectTypeId = switch ($ObjectType) {
-        "Device"        { 2 }
-        "User"          { 1 }
-        "Application"   { 3 }
-        "Mailbox"       { 4 }
-    }
-
-    $payload  = @{}
-    $payload.Add("id", -1)
-    $payload.Add("name", $Name)
-    $payload.Add("description", $Description)
-    $payload.Add("isActive", $IsActive)
-    $payload.Add("stopOnFailedAction", $StopOnFailedAction)
-    $payload.Add("listId", $ListId)
-    $payload.Add("objectTypeId", $objectTypeId)
-    $payload.Add("scheduleTypeId", $scheduleTypeId)
-    $payload.Add("sqlAgentJobName", $sqlAgentJobName)
-
-    $jsonbody = $payload | ConvertTo-Json
-
-    $uri = "{0}/apiv1/admin/automations" -f $Instance
-    $headers = @{'x-api-key' = $APIKey }
-
-    try {
-        if ($PSCmdlet.ShouldProcess($Name)) {
-            $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body $jsonbody -ContentType 'application/json'
-            if ($result.StatusCode -eq 201)
-            {
-                $id = ($result.content | ConvertFrom-Json).id
-                return $id
+    if ($APIKey -and $Instance) {
+        switch ($Schedule) {
+            "Manual" {
+                $scheduleTypeId = 1
+                $sqlAgentJobName = $null
             }
-            else {
-                throw "Error creating automation."
+            "AfterTransform" {
+                $scheduleTypeId = 2
+                $sqlAgentJobName = $null
+            }
+            "Daily" {
+                $scheduleTypeId = 3
+                $sqlAgentJobName = "Dashworks Daily"
             }
         }
-    }
-    catch {
-            Write-Error $_
+    
+        $objectTypeId = switch ($ObjectType) {
+            "Device"        { 2 }
+            "User"          { 1 }
+            "Application"   { 3 }
+            "Mailbox"       { 4 }
+        }
+    
+        $payload  = @{}
+        $payload.Add("id", -1)
+        $payload.Add("name", $Name)
+        $payload.Add("description", $Description)
+        $payload.Add("isActive", $IsActive)
+        $payload.Add("stopOnFailedAction", $StopOnFailedAction)
+        $payload.Add("listId", $ListId)
+        $payload.Add("objectTypeId", $objectTypeId)
+        $payload.Add("scheduleTypeId", $scheduleTypeId)
+        $payload.Add("sqlAgentJobName", $sqlAgentJobName)
+    
+        $jsonbody = $payload | ConvertTo-Json
+    
+        $uri = "{0}/apiv1/admin/automations" -f $Instance
+        $headers = @{'x-api-key' = $APIKey }
+    
+        try {
+            if ($PSCmdlet.ShouldProcess($Name)) {
+                $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body $jsonbody -ContentType 'application/json'
+                if ($result.StatusCode -eq 201)
+                {
+                    $id = ($result.content | ConvertFrom-Json).id
+                    return $id
+                }
+                else {
+                    throw "Error creating automation."
+                }
+            }
+        }
+        catch {
+                Write-Error $_
+        }
+
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }

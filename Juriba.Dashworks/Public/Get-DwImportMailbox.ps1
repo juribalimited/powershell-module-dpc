@@ -1,15 +1,14 @@
-function Get-DwImportLocation {
+function Get-DwImportMailbox {
     <#
         .SYNOPSIS
-        Gets one or more Dashworks devices from the import API.
+        Gets one or more Dashworks mailboxes from the import API.
 
         .DESCRIPTION
-        Gets a Dashworks Location from the import API.
+        Gets one or more Dashworks mailboxes from the import API.
         Takes the ImportId as an input.
-        Optionally takes a UnqiueIdentifier as an input and will return a single location with that UniqueIdentifier.
-        Optionally takes a Hostname as an input and will return all location matching that hostname.
-        Optionally takes a Filter as an input and will return all location matching that filter. See swagger documentation for examples of using filters.
-        If specified, only one of UniqueIdentifier, Hostname or Filter can be supplied. Omit all to return all locations for the import.
+        Optionally takes a UniqueIdentifier as an input and will return a single mailbox with that UniqueIdentifier.
+        Optionally takes a Filter as an input and will return all mailboxes matching that filter. See swagger documentation for examples of using filters.
+        If specified, only one of UniqueIdentifier, Hostname or Filter can be supplied. Omit all to return all mailboxes for the import.
 
         .PARAMETER Instance
 
@@ -21,33 +20,38 @@ function Get-DwImportLocation {
 
         .PARAMETER UniqueIdentifier
 
-        UniqueIdentifier for the location. Cannot be used with LocationName or Filter.
+        UniqueIdentifier for the mailbox. Cannot be used with Hostname or Filter.
 
         .PARAMETER ImportId
 
-        ImportId for the location.
-
-        .PARAMETER LocationName
-
-        Name for the location.
+        ImportId for the mailbox(es).
 
         .PARAMETER Filter
 
-        Filter for location search.
+        Filter for mailbox search. Cannot be used with Hostname or UniqueIdentifier.
 
         .PARAMETER InfoLevel
 
         Optional. Sets the level of information that this function returns. Accepts Basic or Full.
-        Basic returns only the UniqueIdentifier, use when confirming a location exists.
-        Full returns the full json object for the location.
+        Basic returns only the UniqueIdentifier, use when confirming a mailbox exists.
+        Full returns the full json object for the mailbox.
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-DwImportLocation -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Region, 'EU')"
+        PS> Get-DwImportMailbox -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+
+        .EXAMPLE
+        PS> Get-DwImportMailbox -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
+
+        .EXAMPLE
+        PS> Get-DwImportMailbox -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
+
+        .EXAMPLE
+        PS> Get-DwImportMailbox -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
 
          #>
 
-    [CmdletBinding(DefaultParameterSetName="UniqueIdentifier")]
+    [CmdletBinding(DefaultParameterSetName="Default")]
     param (
         [Parameter(Mandatory=$false)]
         [string]$Instance,
@@ -55,8 +59,6 @@ function Get-DwImportLocation {
         [string]$APIKey,
         [parameter(Mandatory=$false, ParameterSetName="UniqueIdentifier")]
         [string]$UniqueIdentifier,
-        [parameter(Mandatory=$false, ParameterSetName="LocationName")]
-        [string]$LocationName,
         [parameter(Mandatory=$false, ParameterSetName="Filter")]
         [string]$Filter,
         [parameter(Mandatory=$true)]
@@ -70,23 +72,17 @@ function Get-DwImportLocation {
         $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
         $Instance = $dwConnection.instance
     }
-
     if ($APIKey -and $Instance) {
-        $limit = 1000 # page size
-        $uri = "{0}/apiv2/imports/locations/{1}/items" -f $Instance, $ImportId
+        $limit = 50 # page size
+        $uri = "{0}/apiv2/imports/mailboxes/{1}/items" -f $Instance, $ImportId
     
         switch ($PSCmdlet.ParameterSetName) {
             "UniqueIdentifier" {
                 $uri += "/{0}" -f $UniqueIdentifier
             }
-            "LocationName" {
-                $uri += "?filter="
-                $uri += [uri]::EscapeDataString("eq(name,'{0}')" -f $LocationName)
-                $uri += "&limit={0}" -f $limit
-            }
             "Filter" {
                 $uri += "?filter="
-                $uri += [uri]::EscapeDataString("{0}" -f $Filter)
+                $uri += [System.Web.HttpUtility]::UrlEncode("{0}" -f $Filter)
                 $uri += "&limit={0}" -f $limit
             }
             Default {
@@ -94,12 +90,15 @@ function Get-DwImportLocation {
             }
         }
     
-        $headers = @{'x-api-key' = $APIKey}
+        $headers = @{
+            'x-api-key' = $APIKey
+            'cache-control' = 'no-cache'
+        }
     
-        $device = ""
+        $mailbox = ""
         try {
             $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json"
-            $device = switch($InfoLevel) {
+            $mailbox = switch($InfoLevel) {
                 "Basic" { ($result.Content | ConvertFrom-Json).UniqueIdentifier }
                 "Full"  { $result.Content | ConvertFrom-Json }
             }
@@ -109,25 +108,24 @@ function Get-DwImportLocation {
                 for ($page = 2; $page -le $totalPages; $page++) {
                     $pagedUri = $uri + "&page={0}" -f $page
                     $pagedResult = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $headers -ContentType "application/json"
-                    $device += switch($InfoLevel) {
+                    $mailbox += switch($InfoLevel) {
                         "Basic" { ($pagedResult.Content | ConvertFrom-Json).UniqueIdentifier }
                         "Full"  { $pagedResult.Content | ConvertFrom-Json }
                     }
                 }
             }
-            return $device
+            return $mailbox
         }
         catch {
             if ($_.Exception.Response.StatusCode.Value__ -eq 404) {
-                # 404 means the location was not found, don't treat this as an error
-                # as we expect this function to be used to check if a device exists
-                Write-Verbose "Location not found"
+                # 404 means the mailbox was not found, don't treat this as an error
+                # as we expect this function to be used to check if a mailbox exists
+                Write-Verbose "mailbox not found"
             }
             else {
                 Write-Error $_
             }
         }
-
     } else {
         Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }

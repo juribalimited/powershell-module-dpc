@@ -1,47 +1,42 @@
-#requires -Version 7
-function Remove-DwImportDepartmentFeed {
+#Requires -Version 7
+function Remove-DwImportMailbox {
     <#
         .SYNOPSIS
-        Deletes a department feed.
+        Deletes a mailbox in the import API.
 
         .DESCRIPTION
-        Deletes a department feed.
-        Takes Id of feed to be deleted.
+        Deletes a mailbox in the import API.
+        Takes the ImportId and UniqueIdentifier as an input.
 
         .PARAMETER Instance
 
         Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
 
-        .PARAMETER Port
-
-        Dashworks API port number. Default = 8443
-
         .PARAMETER APIKey
 
         Optional. API key to be provided if not authenticating using Connect-Juriba.
 
+        .PARAMETER UniqueIdentifier
+
+        UniqueIdentifier for the mailbox.
+
         .PARAMETER ImportId
 
-        The Id of the department feed to be deleted.
+        ImportId for the mailbox.
 
         .EXAMPLE
-
-        PS> Remove-DwImportDepartmentFeed -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
-
-        .EXAMPLE
-
-        PS> Remove-DwImportDepartmentFeed -Confirm:$false -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Remove-DwImportMailbox -ImportId 1 -UniqueIdentifier "w123abc" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
-    [CmdletBinding(
-        SupportsShouldProcess,
-        ConfirmImpact = 'High'
-    )]
+
+    [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory=$false)]
         [string]$Instance,
         [Parameter(Mandatory=$false)]
         [string]$APIKey,
+        [parameter(Mandatory=$true)]
+        [string]$UniqueIdentifier,
         [parameter(Mandatory=$true)]
         [int]$ImportId
     )
@@ -51,12 +46,12 @@ function Remove-DwImportDepartmentFeed {
     }
 
     if ($APIKey -and $Instance) {
-        $uri = "{0}/apiv2/imports/departments/{1}" -f $Instance, $ImportId
+        $uri = "{0}/apiv2/imports/mailboxes/{1}/items/{2}" -f $Instance, $ImportId, $UniqueIdentifier
         $headers = @{'x-api-key' = $APIKey}
     
         try {
-            if ($PSCmdlet.ShouldProcess($ImportId)) {
-                $result = Invoke-RestMethod -Uri $uri -Method DELETE -Headers $headers
+            if ($PSCmdlet.ShouldProcess($UniqueIdentifier)) {
+                $result = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $headers
                 return $result
             }
         }

@@ -1,20 +1,16 @@
 #requires -Version 7
-function Remove-DwImportDepartmentFeed {
+function Remove-DwImportMailboxFeed {
     <#
         .SYNOPSIS
-        Deletes a department feed.
+        Deletes a mailbox feed.
 
         .DESCRIPTION
-        Deletes a department feed.
+        Deletes a mailbox feed.
         Takes Id of feed to be deleted.
 
         .PARAMETER Instance
 
         Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
-
-        .PARAMETER Port
-
-        Dashworks API port number. Default = 8443
 
         .PARAMETER APIKey
 
@@ -22,15 +18,15 @@ function Remove-DwImportDepartmentFeed {
 
         .PARAMETER ImportId
 
-        The Id of the department feed to be deleted.
+        The Id of the mailbox feed to be deleted.
 
         .EXAMPLE
 
-        PS> Remove-DwImportDepartmentFeed -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Remove-DwImportMailboxFeed -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
         .EXAMPLE
 
-        PS> Remove-DwImportDepartmentFeed -Confirm:$false -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Remove-DwImportMailboxFeed -Confirm:$false -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
     [CmdletBinding(
@@ -51,7 +47,7 @@ function Remove-DwImportDepartmentFeed {
     }
 
     if ($APIKey -and $Instance) {
-        $uri = "{0}/apiv2/imports/departments/{1}" -f $Instance, $ImportId
+        $uri = "{0}/apiv2/imports/mailboxes/{1}" -f $Instance, $ImportId
         $headers = @{'x-api-key' = $APIKey}
     
         try {

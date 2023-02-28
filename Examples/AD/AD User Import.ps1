@@ -1,7 +1,7 @@
-    <#
+ <#
     .Synopsis
     Pulls user data from Get-ADUser and upload to a DW User feed
-
+   
     .Description
     Takes all users from Get-ADUser (optional server/cred parameters) transforms the fields into a datatable in the format required
     for the DW API and then uploads that user data to a named or numbered data feed.
@@ -12,17 +12,14 @@
     .Parameter APIKey
     The APIKey for a user with access to the required resources.
 
-    .Parameter Name
-    The name of the feed to be searched for and used.
-
-    .Parameter ImportId
-    The id of the user feed in question.
+    .Parameter FeedName
+    The name of the feed to be searched for and used. If this does not exist, it will create it.
 
     .Parameter ADServer
-    The name of a DC to connect Get-ADUser to.
+    The name of a DC to connect Get-ADUser to, including the port number. e.g. 389.
 
     .Parameter Credentials
-    The credentials to use when calling Get-ADUser
+    The credentials to use when calling Get-ADUser (optional)
 
     .Outputs
     Output type [string]
@@ -31,27 +28,40 @@
     .Example
     # Get the device feed id for the named feed.
     Invoke-DwAPIAUploadUserFeedFromAD -Instance $Instance -APIKey $APIKey -FeedName "AD Users"
+
     #>
+
     [CmdletBinding()]
     Param (
         [parameter(Mandatory=$True)]
         [string]$Instance,
-
         [Parameter(Mandatory=$True)]
         [string]$APIKey,
-
-        [parameter(Mandatory=$False)]
-        [string]$Name = $null,
-
-        [parameter(Mandatory=$False)]
-        [string]$ImportId,
-
-        [parameter(Mandatory=$False)]
+        [parameter(Mandatory=$True)]
+        [string]$FeedName,     
+        [Parameter(Mandatory=$true)]
         [string]$ADServer,
-
         [parameter(Mandatory=$False)]
         [System.Management.Automation.PSCredential]$Credential = [System.Management.Automation.PSCredential]::Empty
     )
+
+    #Requires -Version 7
+    #Requires -Module Juriba.Dashworks
+
+    $DashworksParams = @{
+        Instance = $Instance
+        APIKey = $APIKey
+    }
+
+    # Get DW feed
+    $feed = Get-DwImportUserFeed @DashworksParams -Name $FeedName
+    # If it doesnt exist, create it
+    if (-Not $feed) {
+        $feed = New-DwImportUserFeed @DashworksParams -Name $FeedName -Enabled $true
+    }
+    $importId = $feed.id
+
+    Write-Information ("Using feed id {0}" -f $importId) -InformationAction Continue
 
     $Properties = @("lastlogontimestamp","description","homeDirectory","homeDrive","mail","CanonicalName")
 
@@ -118,21 +128,6 @@
         $dataTable.Rows.Add($NewRow)
     }
 
-
-    if (-not ($ImportId))
-    {
-        if (-not ($Name))
-        {
-            throw 'User feed not found by name or ID'
-        }
-
-        $ImportId = Get-DwAPIUserFeed -Instance $Instance -ApiKey $APIKey -FeedName $FeedName
-
-        if (-not $ImportId)
-        {
-            throw 'User feed not found by name or ID'
-        }
-    }
 
     $Postheaders = @{
         "content-type" = "application/json"

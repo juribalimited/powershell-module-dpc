@@ -6,9 +6,9 @@ function Set-DwTaskValueDate {
         Updates a project task. This cannot be used to clear the date value.
         Takes TaskId, ProjectID, ObjectKey, Value and SlotId (optional) as inputs.
         .PARAMETER Instance
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
         .PARAMETER APIKey
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER TaskId
         TaskId of the task to be updated.
         .PARAMETER ProjectId
@@ -28,9 +28,9 @@ function Set-DwTaskValueDate {
 
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$Instance,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
@@ -50,6 +50,10 @@ function Set-DwTaskValueDate {
         [ValidateSet("Device", "User", "Application", "Mailbox")]
         [string]$ObjectType
     )
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
+    }
 
     $path = switch($ObjectType) {
         "Device"        {"device"}
@@ -66,7 +70,7 @@ function Set-DwTaskValueDate {
 
 
     $params = @{
-        'date'=$Value
+        'value'=$Value
         'projectid'=$ProjectID
         'taskid'=$TaskID
         }

@@ -10,11 +10,11 @@ function Get-DwCustomField {
 
     .PARAMETER Instance
 
-    Dashworks instance. For example, https://myinstance.dashworks.app:8443
+    Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
 
     .PARAMETER APIKey
 
-    Dashworks API Key.
+    Optional. API key to be provided if not authenticating using Connect-Juriba.
 
     .OUTPUTS
 
@@ -28,25 +28,34 @@ function Get-DwCustomField {
 
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$Instance,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$APIKey
     )
-
-    $uri = "{0}/apiv1/custom-fields" -f $Instance
-    $headers = @{'x-api-key' = $APIKey }
-
-    try {
-        $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType 'application/json'
-        if ($result.StatusCode -eq 200) {
-            return ($result.Content | ConvertFrom-Json)
-        }
-        else {
-            Write-Error $_
-        }
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
     }
-    catch {
-            Write-Error $_
+
+    if ($APIKey -and $Instance) {
+        $uri = "{0}/apiv1/custom-fields" -f $Instance
+        $headers = @{'x-api-key' = $APIKey }
+    
+        try {
+            $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType 'application/json'
+            if ($result.StatusCode -eq 200) {
+                return ($result.Content | ConvertFrom-Json)
+            }
+            else {
+                Write-Error $_
+            }
+        }
+        catch {
+                Write-Error $_
+        }
+
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }

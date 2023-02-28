@@ -10,11 +10,11 @@ Function Invoke-DwAutomation {
 
     .PARAMETER Instance
 
-    Dashworks instance. For example, https://myinstance.dashworks.app:8443
+    Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
 
     .PARAMETER APIKey
 
-    Dashworks API Key.
+    Optional. API key to be provided if not authenticating using Connect-Juriba.
 
     .PARAMETER Name
 
@@ -35,20 +35,30 @@ Function Invoke-DwAutomation {
 
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [string]$Instance,
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [string]$APIKey,
         [Parameter(Mandatory = $true)]
         [int[]]$Ids
     )
 
-    $body = @{"AutomationIds" = $Ids} | ConvertTo-Json
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
+    }
 
-    $uri = "{0}/apiv1/admin/automations/run-command" -f $Instance
-    $headers = @{'x-api-key' = $APIKey }
+    if ($APIKey -and $Instance) {
+        $body = @{"AutomationIds" = $Ids} | ConvertTo-Json
 
-    if ($PSCmdlet.ShouldProcess($Ids -Join ",")) {
-        Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -Body $body -ContentType 'application/json'
+        $uri = "{0}/apiv1/admin/automations/run-command" -f $Instance
+        $headers = @{'x-api-key' = $APIKey }
+    
+        if ($PSCmdlet.ShouldProcess($Ids -Join ",")) {
+            Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -Body $body -ContentType 'application/json'
+        }
+
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }

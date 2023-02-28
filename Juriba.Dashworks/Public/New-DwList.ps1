@@ -8,11 +8,11 @@ Function New-DwList {
 
         .PARAMETER Instance
 
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
 
         .PARAMETER Name
 
@@ -36,6 +36,18 @@ Function New-DwList {
 
         Base object type for the new list. Accepts one of: "Device", "User", "Application", "Mailbox", "ApplicationUser", "ApplciationDevice"
 
+        .PARAMETER SharedViewAccessType
+
+        Sets the View Access permissions for the list. Accepts one of: "Owner", "Eveyone". Optional, if ommited "Owner" is used.
+
+        .PARAMETER SharedEditAccessType
+
+        Sets the Edit Access permissions for the list. Accepts one of: "Owner", "Eveyone". Optional, if ommited "Owner" is used.
+
+        .PARAMETER SharedAdminAccessType
+
+        Sets the Admin Access permissions for the list. Accepts one of: "Owner", "Eveyone". Optional, if ommited "Owner" is used.
+
         .EXAMPLE
 
         PS> New-DwList
@@ -46,13 +58,17 @@ Function New-DwList {
             -ListType Dynamic
             -QueryString "`$filter=&`$select=hostname,chassisCategory,oSCategory,ownerDisplayName,bootupDate&`$pinleft=&`$pinright=&`$archiveditems=false"
             -ObjectType "Device"
+            -SharedViewAccessType "Everyone"
+            -SharedEditAccessType "Owner"
+            -SharedAdminAccessType "Owner"
+
 
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$Instance,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [Parameter(Mandatory = $true)]
         [string]$Name,
@@ -65,42 +81,57 @@ Function New-DwList {
         [string]$QueryString,
         [Parameter(Mandatory = $true)]
         [ValidateSet("Device", "User", "Application", "Mailbox", "ApplicationUser", "ApplciationDevice")]
-        [string]$ObjectType
+        [string]$ObjectType,
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("Owner", "Everyone")]
+        [string]$SharedViewAccessType = "Owner",
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("Owner", "Everyone")]
+        [string]$SharedEditAccessType = "Owner",
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("Owner", "Everyone")]
+        [string]$SharedAdminAccessType = "Owner"
     )
-
-    $endpoint = ""
-    switch ($ObjectType) {
-        "ApplicationUser" { throw "not implemented" }
-        "ApplicationDevice" { throw "not implemented" }
-        "Device" { $endpoint = "devices"}
-        "User" { $endpoint = "users "}
-        "Application" { $endpoint = "applications" }
-        "Mailbox" { $endpoint = "mailboxes" }
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
     }
 
-    switch ($ListType) {
-        "Static" { throw "not implemented" }
+    if ($APIKey -and $Instance) {
+        $endpoint = ""
+        switch ($ObjectType) {
+            "ApplicationUser" { throw "not implemented" }
+            "ApplicationDevice" { throw "not implemented" }
+            "Device" { $endpoint = "devices"}
+            "User" { $endpoint = "users "}
+            "Application" { $endpoint = "applications" }
+            "Mailbox" { $endpoint = "mailboxes" }
+        }
+
+        switch ($ListType) {
+            "Static" { throw "not implemented" }
+        }
+
+        $body = @{
+            "listName"                      = $Name
+            "userId"                        = $UserId
+            "queryString"                   = $QueryString
+            "listType"                      = $ListType
+            "sharedAdministerAccessType"    = $SharedAdminAccessType
+            "sharedEditAccessType"          = $SharedEditAccessType
+            "sharedReadAccessType"          = $SharedViewAccessType
+        } | ConvertTo-Json
+
+        $contentType = "application/json"
+        $headers = @{ 'X-API-KEY' = $ApiKey }
+        $uri = "{0}/apiv1/lists/{1}"  -f  $instance, $endpoint
+
+        if ($PSCmdlet.ShouldProcess($Name)) {
+            $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body $body -Method POST -ContentType $contentType
+
+            return ($result.content | ConvertFrom-Json)
+        }
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
-
-    $body = @{
-        "listName"                      = $Name
-        "userId"                        = $UserId
-        "queryString"                   = $QueryString
-        "listType"                      = $ListType
-        "sharedAdministerAccessType"    = "Owner"
-        "sharedEditAccessType"          = "Owner"
-        "sharedReadAccessType"          = "Everyone"
-    } | ConvertTo-Json
-
-    $contentType = "application/json"
-    $headers = @{ 'X-API-KEY' = $ApiKey }
-    $uri = "{0}/apiv1/lists/{1}"  -f  $instance, $endpoint
-
-    if ($PSCmdlet.ShouldProcess($Name)) {
-        $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body $body -Method POST -ContentType $contentType
-
-        return ($result.content | ConvertFrom-Json)
-    }
-
-
 }

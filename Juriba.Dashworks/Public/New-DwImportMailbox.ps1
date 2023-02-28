@@ -1,20 +1,16 @@
-#requires -Version 7
-function Remove-DwImportDepartmentFeed {
+#Requires -Version 7
+function New-DwImportMailbox {
     <#
         .SYNOPSIS
-        Deletes a department feed.
+        Creates a new Dashworks mailbox using the import API.
 
         .DESCRIPTION
-        Deletes a department feed.
-        Takes Id of feed to be deleted.
+        Creates a new Dashworks mailbox using the import API.
+        Takes the ImportId and JsonBody as an input.
 
         .PARAMETER Instance
 
         Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
-
-        .PARAMETER Port
-
-        Dashworks API port number. Default = 8443
 
         .PARAMETER APIKey
 
@@ -22,28 +18,31 @@ function Remove-DwImportDepartmentFeed {
 
         .PARAMETER ImportId
 
-        The Id of the department feed to be deleted.
+        ImportId for the mailbox.
+
+        .PARAMETER JsonBody
+
+        Json payload with updated mailbox details.
 
         .EXAMPLE
-
-        PS> Remove-DwImportDepartmentFeed -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
-
-        .EXAMPLE
-
-        PS> Remove-DwImportDepartmentFeed -Confirm:$false -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
-
+        PS> New-DwImportMailbox -ImportId 1 -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
-    [CmdletBinding(
-        SupportsShouldProcess,
-        ConfirmImpact = 'High'
-    )]
+
+    [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory=$false)]
         [string]$Instance,
         [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [parameter(Mandatory=$true)]
-        [int]$ImportId
+        [int]$ImportId,
+        [ValidateScript({
+            ((Test-Json $_) -and (($_ | ConvertFrom-Json).uniqueIdentifier))
+        },
+        ErrorMessage = "JsonBody is not valid json or does not contain a uniqueIdentifier"
+        )]
+        [parameter(Mandatory=$true)]
+        [string]$JsonBody
     )
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
         $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
@@ -51,19 +50,19 @@ function Remove-DwImportDepartmentFeed {
     }
 
     if ($APIKey -and $Instance) {
-        $uri = "{0}/apiv2/imports/departments/{1}" -f $Instance, $ImportId
+        $uri = "{0}/apiv2/imports/mailboxes/{1}/items" -f $Instance, $ImportId
         $headers = @{'x-api-key' = $APIKey}
     
         try {
-            if ($PSCmdlet.ShouldProcess($ImportId)) {
-                $result = Invoke-RestMethod -Uri $uri -Method DELETE -Headers $headers
+            if ($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueIdentifier)) {
+                $result = Invoke-RestMethod -Uri $uri -Method POST -Headers $headers -ContentType "application/json" -Body $jsonBody
                 return $result
             }
         }
         catch {
             Write-Error $_
         }
-
+    
     } else {
         Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }

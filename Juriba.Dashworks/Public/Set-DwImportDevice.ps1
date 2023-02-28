@@ -10,11 +10,11 @@ function Set-DwImportDevice {
 
         .PARAMETER Instance
 
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
 
         .PARAMETER UniqueIdentifier
 
@@ -35,9 +35,9 @@ function Set-DwImportDevice {
 
     [CmdletBinding(SupportsShouldProcess)]
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$Instance,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [parameter(Mandatory=$true)]
         [string]$UniqueIdentifier,
@@ -51,18 +51,26 @@ function Set-DwImportDevice {
         [parameter(Mandatory=$true)]
         [string]$JsonBody
     )
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
+    }
 
-    $uri = "{0}/apiv2/imports/devices/{1}/items/{2}" -f $Instance, $ImportId, $UniqueIdentifier
-    $headers = @{'x-api-key' = $APIKey}
-
-    try {
-        if ($PSCmdlet.ShouldProcess($UniqueIdentifier)) {
-            $result = Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body $JsonBody
-            return $result
+    if ($APIKey -and $Instance) {
+        $uri = "{0}/apiv2/imports/devices/{1}/items/{2}" -f $Instance, $ImportId, $UniqueIdentifier
+        $headers = @{'x-api-key' = $APIKey}
+    
+        try {
+            if ($PSCmdlet.ShouldProcess($UniqueIdentifier)) {
+                $result = Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body $JsonBody
+                return $result
+            }
         }
-    }
-    catch {
-        Write-Error $_
-    }
+        catch {
+            Write-Error $_
+        }
 
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
+    }
 }

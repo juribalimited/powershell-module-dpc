@@ -7,9 +7,9 @@ function Get-DwImportLocationFeed {
         Gets one or more location feeds.
         Use ImportId to get a specific feed or omit for all feeds.
         .PARAMETER Instance
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
         .PARAMETER APIKey
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ImportId
         Optional. The id for the location feed. Omit to get all location feeds.
         .PARAMETER Name
@@ -21,9 +21,9 @@ function Get-DwImportLocationFeed {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$Instance,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [parameter(Mandatory=$false, ParameterSetName="ImportId")]
         [int]$ImportId,
@@ -31,25 +31,34 @@ function Get-DwImportLocationFeed {
         [string]$Name
     )
 
-    $uri = "{0}/apiv2/imports/locations" -f $Instance
-    switch ($PSCmdlet.ParameterSetName) {
-        "ImportId" {
-            $uri += "/{0}" -f $ImportId
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
+    }
+
+    if ($APIKey -and $Instance) {
+        $uri = "{0}/apiv2/imports/locations" -f $Instance
+        switch ($PSCmdlet.ParameterSetName) {
+            "ImportId" {
+                $uri += "/{0}" -f $ImportId
+            }
+            "Name" {
+                $uri += "?filter="
+                $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Name)
+            }
         }
-        "Name" {
-            $uri += "?filter="
-            $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Name)
+    
+        $headers = @{'x-api-key' = $APIKey}
+    
+        try {
+            $result = Invoke-RestMethod -Uri $uri -Method GET -Headers $headers
+            return $result
         }
-    }
+        catch {
+            Write-Error $_
+        }
 
-    $headers = @{'x-api-key' = $APIKey}
-
-    try {
-        $result = Invoke-RestMethod -Uri $uri -Method GET -Headers $headers
-        return $result
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
-    catch {
-        Write-Error $_
-    }
-
 }
