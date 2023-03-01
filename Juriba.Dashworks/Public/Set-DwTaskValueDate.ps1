@@ -71,7 +71,7 @@ function Set-DwTaskValueDate {
     
     
         $params = @{
-            'value'=$Value
+            'date'=$Value
             'projectid'=$ProjectID
             'taskid'=$TaskID
             }
