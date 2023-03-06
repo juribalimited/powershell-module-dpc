@@ -37,6 +37,18 @@ Function New-JuribaList {
 
         Base object type for the new list. Accepts one of: "Device", "User", "Application", "Mailbox", "ApplicationUser", "ApplciationDevice"
 
+        .PARAMETER SharedViewAccessType
+
+        Sets the View Access permissions for the list. Accepts one of: "Owner", "Eveyone". Optional, if ommited "Owner" is used.
+
+        .PARAMETER SharedEditAccessType
+
+        Sets the Edit Access permissions for the list. Accepts one of: "Owner", "Eveyone". Optional, if ommited "Owner" is used.
+
+        .PARAMETER SharedAdminAccessType
+
+        Sets the Admin Access permissions for the list. Accepts one of: "Owner", "Eveyone". Optional, if ommited "Owner" is used.
+
         .EXAMPLE
 
         PS> New-JuribaList
@@ -47,6 +59,10 @@ Function New-JuribaList {
             -ListType Dynamic
             -QueryString "`$filter=&`$select=hostname,chassisCategory,oSCategory,ownerDisplayName,bootupDate&`$pinleft=&`$pinright=&`$archiveditems=false"
             -ObjectType "Device"
+            -SharedViewAccessType "Everyone"
+            -SharedEditAccessType "Owner"
+            -SharedAdminAccessType "Owner"
+
 
     #>
     [CmdletBinding(SupportsShouldProcess)]
@@ -66,7 +82,16 @@ Function New-JuribaList {
         [string]$QueryString,
         [Parameter(Mandatory = $true)]
         [ValidateSet("Device", "User", "Application", "Mailbox", "ApplicationUser", "ApplciationDevice")]
-        [string]$ObjectType
+        [string]$ObjectType,
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("Owner", "Everyone")]
+        [string]$SharedViewAccessType = "Owner",
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("Owner", "Everyone")]
+        [string]$SharedEditAccessType = "Owner",
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("Owner", "Everyone")]
+        [string]$SharedAdminAccessType = "Owner"
     )
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
         $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
@@ -83,28 +108,28 @@ Function New-JuribaList {
             "Application" { $endpoint = "applications" }
             "Mailbox" { $endpoint = "mailboxes" }
         }
-    
+
         switch ($ListType) {
             "Static" { throw "not implemented" }
         }
-    
+
         $body = @{
             "listName"                      = $Name
             "userId"                        = $UserId
             "queryString"                   = $QueryString
             "listType"                      = $ListType
-            "sharedAdministerAccessType"    = "Owner"
-            "sharedEditAccessType"          = "Owner"
-            "sharedReadAccessType"          = "Everyone"
+            "sharedAdministerAccessType"    = $SharedAdminAccessType
+            "sharedEditAccessType"          = $SharedEditAccessType
+            "sharedReadAccessType"          = $SharedViewAccessType
         } | ConvertTo-Json
-    
+
         $contentType = "application/json"
         $headers = @{ 'X-API-KEY' = $ApiKey }
         $uri = "{0}/apiv1/lists/{1}"  -f  $instance, $endpoint
-    
+
         if ($PSCmdlet.ShouldProcess($Name)) {
             $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body $body -Method POST -ContentType $contentType
-    
+
             return ($result.content | ConvertFrom-Json)
         }
     } else {

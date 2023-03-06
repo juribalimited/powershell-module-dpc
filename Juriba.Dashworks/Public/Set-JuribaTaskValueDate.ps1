@@ -72,7 +72,7 @@ function Set-JuribaTaskValueDate {
     
     
         $params = @{
-            'value'=$Value
+            'date'=$Value
             'projectid'=$ProjectID
             'taskid'=$TaskID
             }
