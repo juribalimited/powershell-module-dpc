@@ -16,4 +16,4 @@ foreach ($import in @($public + $private)) {
 }
 
 # Export public functions
-Export-ModuleMember -Function $public.BaseName
+Export-ModuleMember -Function $public.BaseName -Alias *
