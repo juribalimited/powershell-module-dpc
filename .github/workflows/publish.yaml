@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'Juriba.Dashworks/**'
+      - 'Juriba.Platform/**'
 
 jobs:
   publishpsgallery:
@@ -16,4 +16,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - shell: pwsh
-        run: Publish-Module -Path .\Juriba.Dashworks -NuGetApiKey $env:NUGET_API_KEY -Verbose
+        run: Publish-Module -Path .\Juriba.Platform -NuGetApiKey $env:NUGET_API_KEY -Verbose
