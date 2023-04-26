@@ -1,5 +1,5 @@
 Function Get-JuribaDashboard {
-    [alias("Get-JuribaDashboard")]
+    [alias("Get-DwDashboard")]
     <#
     .SYNOPSIS
 
