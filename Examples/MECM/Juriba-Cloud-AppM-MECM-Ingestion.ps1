@@ -13,6 +13,7 @@ Must be run in the same directory as "MECM App Application With CI_ID Import.ps1
 #>
 
 #requires -Version 7
+#requires -Modules Juriba.Platform
 
 $dwAppImportFeedName = "<<CHANGE ME>>Juriba Application Import Feed Name"
 $dwInstance = "https://change-me-juriba-fqdn.com:8443"
@@ -29,8 +30,10 @@ $mecmPw = "<<CHANGE ME>>"
 $mecmPwSs = ConvertTo-SecureString $mecmPw -AsPlainText -Force
 $mecmCred = New-Object System.Management.Automation.PSCredential ($mecmUser, $mecmPwSs)
 
-
-Import-Module "C:\Users\Cheok-HoMai\Documents\Juriba Repos\powershell-module-dashworks\Juriba.Dashworks\Juriba.Dashworks.psm1"
+if (!(Get-InstalledModule -Name Juriba.Platform)) {
+    Write-Host 'Juriba.Platform module not installed.'
+    Install-Module -Name Juriba.Platform -Force
+}
 
 Write-Host 'Onboarding MECM App Data into Juriba Platform...'
 & $dwAppImportScript -DwInstance $dwInstance -DwAPIKey $dwToken -DwFeedName $dwAppImportFeedName -MecmServerInstance $mecmInstance -MecmDatabaseName $mecmDBName -MecmCredentials $mecmCred
