@@ -204,9 +204,3 @@ foreach ($appMApp in $appMMecmList) {
                     )
                 }
             }
-
-            $json      
-            Set-JuribaImportApplication -Instance $dwInstance -APIKey $dwToken -UniqueIdentifier $appMApp.originalApplicationId -ImportId $importId -JsonBody ($json | ConvertTo-Json)
-        }
-    }
-}
