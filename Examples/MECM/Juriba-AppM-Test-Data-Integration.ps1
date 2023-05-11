@@ -10,6 +10,7 @@ Must add the following custom fields into Juriba platform BEFORE using this scri
 
 New-JuribaCustomField -Instance $dwInstance -APIKey $dwToken -Name 'AppM - App Name' -CSVColumnHeader 'AppM - App Name' -Type Text -ObjectTypes Application -AllowUpdate 'ETL'
 New-JuribaCustomField -Instance $dwInstance -APIKey $dwToken -Name 'AppM - App Version' -CSVColumnHeader 'AppM - App Version' -Type Text -ObjectTypes Application -AllowUpdate 'ETL'
+New-JuribaCustomField -Instance $dwInstance -APIKey $dwToken -Name 'AppM - Direct Link' -CSVColumnHeader 'AppM - Direct Link' -Type Text -ObjectTypes Application -AllowUpdate 'ETL'
 New-JuribaCustomField -Instance $dwInstance -APIKey $dwToken -Name 'AppM - Test Status' -CSVColumnHeader 'AppM - Test Status' -Type Text -ObjectTypes Application -AllowUpdate 'ETL'
 New-JuribaCustomField -Instance $dwInstance -APIKey $dwToken -Name 'AppM - Test Result' -CSVColumnHeader 'AppM - Test Result' -Type Text -ObjectTypes Application -AllowUpdate 'ETL'
 New-JuribaCustomField -Instance $dwInstance -APIKey $dwToken -Name 'AppM - Test OS' -CSVColumnHeader 'AppM - Test OS' -Type Text -ObjectTypes Application -AllowUpdate 'ETL'
@@ -24,15 +25,22 @@ New-JuribaCustomField -Instance $dwInstance -APIKey $dwToken -Name 'PackageID' -
 
 #>
 
-$importId = "<<IMPORT ID>>"
-$dwInstance = "https://change-me-juriba-fqdn.com:8443"
-$dwToken = "<<CHANGE ME>>"
+$importId = ""
+$dwInstance = "https://changeme.com:8443"
+$dwToken = "<<API KEY>>"
 
+$reqCustomFields = @("AppM - App Name","AppM - App Version", "AppM - Direct Link", "AppM - Test Status", "AppM - Test Result", "AppM - Test OS", "AppM - App Manufacturer", "AppM - Virtual Machine Name", "AppM - Test Time Taken", "AppM - Test Start Time", "AppM - Old Test Data", "CI_UniqueID", "PackageID")
+$customFields = Get-JuribaCustomField -Instance $dwInstance -APIKey $dwToken
+foreach ($customField in $reqCustomFields) {
+    if ($customField -notin $customFields.name) {
+        Write-Error "Custom field: $customField missing from Juriba platform instance. Please onboard before proceeding."
+    }
+}
 ##############
 # AppM stuff #
 ##############
-$appMInstance = "https://change-me-appm-fqdn.com/"
-$appMToken = "<<CHANGE ME>>"
+$appMInstance = "https://changeme.com/"
+$appMToken = "<<API KEY>>"
 
 $appMMecmList = New-Object System.Collections.Generic.List[System.Object]
 
@@ -60,6 +68,7 @@ foreach ($app in $appsObj) {
             $app | Add-Member -MemberType NoteProperty -Name "PackagingData" -Value $testEnvDataObj.packagingInfo -Force
         }
         if ($app.basic.appId -match ($evergreenDataObj.applicationId | Select -First 1)) {
+
             $app | Add-Member -MemberType NoteProperty -Name "TestData" -Value $evergreenDataObj.evergreenInformation -Force
             $app | Add-Member -MemberType NoteProperty -Name "TestAppManufacturer" -Value $evergreenDataObj.manufacturer -Force
             $app | Add-Member -MemberType NoteProperty -Name "TestAppName" -Value $evergreenDataObj.applicationName -Force
@@ -94,6 +103,10 @@ foreach ($appMApp in $appMMecmList) {
                             value = "$($appMApp.basic.packageVersion)"
                         },
                         @{
+                            name = "AppM - Direct Link"
+                            value = '<a href="' + $appMInstance + 'app/applications/fullStatus/' + $($appMApp.basic.appId) + '/9" >' + $($appMApp.TestData.status) + '</a>'
+                        },
+                        @{
                             name = "AppM - Test Status"
                             value = "$($appMApp.TestData.status)"
                         },
@@ -110,7 +123,7 @@ foreach ($appMApp in $appMMecmList) {
                             value = "$($appMApp.TestData.virtualMachineName)"
                         },
                         @{
-                            name = "AppM - Test Time aken"
+                            name = "AppM - Test Time Taken"
                             value = "$($appMApp.TestData.testingTimeTakenString)"
                         },
                         @{
@@ -137,6 +150,10 @@ foreach ($appMApp in $appMMecmList) {
                         @{
                             name = "AppM - App Version"
                             value = "$($appMApp.basic.packageVersion)"
+                        },
+                        @{
+                            name = "AppM - Direct Link"
+                            value = '<a href="' + $appMInstance + 'app/applications/fullStatus/' + $($appMApp.basic.appId) + '/9" >' + $($appMApp.TestData.status) + '</a>'
                         },
                         @{
                             name = "AppM - Test Status"
@@ -187,9 +204,3 @@ foreach ($appMApp in $appMMecmList) {
                     )
                 }
             }
-
-            $json      
-            Set-JuribaImportApplication -Instance $dwInstance -APIKey $dwToken -UniqueIdentifier $appMApp.originalApplicationId -ImportId $importId -JsonBody ($json | ConvertTo-Json)
-        }
-    }
-}
