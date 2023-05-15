@@ -1,9 +1,5 @@
 # Juriba Platform PowerShell Module
 
-> **Warning** - This module is under active development
-
-## About
-
 A PowerShell module which can be used to interact with the Juriba Platform API.
 
 ## Installation

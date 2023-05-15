@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.Platform.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.0.36.0'
+    ModuleVersion     = '0.0.37.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -30,8 +30,7 @@
     Copyright         = '(c) Juriba. All rights reserved.'
 
     # Description of the functionality provided by this module
-    # Description       = 'PowerShell Module to interact with Juriba Platform.'
-    Description       = 'This module is currently under active development and is not intended for public use.'
+    Description       = 'PowerShell Module to interact with Juriba Platform.'
 
     # Minimum version of the PowerShell engine required by this module
     # PowerShellVersion = ''
