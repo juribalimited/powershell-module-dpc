@@ -21,10 +21,13 @@
     .Parameter MecmDatabaseName
     The root database name on the MECM server, e.g. CM_XX
 
+    .Parameter MecmCredentials
+    The credentials to use when connecting to the MECM server
+
     .Parameter ADServer
     The name of a DC to connect Get-ADUser to, including the port number. e.g. 389.
 
-    .Parameter Credentials
+    .Parameter ADCredential
     The credentials to use when calling Get-ADUser (optional)
 
     .Outputs
@@ -59,7 +62,7 @@
     )
 
     #Requires -Version 7
-    #Requires -Module Juriba.Dashworks
+    #Requires -Module Juriba.Platform
 
     $ErrorActionPreference = 'Continue'
     Function Get-StringHash{
