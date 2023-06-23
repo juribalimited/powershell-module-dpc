@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
 A sample script to query a CSV file for applications and import
-those devices into Juriba.
+those applications into Juriba.
 
 .DESCRIPTION
 A sample script to query a CSV file for applications and import
