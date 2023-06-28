@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.Platform.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.0.38.0'
+    ModuleVersion     = '0.0.39.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -92,6 +92,7 @@
         'Get-JuribaList',
         'Get-JuribaSessionUser',
         'Get-JuribaTag',
+        'Get-JuribaETLJob',
         'Invoke-JuribaAutomation',
         'New-JuribaAutomation',
         'New-JuribaAutomationAction',
@@ -128,6 +129,7 @@
         'Remove-JuribaList',
         'Remove-JuribaTag',
         'Remove-JuribaTaskValueDate',
+        'Run-JuribaETLJob',
         'Set-JuribaDashboardSection',
         'Set-JuribaDashboardWidgetColour',
         'Set-JuribaImportApplication',
@@ -138,7 +140,8 @@
         'Set-JuribaImportUser',
         'Set-JuribaTaskValueDate',
         'Set-JuribaTaskValueSelect',
-        'Set-JuribaTaskValueText'
+        'Set-JuribaTaskValueText',
+        'Stop-JuribaETLJob'
     )
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
