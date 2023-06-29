@@ -20,6 +20,10 @@ function Get-JuribaETLJob {
 
         Optional. The id for the ETL job. Omit to get all jobs.
 
+        .PARAMETER Name
+
+        Optional. Name of the ETL Job to find. Can only be used when JobId is not specified.
+
         .EXAMPLE
 
         PS> Get-JuribaETLJob -JobId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"

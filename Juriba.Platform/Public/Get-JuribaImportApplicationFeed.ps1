@@ -38,14 +38,10 @@ function Get-JuribaImportApplicationFeed {
 
     if ($APIKey -and $Instance) {
         $uri = "{0}/apiv2/imports/applications" -f $Instance
-        switch ($PSCmdlet.ParameterSetName) {
-            "ImportId" {
-                $uri += "/{0}" -f $ImportId
-            }
-            "Name" {
-                $uri += "?filter="
-                $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Name)
-            }
+        if ($ImportId) {$uri += "/{0}" -f $ImportId}
+        if ($Name) {
+            $uri += "?filter="
+            $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Name)
         }
     
         $headers = @{'x-api-key' = $APIKey}
