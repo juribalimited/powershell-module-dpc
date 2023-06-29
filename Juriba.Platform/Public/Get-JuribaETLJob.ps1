@@ -1,24 +1,37 @@
 #requires -Version 7
-function Get-JuribaImportLocationFeed {
-    [alias("Get-DwImportLocationFeed")]
+function Get-JuribaETLJob {
     <#
         .SYNOPSIS
-        Gets location imports.
+        Gets ETL jobs 
+
         .DESCRIPTION
-        Gets one or more location feeds.
-        Use ImportId to get a specific feed or omit for all feeds.
+        Gets one or more ETL jobs.
+        Use JobId to get a specific ETL or omit for all jobs.
+
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+
         .PARAMETER APIKey
+
         Optional. API key to be provided if not authenticating using Connect-Juriba.
-        .PARAMETER ImportId
-        Optional. The id for the location feed. Omit to get all location feeds.
+
+        .PARAMETER JobId
+
+        Optional. The id for the ETL job. Omit to get all jobs.
+
         .PARAMETER Name
-        Optional. Name of location feed to find. Can only be used when ImportId is not specified.
+
+        Optional. Name of the ETL Job to find. Can only be used when JobId is not specified.
+
         .EXAMPLE
-        PS> Get-JuribaImportLocationFeed -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+
+        PS> Get-JuribaETLJob -JobId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+                
         .EXAMPLE
-        PS> Get-JuribaImportLocationFeed -Name "My Location Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+
+        PS> Get-JuribaETLJob -Name "Dashworks ETL (Transform Only)" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+
     #>
     [CmdletBinding(DefaultParameterSetName="Name")]
     param (
@@ -26,9 +39,11 @@ function Get-JuribaImportLocationFeed {
         [string]$Instance,
         [Parameter(Mandatory=$false)]
         [string]$APIKey,
-        [parameter(Mandatory=$false, ParameterSetName="ImportId")]
-        [int]$ImportId,
-        [parameter(Mandatory=$false, ParameterSetName="Name")]
+        [parameter(Mandatory=$false,
+        ParameterSetName="JobId")]
+        [string]$JobId,
+        [parameter(Mandatory=$false,
+        ParameterSetName="Name")]
         [string]$Name
     )
 
@@ -38,15 +53,15 @@ function Get-JuribaImportLocationFeed {
     }
 
     if ($APIKey -and $Instance) {
-        $uri = "{0}/apiv2/imports/locations" -f $Instance
-        if ($ImportId) {$uri += "/{0}" -f $ImportId}
+        $uri = "{0}/apiv2/etl-jobs" -f $Instance
+
+        if ($JobId) {$uri += "/{0}" -f $JobId}
         if ($Name) {
             $uri += "?filter="
             $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Name)
         }
-    
+        
         $headers = @{'x-api-key' = $APIKey}
-    
         try {
             $result = Invoke-RestMethod -Uri $uri -Method GET -Headers $headers
             return $result
@@ -54,7 +69,7 @@ function Get-JuribaImportLocationFeed {
         catch {
             Write-Error $_
         }
-
+    
     } else {
         Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }

@@ -20,7 +20,7 @@ function Get-JuribaImportDepartmentFeed {
         .EXAMPLE
         PS> Get-JuribaImportDepartmentFeed -Name "My Department Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName="Name")]
     param (
         [Parameter(Mandatory=$false)]
         [string]$Instance,
@@ -39,14 +39,10 @@ function Get-JuribaImportDepartmentFeed {
 
     if ($APIKey -and $Instance) {
         $uri = "{0}/apiv2/imports/departments" -f $Instance
-        switch ($PSCmdlet.ParameterSetName) {
-            "ImportId" {
-                $uri += "/{0}" -f $ImportId
-            }
-            "Name" {
-                $uri += "?filter="
-                $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Name)
-            }
+        if ($ImportId) {$uri += "/{0}" -f $ImportId}
+        if ($Name) {
+            $uri += "?filter="
+            $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Name)
         }
     
         $headers = @{'x-api-key' = $APIKey}
