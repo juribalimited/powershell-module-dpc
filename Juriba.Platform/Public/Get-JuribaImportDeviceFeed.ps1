@@ -34,7 +34,7 @@ function Get-JuribaImportDeviceFeed {
         PS> Get-JuribaImportDeviceFeed -Name "My Device Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName="Name")]
     param (
         [Parameter(Mandatory=$false)]
         [string]$Instance,

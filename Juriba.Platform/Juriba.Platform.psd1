@@ -129,7 +129,6 @@
         'Remove-JuribaList',
         'Remove-JuribaTag',
         'Remove-JuribaTaskValueDate',
-        'Run-JuribaETLJob',
         'Set-JuribaDashboardSection',
         'Set-JuribaDashboardWidgetColour',
         'Set-JuribaImportApplication',
@@ -141,6 +140,7 @@
         'Set-JuribaTaskValueDate',
         'Set-JuribaTaskValueSelect',
         'Set-JuribaTaskValueText',
+        'Start-JuribaETLJob',
         'Stop-JuribaETLJob'
     )
 

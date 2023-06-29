@@ -34,7 +34,7 @@ function Get-JuribaImportMailboxFeed {
         PS> Get-JuribaImportMailboxFeed -Name "My Mailbox Feed"
 
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName="Name")]
     param (
         [parameter(Mandatory=$false)]
         [int]$ImportId,

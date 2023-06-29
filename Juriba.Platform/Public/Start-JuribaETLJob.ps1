@@ -1,5 +1,5 @@
 #requires -Version 7
-function Run-JuribaETLJob {
+function Start-JuribaETLJob {
     <#
         .SYNOPSIS
         Run an ETL job.
@@ -21,7 +21,7 @@ function Run-JuribaETLJob {
 
         .EXAMPLE
 
-        PS> Run-JuribaETLJob -JobId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Start-JuribaETLJob -JobId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
     [CmdletBinding()]

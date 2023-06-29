@@ -24,7 +24,7 @@ function Stop-JuribaETLJob {
         PS> Stop-JuribaETLJob -JobId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact='Medium')]
     param (
         [Parameter(Mandatory=$false)]
         [string]$Instance,
@@ -43,9 +43,18 @@ function Stop-JuribaETLJob {
     if ($APIKey -and $Instance -and $JobId) {
         $uri = "{0}/apiv2/etl-jobs/{1}" -f $Instance, $JobId
         $headers = @{'x-api-key' = $APIKey}
+    
         try {
-            $result = Invoke-RestMethod -Uri $uri -Method DELETE -Headers $headers
-            return $result
+            $job = Get-JuribaETLJob -Instance $Instance -APIKey $APIKey -JobId $JobId
+            if ($PSCmdlet.ShouldProcess(
+                ("Stopping Job {0}" -f $job.name),
+                ("This action will stop Job {0} in state {1}, continue?" -f $job.name, $job.status),
+                "Confirm Job cancellation"
+                )
+            ) {
+                $result = Invoke-RestMethod -Uri $uri -Method DELETE -Headers $headers
+                return $result
+            }
         }
         catch {
             Write-Error $_

@@ -20,7 +20,7 @@ function Get-JuribaImportLocationFeed {
         .EXAMPLE
         PS> Get-JuribaImportLocationFeed -Name "My Location Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName="Name")]
     param (
         [Parameter(Mandatory=$false)]
         [string]$Instance,

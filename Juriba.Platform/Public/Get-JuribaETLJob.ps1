@@ -23,9 +23,13 @@ function Get-JuribaETLJob {
         .EXAMPLE
 
         PS> Get-JuribaETLJob -JobId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+                
+        .EXAMPLE
+
+        PS> Get-JuribaETLJob -Name "Dashworks ETL (Transform Only)" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName="Name")]
     param (
         [Parameter(Mandatory=$false)]
         [string]$Instance,
@@ -33,7 +37,10 @@ function Get-JuribaETLJob {
         [string]$APIKey,
         [parameter(Mandatory=$false,
         ParameterSetName="JobId")]
-        [string]$JobId
+        [string]$JobId,
+        [parameter(Mandatory=$false,
+        ParameterSetName="Name")]
+        [string]$Name
     )
 
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
@@ -45,6 +52,11 @@ function Get-JuribaETLJob {
         $uri = "{0}/apiv2/etl-jobs" -f $Instance
 
         if ($JobId) {$uri += "/{0}" -f $JobId}
+        if ($Name) {
+            $uri += "?filter="
+            $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Name)
+        }
+        
         $headers = @{'x-api-key' = $APIKey}
         try {
             $result = Invoke-RestMethod -Uri $uri -Method GET -Headers $headers
