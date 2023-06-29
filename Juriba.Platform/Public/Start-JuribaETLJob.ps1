@@ -24,7 +24,7 @@ function Start-JuribaETLJob {
         PS> Start-JuribaETLJob -JobId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact='Medium')]
     param (
         [Parameter(Mandatory=$false)]
         [string]$Instance,
@@ -44,8 +44,17 @@ function Start-JuribaETLJob {
         $uri = "{0}/apiv2/etl-jobs/{1}" -f $Instance, $JobId
         $headers = @{'x-api-key' = $APIKey}
         try {
-            $result = Invoke-RestMethod -Uri $uri -Method POST -Headers $headers
-            return $result
+            $job = Get-JuribaETLJob -Instance $Instance -APIKey $APIKey -JobId $JobId
+            if ($PSCmdlet.ShouldProcess(
+                ("Starting Job {0}" -f $job.name),
+                ("This action will start Job {0} in state {1}, continue?" -f $job.name, $job.status),
+                "Confirm Job initiation"
+                )
+            ) {
+                $result = Invoke-RestMethod -Uri $uri -Method POST -Headers $headers
+                return $result
+            }
+
         }
         catch {
             Write-Error $_
