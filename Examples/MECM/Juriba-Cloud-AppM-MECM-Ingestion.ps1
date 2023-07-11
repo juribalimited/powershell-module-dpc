@@ -31,7 +31,7 @@ New-JuribaCustomField -Instance $dwInstance -APIKey $dwToken -Name 'PackageID' -
 #>
 
 #requires -Version 7
-#requires -Modules Juriba.Platform
+#requires -Modules @{ ModuleName="Juriba.Platform"; ModuleVersion="0.0.39.0" }
 
 $dwAppImportFeedName = ""
 $dwInstance = "https://changeme.com:8443"
@@ -66,3 +66,27 @@ if (!(Get-InstalledModule -Name Juriba.Platform)) {
 
 Write-Host 'Onboarding MECM App Data into Juriba Platform...'
 & $dwAppImportScript -DwInstance $dwInstance -DwAPIKey $dwToken -DwFeedName $dwAppImportFeedName -MecmServerInstance $mecmInstance -MecmDatabaseName $mecmDBName -MecmCredentials $mecmCred
+
+Write-Host 'Running a transform only ETL job...'
+$transformEtl = Get-JuribaETLJob -Instance $dwInstance -APIKey $dwToken -Name "Dashworks ETL (Transform Only)"
+if ($transformEtl.status -eq "Idle") {
+    Start-JuribaETLJob -Instance $dwInstance -APIKey $dwToken -JobId $transformEtl.id
+    while ($True) {
+        Start-Sleep -Seconds 5
+        try
+        {
+            $transformEtl = Get-JuribaETLJob -Instance $dwInstance -APIKey $dwToken -Name "Dashworks ETL (Transform Only)"
+            if ($transformEtl.status -eq "Idle") {
+                break
+            } elseif ($transformEtl.status -eq "Executing") {
+                Write-Host "Transform ETL executing..."
+            }
+        }
+        catch
+        {
+            Write-Error "Unable to get Transform ETL job status..."
+        }
+    }
+} else {
+    Write-Error "Transform ETL Job currently not in idle state..."
+}
