@@ -27,7 +27,7 @@ New-JuribaCustomField -Instance $dwInstance -APIKey $dwToken -Name 'PackageID' -
 
 #requires -Modules @{ ModuleName="Juriba.Platform"; ModuleVersion="0.0.39.0" }
 
-$dwAppImportFeedName = "<<FEED NAME>>"
+$dwAppImportFeedName = "<<IMPORT FEED NAME>>"
 $dwInstance = "https://changeme.com:8443"
 $dwToken = "<<API KEY>>"
 
@@ -225,6 +225,7 @@ if ($transformEtl.status -eq "Idle") {
         {
             $transformEtl = Get-JuribaETLJob -Instance $dwInstance -APIKey $dwToken -Name "Dashworks ETL (Transform Only)"
             if ($transformEtl.status -eq "Idle") {
+                Write-Host "Transform ETL job complete."
                 break
             } elseif ($transformEtl.status -eq "Executing") {
                 Write-Host "Transform ETL executing..."
