@@ -86,7 +86,7 @@ foreach ($app in $appsObj) {
 Write-Host "Total AppM apps found: $($appMMecmList.Count)"
 
 $headers = @{'x-api-key' = $dwToken}
-$uri = "$dwInstance/apiv2/imports/applications/$(feed.id)/items?limit=1000"
+$uri = "$dwInstance/apiv2/imports/applications/$($feed.id)/items?limit=1000"
 $jrbAppList = (Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json").content | ConvertFrom-Json
 
 foreach ($appMApp in $appMMecmList) {        
