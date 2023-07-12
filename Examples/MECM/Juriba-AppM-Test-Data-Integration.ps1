@@ -46,8 +46,8 @@ if ($null -eq $feed) {
 ##############
 # AppM stuff #
 ##############
-$appMInstance = "https://change-me-appm-fqdn.com/"
-$appMToken = "<<CHANGE ME>>"
+$appMInstance = "https://changeme.com/"
+$appMToken = "<<API KEY>>"
 
 $appMMecmList = New-Object System.Collections.Generic.List[System.Object]
 
@@ -160,7 +160,7 @@ foreach ($appMApp in $appMMecmList) {
                         },
                         @{
                             name = "AppM - Direct Link"
-                            value = '<a href="' + $appMInstance + 'app/applications/fullStatus/' + $($appMApp.basic.appId) + '/9" >' + $($appMApp.TestData.status) + '</a>'
+                            value = '<a href="' + $appMInstance + 'app/applications/fullStatus/' + $($appMApp.basic.appId) + '/9" >' + $($appMApp.TestData.status)[$($appMApp.TestData.status).Count-1] + '</a>'
                         },
                         @{
                             name = "AppM - Test Status"
