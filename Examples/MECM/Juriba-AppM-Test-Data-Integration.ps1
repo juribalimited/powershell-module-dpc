@@ -28,8 +28,8 @@ New-JuribaCustomField -Instance $dwInstance -APIKey $dwToken -Name 'PackageID' -
 #requires -Modules @{ ModuleName="Juriba.Platform"; ModuleVersion="0.0.39.0" }
 
 $dwAppImportFeedName = "<<IMPORT FEED NAME>>"
-$dwInstance = "https://changeme.com:8443"
-$dwToken = "<<API KEY>>"
+$dwInstance = "https://change-me-juriba-fqdn.com:8443"
+$dwToken = "<<CHANGE ME>>"
 
 $reqCustomFields = @("AppM - App Name","AppM - App Version", "AppM - Direct Link", "AppM - Test Status", "AppM - Test Result", "AppM - Test OS", "AppM - App Manufacturer", "AppM - Virtual Machine Name", "AppM - Test Time Taken", "AppM - Test Start Time", "AppM - Old Test Data", "CI_UniqueID", "PackageID")
 $customFields = Get-JuribaCustomField -Instance $dwInstance -APIKey $dwToken
@@ -46,8 +46,8 @@ if ($null -eq $feed) {
 ##############
 # AppM stuff #
 ##############
-$appMInstance = "https://changeme.com/"
-$appMToken = "<<API KEY>>"
+$appMInstance = "https://change-me-appm-fqdn.com/"
+$appMToken = "<<CHANGE ME>>"
 
 $appMMecmList = New-Object System.Collections.Generic.List[System.Object]
 
@@ -74,7 +74,7 @@ foreach ($app in $appsObj) {
             $app | Add-Member -MemberType NoteProperty -Name "TestSettings" -Value $testEnvDataObj.ext -Force
             $app | Add-Member -MemberType NoteProperty -Name "PackagingData" -Value $testEnvDataObj.packagingInfo -Force
         }
-        if ($app.basic.appId -match ($evergreenDataObj.applicationId | Select -First 1)) {
+        if ($app.basic.appId -match ($evergreenDataObj.applicationId | Select-Object -First 1)) {
 
             $app | Add-Member -MemberType NoteProperty -Name "TestData" -Value $evergreenDataObj.evergreenInformation -Force
             $app | Add-Member -MemberType NoteProperty -Name "TestAppManufacturer" -Value $evergreenDataObj.manufacturer -Force
@@ -211,9 +211,11 @@ foreach ($appMApp in $appMMecmList) {
                     )
                 }
             }
+            Set-JuribaImportApplication -Instance $dwInstance -APIKey $dwToken -UniqueIdentifier $appMApp.originalApplicationId -ImportId $($feed.id) -JsonBody ($json | ConvertTo-Json)
         }
     }
 }
+
 
 Write-Host 'Running a transform only ETL job...'
 $transformEtl = Get-JuribaETLJob -Instance $dwInstance -APIKey $dwToken -Name "Dashworks ETL (Transform Only)"
