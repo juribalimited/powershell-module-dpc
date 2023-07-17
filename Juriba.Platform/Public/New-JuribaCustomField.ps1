@@ -1,56 +1,31 @@
 function New-JuribaCustomField {
     [alias("New-DwCustomField")]
     <#
-    .SYNOPSIS
-
-    Creates a new custom field.
-
-    .DESCRIPTION
-
-    Creates a new custom field using the Dashworks API v1.
-
-    .PARAMETER Instance
-
-    Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
-
-    .PARAMETER APIKey
-
-    Optional. API key to be provided if not authenticating using Connect-Juriba.
-
-    .PARAMETER Name
-
-    Name of the new custom field.
-
-    .PARAMETER CSVColumnHeader
-
-    CSV Column Header for the new custom field. Restricted to alphanumeric characters.
-
-    .PARAMETER Type
-
-    Type of the new custom field. One of Text, MultiText, LargeText, Number or Date.
-
-    .PARAMETER ObjectTypes
-
-    Object types that this new custom field applies to. Accepts multiple selections. One or more of Device, User, Application, Mailbox.
-
-    .PARAMETER IsActive
-
-    Set the new custom field to active or inactive. Defaults to Active.
-
-    .PARAMETER AllowUpdate
-
-    Optional. Sets the type of updates allowed for this custom field. Either Directly or ETL. Defaults to Directly.
-
-    .OUTPUTS
-
-    None.
-
-    .EXAMPLE
-
-    PS> New-JuribaCustomField -ObjectTypes Device, User -Name "MyNewCustomField" -CSVColumnHeader "mynewcustomfield" -Type Text -IsActive $true -AllowUpdate ETL -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
-
+        .SYNOPSIS
+        Creates a new custom field.
+        .DESCRIPTION
+        Creates a new custom field using the Dashworks API v1, Supporting special characters in the naming. 
+        .PARAMETER Instance
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        .PARAMETER APIKey
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
+        .PARAMETER Name
+        Name of the new custom field.
+        .PARAMETER CSVColumnHeader
+        CSV Column Header for the new custom field. Restricted to alphanumeric characters.
+        .PARAMETER Type
+        Type of the new custom field. One of Text, MultiText, LargeText, Number or Date.
+        .PARAMETER ObjectTypes
+        Object types that this new custom field applies to. Accepts multiple selections. One or more of Device, User, Application, Mailbox.
+        .PARAMETER IsActive
+        Set the new custom field to active or inactive. Defaults to Active.
+        .PARAMETER AllowUpdate
+        Optional. Sets the type of updates allowed for this custom field. Either Directly or ETL. Defaults to Directly.
+        .OUTPUTS
+        Text "Custom field created"
+        .EXAMPLE
+        PS> New-JuribaCustomField -ObjectTypes Device, User -Name "MyNewCustomField" -CSVColumnHeader "mynewcustomfield" -Type Text -IsActive $true -AllowUpdate ETL -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
-
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]
@@ -114,7 +89,7 @@ function New-JuribaCustomField {
     
         try {
             if ($PSCmdlet.ShouldProcess($Name)) {
-                $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body $jsonbody -ContentType 'application/json'
+                $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType 'application/json'
                 if ($result.StatusCode -eq 200) {
                     Write-Information "Custom field created" -InformationAction Continue
                 }

@@ -1,10 +1,10 @@
-function New-JuribaDashboardCardWidget {
-    [alias("New-DwDashboardCardWidget")]
+function New-JuribaDashboardListWidget {
+    [alias("New-DwDashboardListWidget")]
     <#
         .SYNOPSIS
-        Creates a new dashboard card widget.
+        Creates a new dashboard list widget.
         .DESCRIPTION
-        Creates a new dashboard card widget using the Dashworks API v1, Supporting special characters in the naming.
+        Creates a new dashboard list widget using the Dashworks API v1, Supporting special characters in the naming.
         .PARAMETER Instance
         Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
         .PARAMETER APIKey
@@ -19,16 +19,14 @@ function New-JuribaDashboardCardWidget {
         ListId for the widget.
         .PARAMETER ObjectType
         Object type that this new widget applies to. Accepts Devices, Users, Applications, Mailboxes. Defaults to Devices
-        .PARAMETER AggregateFunction
-        Function used for the widget. Accepts Count, Count Distinct, Max, Min, Sum, Average
-        .PARAMETER AggregateBy
-        Normally custom field/task in a special format: customField_[data type ID]_[custom field ID] or project_task_[project ID]_[Task ID]_[Data type ID]_Task. Defaults to empty
-        .PARAMETER ColourTemplate
-        Optional. Sets the type of updates allowed for this custom field. Either Directly or ETL. Defaults to Directly.
+        .PARAMETER maxRows
+        Maximum number of rows 1 to 1000
+        .PARAMETER maxColumns
+        Maximum number of columns 1 to 1000
         .OUTPUTS
         widgetId
         .EXAMPLE
-        PS> New-JuribaDashboardCardWidget @dwparam -DashboardId 1 -SectionId 2 -Title "Windows 11 Upgrade Scope" -ListId 2 -AggregateFunction "Count" -AggregateBy "" -ColourTemplate 1
+        PS> New-JuribaDashboardListWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Today's Direct Ships" -ListId 337 -maxRows 1000 -maxColumns 10
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
@@ -48,27 +46,18 @@ function New-JuribaDashboardCardWidget {
         [ValidateSet ("Users","Devices","Applications","Mailboxes")]
         [string]$ObjectType = "Devices",
         [Parameter(Mandatory=$false)]
-        [ValidateSet ("Count","Count Distinct","Max","Min","Sum","Average")]
-        [string]$AggregateFunction = "Count",
-        [parameter(Mandatory = $false)]
-        [string]$AggregateBy = "",
+        [ValidateRange(1,1000) ]
+        [string]$maxRows = 100,
         [Parameter(Mandatory=$false)]
-        [int]$ColourTemplate = 1 ##1 Black , 2 Blue, 3 Turquoise, 4 Red, 5 Brown, 6 Pink, 7 Amber, 8 Orange, 9 Purple, 10 Green, 11 Grey, 12 Silver        
-	)
+        [ValidateRange(1,1000) ]
+        [string]$maxColumns = 10
+    )
 
     switch ($ObjectType){
         "Users" {$ObjectTypeID = 1}
         "Devices" {$ObjectTypeID = 2}
         "Applications" {$ObjectTypeID = 3}
         "Mailboxes" {$ObjectTypeID = 4}
-    }
-    switch ($AggregateFunction){
-        "Count" {$AggregateFunctionID = 1}
-        "Count Distinct" {$AggregateFunctionID = 2}
-        "Sum" {$AggregateFunctionID = 3}
-        "Min" {$AggregateFunctionID = 4}
-        "Max" {$AggregateFunctionID = 5}
-        "Average" {$AggregateFunctionID = 6}
     }
 
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
@@ -77,9 +66,9 @@ function New-JuribaDashboardCardWidget {
     }
 
     if ($APIKey -and $Instance) {
-		$Uri = "{0}/apiv1/dashboard/{1}/section/{2}/widget" -f $Instance, $DashboardId, $SectionId
+		$uri = "{0}/apiv1/dashboard/{1}/section/{2}/widget" -f $Instance, $DashboardId, $SectionId						
         $Body = @{
-            "widgetType"                = "Card"
+            "widgetType"                = "List"
             "displayOrder"              = 0
             "title"                     = $Title
             "listId"                    = if ($null -eq $ListId -or $ListId -eq 0) { $null } else { $ListId }
@@ -87,21 +76,21 @@ function New-JuribaDashboardCardWidget {
             "listObjectTypeId"          = $ObjectTypeId
             "colourSchemeId"            = 3
             "widgetValuesColours"       = @()
-            "colourTemplateId"          = $ColourTemplate
-            "aggregateFunctionId"       = $AggregateFunctionID
+            "colourTemplateId"          = 1
+            "aggregateFunctionId"       = $null
             "maximumValues"             = $null
-            "drilldownEnabled"          = $true
-            "maxRows"                   = 0
-            "maxColumns"                = 0
-            "cardTypeIsAggregate"       = $true
+            "drilldownEnabled"          = $false
+            "maxRows"                   = $maxRows
+            "maxColumns"                = $maxColumns
+            "cardTypeIsAggregate"       = $false
             "splitBy"                   = ""
-            "aggregateBy"               = $AggregateBy
+            "aggregateBy"               = ""
             "orderByDescending"         = $null
             "orderById"                 = $null
             "orderByField"              = $null
-            "legend"                    = 5
+            "legend"                    = 1
             "orientationIsVertical"     = $false
-            "layout"                    = "IconAndText"
+            "layout"                    = $null
             "displayDataLabels"         = $false
             "categoriseBy"              = ""
             "categorisationViewType"    = "None"
@@ -110,15 +99,14 @@ function New-JuribaDashboardCardWidget {
         
         $jsonbody = $body | ConvertTo-Json
         $ContentType = "application/json"
-        $headers     = @{
-            'X-API-KEY' = $APIKey
+        $Headers     = @{
+            'X-API-KEY' = $APIKey			 
         }
-    }
-
-    if ($PSCmdlet.ShouldProcess($Title)) {
-        
-        $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -Method POST -ContentType $contentType
-        return ($result.Content | ConvertFrom-Json).WidgetId
+    
+        if ($PSCmdlet.ShouldProcess($Title)) {
+            $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -Method POST -ContentType $contentType
+            return ($result.Content | ConvertFrom-Json).WidgetId
+        }
     }
     else {
         Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
