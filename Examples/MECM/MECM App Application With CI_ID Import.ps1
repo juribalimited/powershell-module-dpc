@@ -51,6 +51,10 @@ if (-Not $feed) {
 }
 $importId = $feed.id
 
+if($null -eq $importId) {
+    Write-Error ("Feed id {0} not found. Cannot ingest data." -f $importId)
+}
+
 Write-Information ("Using feed id {0}" -f $importId) -InformationAction Continue
 
 # Run query against MECM database
