@@ -26,6 +26,8 @@ function Set-JuribaEvergreenSelfService {
         .EXAMPLE
         PS> Set-JuribaEvergreenSelfService @dwparams -ServiceID 20 -ScopeID 115 -ServiceName 'W11 Deployment' -ServiceShortName 'W11-App' -ObjectType 'Device' -Enabled $true
     #>
+    [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([string])]
     param(
         [Parameter(Mandatory = $false)]
         [string]$Instance,
@@ -70,28 +72,28 @@ function Set-JuribaEvergreenSelfService {
     #validate scopelistid
     if ($scopeId -gt 0) {
         try {
-            $validate = Invoke-WebRequest -Uri $uriscope -Method PUT -Headers $headers -ContentType 'application/json'
+            $result = Invoke-WebRequest -Uri $uriscope -Method PUT -Headers $headers -ContentType 'application/json'
             #Write-host 'Scope List Validated'
         } 
         Catch {
-            Write-host "Scope list provided is not valid."
-            Write-Error $_
-            throw
+            Write-Error "Scope list provided is not valid."
         }
     }
 
     #Try to update SS
     try {
-        $result = Invoke-WebRequest -Uri $uri -Method PUT -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType 'application/json'
-        if ($result.StatusCode -eq 200)
-        {
-            return "Self service details have updated successfully"
-        }
-        else {
-            throw "Error updating self service."
+        if($PSCmdlet.ShouldProcess($ServiceID)) {
+            $result = Invoke-WebRequest -Uri $uri -Method PUT -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType 'application/json'
+            if ($result.StatusCode -eq 200)
+            {
+                return "Self service details have updated successfully"
+            }
+            else {
+                throw "Error updating self service."
+            }
         }
     }
     catch {
-            Write-Error $_
+        Write-Error $_
     }
 }

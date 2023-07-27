@@ -22,6 +22,7 @@ function Set-JuribaTeam {
         .EXAMPLE
         PS> Set-JuribaTeam @DwParams -TeamID 1 -TeamName "A Team" -Description "A new team"
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,
@@ -53,8 +54,10 @@ function Set-JuribaTeam {
     $uri = "{0}/apiv1/admin/team/{1}/updateTeam" -f $Instance, $TeamID
 
     try {
-        $result = Invoke-WebRequest -Uri $uri -Method PUT -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType $contentType
-        return ($result.Content | ConvertFrom-Json).message
+        if($PSCmdlet.ShouldProcess($TeamID)) {
+            $result = Invoke-WebRequest -Uri $uri -Method PUT -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType $contentType
+            return ($result.Content | ConvertFrom-Json).message
+        }
     }
     catch {
         Write-Error $_

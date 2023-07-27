@@ -18,6 +18,7 @@ function Remove-JuribaCapacitySlot {
         .EXAMPLE
         PS> Remove-JuribaCapacitySlot @DwParams -ProjectID 1 -SlotID 1
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,
@@ -45,8 +46,10 @@ function Remove-JuribaCapacitySlot {
     $jsonbody = ($payload | ConvertTo-Json)
 
     try {
-        $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -Method POST -ContentType $contentType
-        return ($result.Content).Trim('"')
+        if($PSCmdlet.ShouldProcess($SlotID)) {
+            $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -Method POST -ContentType $contentType
+            return ($result.Content).Trim('"')
+        }
     }
     catch {
         Write-Error $_

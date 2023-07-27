@@ -114,7 +114,7 @@ function Set-JuribaAutomation {
             }
         }
         catch {
-                Write-Error $_
+            Write-Error $_
         }
     }
     else {

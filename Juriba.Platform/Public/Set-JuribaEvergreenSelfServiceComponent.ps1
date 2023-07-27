@@ -39,6 +39,7 @@ function Set-JuribaEvergreenSelfServiceComponent {
              -ComponentTypeDescription "ComponentTypeDescription"
     #>
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([int32])]
     param(
         [Parameter(Mandatory = $false)]
         [string]$Instance,

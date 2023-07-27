@@ -22,6 +22,7 @@ function New-JuribaCapacityUnit {
 		.EXAMPLE
 		PS> New-JuribaCapacityUnit @dwparams -ProjectID 4 -Name "Unit 1" -Description "Description" -IsDefault $true
     #>
+    [CmdletBinding(SupportsShouldProcess)]
 	param (
 		[Parameter(Mandatory=$false)]
 		[string]$Instance,
@@ -56,8 +57,10 @@ function New-JuribaCapacityUnit {
     $jsonbody = $payload | ConvertTo-Json 
 
     try {
-        $result = Invoke-WebRequest -uri $uri -method POST -headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType 'application/json'
-        return ($result.content | convertfrom-json).capacityUnitId
+		if($PSCmdlet.ShouldProcess($Name)) {
+			$result = Invoke-WebRequest -uri $uri -method POST -headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType 'application/json'
+			return ($result.content | convertfrom-json).capacityUnitId
+		}
     }
     catch {
         write-error $_

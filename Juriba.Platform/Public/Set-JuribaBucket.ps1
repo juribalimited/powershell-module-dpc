@@ -24,6 +24,7 @@ function Set-JuribaBucket {
         .EXAMPLE
         PS> Set-JuribaBucket @DwParams -ProjectID 1 -BucketID 9 -BucketName "01 Preview" -OwnerTeamID 1
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,
@@ -58,8 +59,10 @@ function Set-JuribaBucket {
     $uri = "{0}/apiv1/admin/projects/{1}/update-bucket" -f $Instance, $ProjectID
 
     try {
-        $result = Invoke-WebRequest -Uri $uri -Method PUT -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType $contentType
-        return ($result.Content | ConvertFrom-Json).message
+        if($PSCmdlet.ShouldProcess($BucketID)) {
+            $result = Invoke-WebRequest -Uri $uri -Method PUT -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType $contentType
+            return ($result.Content | ConvertFrom-Json).message
+        }
     }
     catch {
         Write-Error $_

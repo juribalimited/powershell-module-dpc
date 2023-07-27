@@ -18,6 +18,7 @@ function Remove-JuribaTeam {
         .EXAMPLE
         PS> Remove-JuribaTeam @DwParams -ReassignedTeamID 5 -TeamID 1
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,
@@ -45,8 +46,10 @@ function Remove-JuribaTeam {
     $jsonbody = ($payload | ConvertTo-Json)
 
     try {
-        $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body $jsonbody -Method PUT -ContentType $contentType
-        return ($result.Content).Trim('"')
+        if($PSCmdlet.ShouldProcess($TeamID)) {
+            $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body $jsonbody -Method PUT -ContentType $contentType
+            return ($result.Content).Trim('"')
+        }
     }
     catch {
         Write-Error $_

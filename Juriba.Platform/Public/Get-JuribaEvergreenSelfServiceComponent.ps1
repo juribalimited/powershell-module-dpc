@@ -13,15 +13,13 @@ function Get-JuribaEvergreenSelfServiceComponent {
         ServiceId to get page information from.
         .PARAMETER PageId
         PageId to get components from.
-        .PARAMETER ReturnType
-        Returns components by "Page" or by "SelfService"
         .OUTPUTS
         Components object
         componentId, pageId, componentTypeId, order, componentName, helpText, componentType, showInSelfService, isComponentInteractive, isComponentInvalid, componentErrorMessages, isReadOnlyForEndUser, childComponentCount, parentComponent, components, extraProperties
         .EXAMPLE
-        PS> Get-JuribaEvergreenSelfServiceComponent @dwparams -Serviceid 2 -PageId 15 -ReturnType "SelfService"
+        PS> Get-JuribaEvergreenSelfServiceComponent @dwparams -ServiceId 1
+        PS> Get-JuribaEvergreenSelfServiceComponent @dwparams -ServiceId 1 -PageId 7
     #>
-    [CmdletBinding(DefaultParameterSetName="Default")]
     param(
         [Parameter(Mandatory = $false)]
         [string]$Instance,
@@ -29,11 +27,8 @@ function Get-JuribaEvergreenSelfServiceComponent {
         [string]$APIKey,
         [Parameter(Mandatory = $true)]
         [int]$ServiceId,
-        [Parameter(Mandatory = $true)]
-        [int]$PageId,
-        [Parameter(Mandatory = $true)]
-        [ValidateSet("SelfService", "Page")]
-        [string]$ReturnType
+        [Parameter(Mandatory = $false)]
+        [int]$PageId
     )
 
     $headers = @{'x-api-key' = $APIKey }
@@ -45,12 +40,15 @@ function Get-JuribaEvergreenSelfServiceComponent {
         if($result.StatusCode -eq 200) {
             $resulttable = $result.Content | ConvertFrom-Json
 
-            if($ReturnType -eq "Page") {
-                return (($resulttable | Where-Object {$_.pageId -eq $PageId}).components +
-                    ($resulttable | Where-Object {$_.pageId -eq $PageId}).components.components ) 
+            if($PageId -gt 0) {
+                [array]$results = ($resulttable | Where-Object {$_.pageId -eq $PageId}).components
+                $results += ($resulttable | Where-Object {$_.pageId -eq $PageId}).components.components
+                return $results                    
             }
             else {
-                return ($resulttable.components + $resulttable.components.components)
+                [array]$results = $resulttable.components
+                $results += $resulttable.components.components
+                return $results
             }
         }
     }

@@ -23,8 +23,6 @@ function New-JuribaDashboardPieWidget {
         Defines the object that orders by Split Value = 1, Aggregate Value = 2, Status = 3, Severity = 4, Chronological = 5, Display Order = 6
         .PARAMETER OrderByDescending
         Boolean value to define if order by by descending true or false, false by default
-        .PARAMETER CategoriseBy
-        Object to categorise the result by, typically a task, custom field, column from a list or empty
         .PARAMETER ObjectType
         Object type that this new widget applies to. Accepts Devices, Users, Applications, Mailboxes. Defaults to Devices
         .PARAMETER AggregateFunction
@@ -62,8 +60,6 @@ function New-JuribaDashboardPieWidget {
         [string]$OrderByField = $null,
         [Parameter(Mandatory = $false)]
         [bool]$OrderByDescending = $false,
-        [Parameter(Mandatory = $false)]
-        [string]$CategoriseBy = $null,
         [Parameter(Mandatory=$false)]
         [ValidateSet ("Users","Devices","Applications","Mailboxes")]
         [string]$ObjectType = "Devices",

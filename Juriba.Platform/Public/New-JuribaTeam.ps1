@@ -20,6 +20,7 @@ function New-JuribaTeam {
         .EXAMPLE
         PS> New-JuribaTeam @DwParams -TeamName "A Team" -Description "A new team"
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,
@@ -49,8 +50,10 @@ function New-JuribaTeam {
     $uri = "{0}/apiv1/admin/team/createTeam" -f $Instance
 
     try {
-        $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType $contentType
-        return ($result.Content | ConvertFrom-Json).teamId
+        if($PSCmdlet.ShouldProcess($TeamName)) {
+            $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType $contentType
+            return ($result.Content | ConvertFrom-Json).teamId
+        }
     }
     catch {
         Write-Error $_

@@ -72,13 +72,11 @@ function New-JuribaEvergreenSelfService {
     #validate scopelistid
     if ($scopeId -gt 0) {
         try {
-            $validate = Invoke-WebRequest -Uri $uriscope -Method PUT -Headers $headers -ContentType 'application/json'
+            $result = Invoke-WebRequest -Uri $uriscope -Method PUT -Headers $headers -ContentType 'application/json'
             #Write-host 'Scope List Validated'
         } 
         Catch {
-            Write-host "Scope list provided is not valid."
-            Write-Error $_
-            throw
+            Write-Error "Scope list provided is not valid."
         }
     }
 
@@ -97,6 +95,6 @@ function New-JuribaEvergreenSelfService {
         }
     }
     catch {
-            Write-Error $_
+        Write-Error $_
     }
 }

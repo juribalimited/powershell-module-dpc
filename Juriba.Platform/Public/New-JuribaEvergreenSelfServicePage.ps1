@@ -72,13 +72,11 @@ function New-JuribaEvergreenSelfServicePage {
     #validate listid
     if ($ListID -gt 0) {
         try {
-            $validate = Invoke-WebRequest -Uri $urilist -Method PUT -Headers $headers -ContentType 'application/json'
+            $result = Invoke-WebRequest -Uri $urilist -Method PUT -Headers $headers -ContentType 'application/json'
             #Write-host 'Scope List Validated'
         } 
         Catch {
-            Write-host "Scope list provided is not valid."
-            Write-Error $_
-            throw
+            Write-Error "Scope list provided is not valid."
         }
     }
 

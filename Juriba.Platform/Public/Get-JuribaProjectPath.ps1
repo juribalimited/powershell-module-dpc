@@ -35,6 +35,9 @@ function Get-JuribaProjectPath {
     try {
         $result = Invoke-WebRequest -Uri $Uri -Method GET -Headers $headers -ContentType "application/json"
         return ($result.content | ConvertFrom-Json)
-    } Catch 
-    {Write-Error $_}
+    }
+    Catch 
+    {
+        Write-Error $_
+    }
 }

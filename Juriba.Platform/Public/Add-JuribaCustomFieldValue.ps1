@@ -52,10 +52,12 @@ function Add-JuribaCustomFieldValue {
     $headers = @{'x-api-key' = $APIKey }
     
     try {
-        $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType 'application/json'
-        return ($result.Content).Trim('"')
+        if ($PSCmdlet.ShouldProcess($ObjectKey)) {
+            $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType 'application/json'
+            return ($result.Content).Trim('"')
+        }
 	}
     catch {
-            Write-Error $_
+        Write-Error $_
     }
 }

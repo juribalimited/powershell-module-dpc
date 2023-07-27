@@ -22,6 +22,7 @@ function New-JuribaBucket {
         .EXAMPLE
         PS> New-JuribaBucket @DwParams -ProjectID 1 -BucketName "01 Preview" -OwnerTeamID 1
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,
@@ -53,8 +54,10 @@ function New-JuribaBucket {
     $uri = "{0}/apiv1/admin/projects/{1}/create-bucket" -f $Instance, $ProjectID
 
     try {
-        $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType $contentType
-        return ($result.Content | ConvertFrom-Json).bucketId
+        if($PSCmdlet.ShouldProcess($BucketName)) {
+            $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType $contentType
+            return ($result.Content | ConvertFrom-Json).bucketId
+        }
     }
     catch {
         Write-Error $_

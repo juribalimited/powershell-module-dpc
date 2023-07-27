@@ -29,6 +29,7 @@ function Set-JuribaProjectCapacityDetail {
         PS> Set-JuribaProjectCapacityDetail @DwParams -CapacityMode "Capacity Units" -CapacityUnitMode "Project Capacity Units" 
             -CapacityToReachBeforeShowAmber 90 -EnableCapacity $true -EnforceCapacityOnProjectObject $false -EnforceCapacityOnSelfService $true
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,
@@ -82,8 +83,10 @@ function Set-JuribaProjectCapacityDetail {
     $uri = "{0}/apiv1/admin/projects/{1}/updateProjectCapacityDetails" -f $Instance, $ProjectID
 
     try {
-        $result = Invoke-WebRequest -Uri $uri -Method PUT -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType $contentType
-        return ($result.Content).Trim('"')
+        if($PSCmdlet.ShouldProcess($EnableCapacity)) {
+            $result = Invoke-WebRequest -Uri $uri -Method PUT -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType $contentType
+            return ($result.Content).Trim('"')
+        }
     }
     catch {
         Write-Error $_

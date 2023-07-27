@@ -15,7 +15,8 @@ function Set-JuribaEvergreenSelfServiceBaseURL {
         settingValue
         .EXAMPLE
         PS>  Set-JuribaEvergreenSelfServiceBaseURL @dwparams -URL "https://myinstance.dashworks.app"
-    #>						  
+    #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory = $false)]
         [string]$Instance,
@@ -35,16 +36,18 @@ function Set-JuribaEvergreenSelfServiceBaseURL {
     
     #Try to update SS URL
     try {
-        $result = Invoke-WebRequest -Uri $uri -Method PUT -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType 'application/json'
-        if ($result.StatusCode -eq 200)
-        {
-            return ($result.content | ConvertFrom-Json).settingValue
-        }
-        else {
-            throw "Error updating self service url."
+        if($PSCmdlet.ShouldProcess($URL)) {
+            $result = Invoke-WebRequest -Uri $uri -Method PUT -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType 'application/json'
+            if ($result.StatusCode -eq 200)
+            {
+                return ($result.content | ConvertFrom-Json).settingValue
+            }
+            else {
+                throw "Error updating self service url."
+            }
         }
     }
     catch {
-            Write-Error $_
+        Write-Error $_
     }
 }

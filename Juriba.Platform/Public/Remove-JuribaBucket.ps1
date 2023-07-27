@@ -18,6 +18,7 @@ function Remove-JuribaBucket {
         .EXAMPLE
         PS> Remove-JuribaBucket @DwParams -ProjectID 1 -BucketID "1,2"
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,
@@ -45,8 +46,10 @@ function Remove-JuribaBucket {
     $jsonbody = ($payload | ConvertTo-Json)
 
     try {
-        $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -Method DELETE -ContentType $contentType
-        return ($result.Content).Trim('"')
+        if($PSCmdlet.ShouldProcess($BucketID)) {
+            $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -Method DELETE -ContentType $contentType
+            return ($result.Content).Trim('"')
+        }
     }
     catch {
         Write-Error $_

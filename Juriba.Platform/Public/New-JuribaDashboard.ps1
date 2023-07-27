@@ -14,7 +14,7 @@ Function New-JuribaDashboard {
         .PARAMETER SharedAccessType
         Choose from one of the type. Private, SharedAllUsersEdit, SharedAllUsersReadOnly, SharedSpecificUsers
         .OUTPUTS
-        dashboardId.
+        Dashboard object
         .EXAMPLE
         PS> New-JuribaDashboard -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -Name "W11" -SharedAccessType "SharedAllUsersReadOnly"
     #>
@@ -48,7 +48,7 @@ Function New-JuribaDashboard {
     
         if ($PSCmdlet.ShouldProcess($Name)) {
             $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body $body -Method POST -ContentType $contentType
-            return ($result.Content | ConvertFrom-Json).dashboardId
+            return ($result.Content | ConvertFrom-Json)
         }
 
     } else {
