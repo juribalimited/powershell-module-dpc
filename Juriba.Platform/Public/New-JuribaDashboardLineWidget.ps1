@@ -1,10 +1,10 @@
-function New-JuribaDashboardBarWidget {
-    [alias("New-DwDashboardBarWidget")]
+function New-JuribaDashboardLineWidget {
+    [alias("New-DwDashboardLineWidget")]
     <#
         .SYNOPSIS
-        Creates a new dashboard bar widget.
+        Creates a new dashboard line widget.
         .DESCRIPTION
-        Creates a new dashboard bar widget using the Dashworks API v1, Supporting special characters in the naming.
+        Creates a new dashboard line widget using the Dashworks API v1, Supporting special characters in the naming.
         .PARAMETER Instance
         Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
         .PARAMETER APIKey
@@ -15,28 +15,22 @@ function New-JuribaDashboardBarWidget {
         Section ID to add the widget to.
         .PARAMETER Title
         Title of the new widget.
-        .PARAMETER ListId
-        ListId for the widget.
-        .PARAMETER SplitBy
-        Object to split the result by, typically a task, custom field, column from a list or empty
-        .PARAMETER OrderByField
-        Defines the object that orders by Split Value = 1, Aggregate Value = 2, Status = 3, Severity = 4, Chronological = 5, Display Order = 6
-        .PARAMETER OrderByDescending
-        Boolean value to define if order by by descending true or false, false by default
-        .PARAMETER CategoriseBy
-        Object to categorise the result by, typically a task, custom field, column from a list or empty
         .PARAMETER ObjectType
         Object type that this new widget applies to. Accepts Devices, Users, Applications, Mailboxes. Defaults to Devices
         .PARAMETER AggregateFunction
         Function used for the widget. Accepts Count, Count Distinct, Max, Min, Sum, Average
+        .PARAMETER ListId
+        ListId for the widget.
+        .PARAMETER SplitBy
+        Object to split the result by, typically a task, custom field, column from a list or empty
         .PARAMETER AggregateBy
         Normally custom field/task in a special format: customField_[data type ID]_[custom field ID] or project_task_[project ID]_[Task ID]_[Data type ID]_Task. Defaults to empty
+        .PARAMETER OrderByDescending
+        Boolean value to define if order by by descending true or false, false by default
+        .PARAMETER OrderByField
+        Defines the object that orders by Split Value = 1, Aggregate Value = 2, Status = 3, Severity = 4, Chronological = 5, Display Order = 6
         .PARAMETER MaximumValues
         Maximum value to display for the widget
-        .PARAMETER CategoriseByMaximumValues
-        Maximum categorise value to display for the widget
-        .PARAMETER Legend
-        Position of legend "None","Right","Left","Top","Bottom" in the widget
         .PARAMETER splitByGroupDatesBy
         Option to choose to group by "Month","Day","Year","None","Week from Monday","Week from Sunday"
         .PARAMETER splitByIncludeEmptyDates
@@ -44,47 +38,39 @@ function New-JuribaDashboardBarWidget {
         .OUTPUTS
         widgetId
         .EXAMPLE
-        PS> New-JuribaDashboardBarWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Device exceptions by reason/Location" -ListId 337 -SplitBy "project_task_4_49_2_Task" -OrderByField "Aggregate Value" -OrderByDescending $true -AggregateFunction "count" -CategoriseByMaximumValues 30 -Legend "Top" -splitByGroupDatesBy "None" -splitByIncludeEmptyDates $true
-    #>
+        PS> New-JuribaDashboardLineWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Devices scheduled next 30 days" -AggregateFunction "count" -ListId 337 -SplitBy "project_task_4_49_2_Task" -OrderByDescending $false -OrderByField "Aggregate Value" -MaximumValues 100
+	#>
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,
         [Parameter(Mandatory=$false)]
         [string]$APIKey,
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory=$true)]
         [int]$DashboardId,
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory=$true)]
         [int]$SectionId,
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory=$true)]
         [string]$Title,
-        [Parameter(Mandatory = $true)]
-        [int]$ListId,
-        [Parameter(Mandatory = $true)]
-        [string]$SplitBy,
-        [Parameter(Mandatory = $false)]
-        [string]$OrderByField = $null,
-        [Parameter(Mandatory = $false)]
-        [bool]$OrderByDescending = $false,
-        [Parameter(Mandatory = $false)]
-        [string]$CategoriseBy = $null,
         [Parameter(Mandatory=$false)]
         [ValidateSet ("Users","Devices","Applications","Mailboxes")]
         [string]$ObjectType = "Devices",
         [Parameter(Mandatory=$true)]
         [ValidateSet ("Count","Count Distinct","Max","Min","Sum","Average")]
         [string]$AggregateFunction = "Count",
+        [Parameter(Mandatory=$true)]
+        [int]$ListId,
+        [Parameter(Mandatory=$true)]
+        [string]$SplitBy,
         [parameter(Mandatory = $false)]
         [string]$AggregateBy = "",
         [Parameter(Mandatory=$false)]
+        [bool]$OrderByDescending = $false,
+        [Parameter(Mandatory=$false)]
+        [string]$OrderByField = $null,
+        [Parameter(Mandatory=$false)]
         [ValidateRange(1,100) ]
         [int]$MaximumValues = 10,
-        [Parameter(Mandatory=$false)]
-        [ValidateRange(1,30) ]
-        [int]$CategoriseByMaximumValues = 10,
-        [Parameter(Mandatory=$false)]
-        [ValidateSet ("None","Right","Left","Top","Bottom")]
-        [string]$Legend = "Bottom",
         [Parameter(Mandatory=$false)]
         [ValidateSet("Month","Day","Year","None","Week from Monday","Week from Sunday")]
         [string]$splitByGroupDatesBy = "None",
@@ -105,13 +91,6 @@ function New-JuribaDashboardBarWidget {
         "Min" {$AggregateFunctionID = 4}
         "Max" {$AggregateFunctionID = 5}
         "Average" {$AggregateFunctionID = 6}
-    }
-    switch ($Legend){
-        "None" {$LegendValue = 1}
-        "Right" {$LegendValue = 2}
-        "Left" {$LegendValue = 3}
-        "Top" {$LegendValue = 4}
-        "Bottom" {$LegendValue = 5}
     }
     switch ($splitByGroupDatesBy){
         "None" {$splitByGroupDatesById = 1}
@@ -136,14 +115,16 @@ function New-JuribaDashboardBarWidget {
     }
 
     if ($APIKey -and $Instance) {
-        $body = @{
-            "widgetType"                = "Bar"
+		$Uri = "{0}/apiv1/dashboard/{1}/section/{2}/widget" -f $Instance, $DashboardId, $SectionId
+								
+        $Body = @{
+            "widgetType"                = "Line"
             "displayOrder"              = 0
             "title"                     = $Title
             "listId"                    = if ($null -eq $ListId -or $ListId -eq 0) { $null } else { $ListId }
             "listObjectType"            = $ObjectType
             "listObjectTypeId"          = $ObjectTypeID
-            "colourSchemeId"            = 3
+            "colourSchemeId"            = 1
             "widgetValuesColours"       = @()
             "colourTemplateId"          = 1
             "aggregateFunctionId"       = $AggregateFunctionID
@@ -158,20 +139,22 @@ function New-JuribaDashboardBarWidget {
             "aggregateBy"               = $AggregateBy
             "orderByDescending"         = $OrderByDescending
             "orderById"                 = $OrderById
-            "legend"                    = $LegendValue
+            #"orderByField"              = $OrderByField
+            "legend"                    = 5
             "orientationIsVertical"     = $false
             "layout"                    = $null
             "displayDataLabels"         = $false
-            "categoriseBy"              = $CategoriseBy
-            "categorisationViewType"    = "Stacked"
-            "categoriseByMaximumValues" = $CategoriseByMaximumValues
+            "categoriseBy"              = ""
+            "categorisationViewType"    = "None"
+            "categoriseByMaximumValues" = 10
         }
-
+        
         $jsonbody = $body | ConvertTo-Json
-        $contentType = "application/json"
-        $headers = @{ 'X-API-KEY' = $ApiKey }
-		$uri = "{0}/apiv1/dashboard/{1}/section/{2}/widget" -f $Instance, $DashboardId, $SectionId
-
+        $ContentType = "application/json"
+        $Headers     = @{
+            'X-API-KEY' = $APIKey			 
+        }
+    
         if ($PSCmdlet.ShouldProcess($Title)) {
             $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -Method POST -ContentType $contentType
             return ($result.Content | ConvertFrom-Json).WidgetId

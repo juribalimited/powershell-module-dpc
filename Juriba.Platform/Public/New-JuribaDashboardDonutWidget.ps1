@@ -1,10 +1,10 @@
-function New-JuribaDashboardBarWidget {
-    [alias("New-DwDashboardBarWidget")]
+function New-JuribaDashboardDonutWidget {
+    [alias("New-DwDashboardDonutWidget")]
     <#
         .SYNOPSIS
-        Creates a new dashboard bar widget.
+        Creates a new dashboard donut widget.
         .DESCRIPTION
-        Creates a new dashboard bar widget using the Dashworks API v1, Supporting special characters in the naming.
+        Creates a new dashboard donut widget using the Dashworks API v1, Supporting special characters in the naming.
         .PARAMETER Instance
         Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
         .PARAMETER APIKey
@@ -23,8 +23,6 @@ function New-JuribaDashboardBarWidget {
         Defines the object that orders by Split Value = 1, Aggregate Value = 2, Status = 3, Severity = 4, Chronological = 5, Display Order = 6
         .PARAMETER OrderByDescending
         Boolean value to define if order by by descending true or false, false by default
-        .PARAMETER CategoriseBy
-        Object to categorise the result by, typically a task, custom field, column from a list or empty
         .PARAMETER ObjectType
         Object type that this new widget applies to. Accepts Devices, Users, Applications, Mailboxes. Defaults to Devices
         .PARAMETER AggregateFunction
@@ -33,18 +31,14 @@ function New-JuribaDashboardBarWidget {
         Normally custom field/task in a special format: customField_[data type ID]_[custom field ID] or project_task_[project ID]_[Task ID]_[Data type ID]_Task. Defaults to empty
         .PARAMETER MaximumValues
         Maximum value to display for the widget
-        .PARAMETER CategoriseByMaximumValues
-        Maximum categorise value to display for the widget
+        .PARAMETER displayDataLabels
+        Boolean value to display data labels, default to false
         .PARAMETER Legend
         Position of legend "None","Right","Left","Top","Bottom" in the widget
-        .PARAMETER splitByGroupDatesBy
-        Option to choose to group by "Month","Day","Year","None","Week from Monday","Week from Sunday"
-        .PARAMETER splitByIncludeEmptyDates
-        Boolean value to include empty dates, default to false
         .OUTPUTS
         widgetId
         .EXAMPLE
-        PS> New-JuribaDashboardBarWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Device exceptions by reason/Location" -ListId 337 -SplitBy "project_task_4_49_2_Task" -OrderByField "Aggregate Value" -OrderByDescending $true -AggregateFunction "count" -CategoriseByMaximumValues 30 -Legend "Top" -splitByGroupDatesBy "None" -splitByIncludeEmptyDates $true
+        PS> New-JuribaDashboardDonutWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Application Rationalisation" -ListId 337 -SplitBy "project_1_applicationRationalisation" -OrderByField "Split Value" -OrderByDescending $true -ObjectType "Applications" -AggregateFunction "count" -Legend "Top"
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
@@ -66,8 +60,6 @@ function New-JuribaDashboardBarWidget {
         [string]$OrderByField = $null,
         [Parameter(Mandatory = $false)]
         [bool]$OrderByDescending = $false,
-        [Parameter(Mandatory = $false)]
-        [string]$CategoriseBy = $null,
         [Parameter(Mandatory=$false)]
         [ValidateSet ("Users","Devices","Applications","Mailboxes")]
         [string]$ObjectType = "Devices",
@@ -80,16 +72,10 @@ function New-JuribaDashboardBarWidget {
         [ValidateRange(1,100) ]
         [int]$MaximumValues = 10,
         [Parameter(Mandatory=$false)]
-        [ValidateRange(1,30) ]
-        [int]$CategoriseByMaximumValues = 10,
+        [boolean]$displayDataLabels = $false,
         [Parameter(Mandatory=$false)]
         [ValidateSet ("None","Right","Left","Top","Bottom")]
-        [string]$Legend = "Bottom",
-        [Parameter(Mandatory=$false)]
-        [ValidateSet("Month","Day","Year","None","Week from Monday","Week from Sunday")]
-        [string]$splitByGroupDatesBy = "None",
-        [Parameter(Mandatory=$false)]
-        [boolean]$splitByIncludeEmptyDates = $false
+        [string]$Legend = "Bottom"
     )
 
     switch ($ObjectType){
@@ -111,15 +97,7 @@ function New-JuribaDashboardBarWidget {
         "Right" {$LegendValue = 2}
         "Left" {$LegendValue = 3}
         "Top" {$LegendValue = 4}
-        "Bottom" {$LegendValue = 5}
-    }
-    switch ($splitByGroupDatesBy){
-        "None" {$splitByGroupDatesById = 1}
-        "Day" {$splitByGroupDatesById = 2}
-        "Week from Monday" {$splitByGroupDatesById = 3}
-        "Week from Sunday" {$splitByGroupDatesById = 4}
-        "Month" {$splitByGroupDatesById = 5}
-        "Year" {$splitByGroupDatesById = 6}
+        "Bottom" {$LegendValue = 4}
     }
     switch ($OrderByField){
         "Split Value" {$OrderById = 1}
@@ -137,7 +115,7 @@ function New-JuribaDashboardBarWidget {
 
     if ($APIKey -and $Instance) {
         $body = @{
-            "widgetType"                = "Bar"
+            "widgetType"                = "Donut"
             "displayOrder"              = 0
             "title"                     = $Title
             "listId"                    = if ($null -eq $ListId -or $ListId -eq 0) { $null } else { $ListId }
@@ -153,20 +131,18 @@ function New-JuribaDashboardBarWidget {
             "maxColumns"                = 0
             "cardTypeIsAggregate"       = $false
             "splitBy"                   = $SplitBy
-            "splitByGroupDatesById"     = $splitByGroupDatesById
-            "splitByIncludeEmptyDates"  = $splitByIncludeEmptyDates
             "aggregateBy"               = $AggregateBy
             "orderByDescending"         = $OrderByDescending
             "orderById"                 = $OrderById
             "legend"                    = $LegendValue
             "orientationIsVertical"     = $false
             "layout"                    = $null
-            "displayDataLabels"         = $false
-            "categoriseBy"              = $CategoriseBy
-            "categorisationViewType"    = "Stacked"
-            "categoriseByMaximumValues" = $CategoriseByMaximumValues
+            "displayDataLabels"         = $displayDataLabels
+            "categoriseBy"              = ""
+            "categorisationViewType"    = "None"
+            "categoriseByMaximumValues" = 10
         }
-
+        
         $jsonbody = $body | ConvertTo-Json
         $contentType = "application/json"
         $headers = @{ 'X-API-KEY' = $ApiKey }

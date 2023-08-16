@@ -1,10 +1,10 @@
-function New-JuribaDashboardBarWidget {
-    [alias("New-DwDashboardBarWidget")]
+function New-JuribaDashboardColumnWidget {
+    [alias("New-DwDashboardColumnWidget")]
     <#
         .SYNOPSIS
-        Creates a new dashboard bar widget.
+        Creates a new dashboard column widget.
         .DESCRIPTION
-        Creates a new dashboard bar widget using the Dashworks API v1, Supporting special characters in the naming.
+        Creates a new dashboard column widget using the Dashworks API v1, Supporting special characters in the naming.
         .PARAMETER Instance
         Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
         .PARAMETER APIKey
@@ -44,7 +44,7 @@ function New-JuribaDashboardBarWidget {
         .OUTPUTS
         widgetId
         .EXAMPLE
-        PS> New-JuribaDashboardBarWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Device exceptions by reason/Location" -ListId 337 -SplitBy "project_task_4_49_2_Task" -OrderByField "Aggregate Value" -OrderByDescending $true -AggregateFunction "count" -CategoriseByMaximumValues 30 -Legend "Top" -splitByGroupDatesBy "None" -splitByIncludeEmptyDates $true
+        PS> New-JuribaDashboardColumnWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Devices completed by location" -ListId 337 -SplitBy "locationName" -OrderByField "Aggregate Value" -OrderByDescending $false -AggregateFunction "count" -MaximumValues 100 -CategoriseByMaximumValues 30 -Legend "None" -splitByGroupDatesBy "month" -splitByIncludeEmptyDates $true
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
@@ -137,7 +137,7 @@ function New-JuribaDashboardBarWidget {
 
     if ($APIKey -and $Instance) {
         $body = @{
-            "widgetType"                = "Bar"
+            "widgetType"                = "Column"
             "displayOrder"              = 0
             "title"                     = $Title
             "listId"                    = if ($null -eq $ListId -or $ListId -eq 0) { $null } else { $ListId }
@@ -165,7 +165,7 @@ function New-JuribaDashboardBarWidget {
             "categoriseBy"              = $CategoriseBy
             "categorisationViewType"    = "Stacked"
             "categoriseByMaximumValues" = $CategoriseByMaximumValues
-        }
+        } 
 
         $jsonbody = $body | ConvertTo-Json
         $contentType = "application/json"

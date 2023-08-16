@@ -1,5 +1,23 @@
 Function New-JuribaDashboard {
     [alias("New-DwDashboard")]
+    <#
+        .SYNOPSIS
+        Creates a new dashboard.
+        .DESCRIPTION
+        Creates a new dashboard using Dashworks API v1.
+        .PARAMETER Instance
+        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        .PARAMETER APIKey
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
+        .PARAMETER Name
+        Name of the dashboard.
+        .PARAMETER SharedAccessType
+        Choose from one of the type. Private, SharedAllUsersEdit, SharedAllUsersReadOnly, SharedSpecificUsers
+        .OUTPUTS
+        Dashboard object
+        .EXAMPLE
+        PS> New-JuribaDashboard -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -Name "W11" -SharedAccessType "SharedAllUsersReadOnly"
+    #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]
@@ -9,7 +27,7 @@ Function New-JuribaDashboard {
         [Parameter(Mandatory = $true)]
         [string]$Name,
         [Parameter(Mandatory = $true)]
-        [ValidateSet("SharedAllUsersReadOnly")]
+        [ValidateSet("Private","SharedAllUsersEdit","SharedAllUsersReadOnly","SharedSpecificUsers")]
         [string]$SharedAccessType
     )
 
