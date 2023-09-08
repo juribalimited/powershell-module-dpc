@@ -25,9 +25,11 @@ New-JuribaCustomField -Instance $dwInstance -APIKey $dwToken -Name 'PackageID' -
 
 #>
 
-$importId = ""
-$dwInstance = "https://changeme.com:8443"
-$dwToken = "<<API KEY>>"
+#requires -Modules @{ ModuleName="Juriba.Platform"; ModuleVersion="0.0.39.0" }
+
+$dwAppImportFeedName = "<<IMPORT FEED NAME>>"
+$dwInstance = "https://change-me-juriba-fqdn.com:8443"
+$dwToken = "<<CHANGE ME>>"
 
 $reqCustomFields = @("AppM - App Name","AppM - App Version", "AppM - Direct Link", "AppM - Test Status", "AppM - Test Result", "AppM - Test OS", "AppM - App Manufacturer", "AppM - Virtual Machine Name", "AppM - Test Time Taken", "AppM - Test Start Time", "AppM - Old Test Data", "CI_UniqueID", "PackageID")
 $customFields = Get-JuribaCustomField -Instance $dwInstance -APIKey $dwToken
@@ -35,6 +37,11 @@ foreach ($customField in $reqCustomFields) {
     if ($customField -notin $customFields.name) {
         Write-Error "Custom field: $customField missing from Juriba platform instance. Please onboard before proceeding."
     }
+}
+$feed = Get-JuribaImportDeviceFeed -Instance $dwInstance -APIKey $dwToken -Name $dwAppImportFeedName
+if ($null -eq $feed) {
+    Write-Error "Could not find Juriba import feed with name: $dwAppImportFeedName"
+    Exit
 }
 ##############
 # AppM stuff #
@@ -67,7 +74,7 @@ foreach ($app in $appsObj) {
             $app | Add-Member -MemberType NoteProperty -Name "TestSettings" -Value $testEnvDataObj.ext -Force
             $app | Add-Member -MemberType NoteProperty -Name "PackagingData" -Value $testEnvDataObj.packagingInfo -Force
         }
-        if ($app.basic.appId -match ($evergreenDataObj.applicationId | Select -First 1)) {
+        if ($app.basic.appId -match ($evergreenDataObj.applicationId | Select-Object -First 1)) {
 
             $app | Add-Member -MemberType NoteProperty -Name "TestData" -Value $evergreenDataObj.evergreenInformation -Force
             $app | Add-Member -MemberType NoteProperty -Name "TestAppManufacturer" -Value $evergreenDataObj.manufacturer -Force
@@ -79,7 +86,7 @@ foreach ($app in $appsObj) {
 Write-Host "Total AppM apps found: $($appMMecmList.Count)"
 
 $headers = @{'x-api-key' = $dwToken}
-$uri = "$dwInstance/apiv2/imports/applications/$importId/items?limit=1000"
+$uri = "$dwInstance/apiv2/imports/applications/$($feed.id)/items?limit=1000"
 $jrbAppList = (Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json").content | ConvertFrom-Json
 
 foreach ($appMApp in $appMMecmList) {        
@@ -153,7 +160,7 @@ foreach ($appMApp in $appMMecmList) {
                         },
                         @{
                             name = "AppM - Direct Link"
-                            value = '<a href="' + $appMInstance + 'app/applications/fullStatus/' + $($appMApp.basic.appId) + '/9" >' + $($appMApp.TestData.status) + '</a>'
+                            value = '<a href="' + $appMInstance + 'app/applications/fullStatus/' + $($appMApp.basic.appId) + '/9" >' + $($appMApp.TestData.status)[$($appMApp.TestData.status).Count-1] + '</a>'
                         },
                         @{
                             name = "AppM - Test Status"
@@ -204,3 +211,33 @@ foreach ($appMApp in $appMMecmList) {
                     )
                 }
             }
+            Set-JuribaImportApplication -Instance $dwInstance -APIKey $dwToken -UniqueIdentifier $appMApp.originalApplicationId -ImportId $($feed.id) -JsonBody ($json | ConvertTo-Json)
+        }
+    }
+}
+
+
+Write-Host 'Running a transform only ETL job...'
+$transformEtl = Get-JuribaETLJob -Instance $dwInstance -APIKey $dwToken -Name "Dashworks ETL (Transform Only)"
+if ($transformEtl.status -eq "Idle") {
+    Start-JuribaETLJob -Instance $dwInstance -APIKey $dwToken -JobId $transformEtl.id
+    while ($True) {
+        Start-Sleep -Seconds 5
+        try
+        {
+            $transformEtl = Get-JuribaETLJob -Instance $dwInstance -APIKey $dwToken -Name "Dashworks ETL (Transform Only)"
+            if ($transformEtl.status -eq "Idle") {
+                Write-Host "Transform ETL job complete."
+                break
+            } elseif ($transformEtl.status -eq "Executing") {
+                Write-Host "Transform ETL executing..."
+            }
+        }
+        catch
+        {
+            Write-Error "Unable to get Transform ETL job status..."
+        }
+    }
+} else {
+    Write-Error "Transform ETL Job currently not in idle state..."
+}
