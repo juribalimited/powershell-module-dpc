@@ -78,7 +78,7 @@ function Set-JuribaTaskValueText {
         try {
             if ($PSCmdlet.ShouldProcess($ObjectKey)) {
                 $response = Invoke-WebRequest -Uri $uri -Headers $headers -Body $body -Method PUT
-                $results = ($response.Content | ConvertFrom-Json).message
+                $results = $response.Content | ConvertFrom-Json
                 return $results
             }
         }
