@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.Platform.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.0.42.0'
+    ModuleVersion     = '0.0.43.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -100,7 +100,7 @@
         'Get-JuribaImportMailboxFeed',
         'Get-JuribaImportUser',
         'Get-JuribaImportUserFeed',
-        'Get-JuribaImportGroup',
+        #'Get-JuribaImportGroup',
         'Get-JuribaList',
         'Get-JuribaProject',
         'Get-JuribaProjectDetail',
@@ -141,7 +141,7 @@
         'New-JuribaImportMailboxFeed',
         'New-JuribaImportUser',
         'New-JuribaImportUserFeed',
-        'New-JuribaImportGroup',
+        #'New-JuribaImportGroup',
         'New-JuribaList',
         'New-JuribaTag',
         'New-JuribaTeam',
@@ -159,7 +159,7 @@
         'Remove-JuribaImportMailbox',
         'Remove-JuribaImportMailboxFeed',
         'Remove-JuribaImportUserFeed',
-        'Remove-JuribaImportGroup',
+        #'Remove-JuribaImportGroup',
         'Remove-JuribaList',
         'Remove-JuribaTag',
         'Remove-JuribaTaskValueDate',
@@ -180,7 +180,7 @@
         'Set-JuribaImportMailbox',
         'Set-JuribaImportMailboxFeed',
         'Set-JuribaImportUser',
-        'Set-JuribaImportGroup',
+        #'Set-JuribaImportGroup',
         'Set-JuribaProjectCapacityDetail',
         'Set-JuribaTaskValueDate',
         'Set-JuribaTaskValueSelect',
