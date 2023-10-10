@@ -1,5 +1,5 @@
-function Remove-JuribaTaskValueDate {
-    [alias("Remove-DwTaskValueDate")]
+function Remove-JuribaTaskValueText {
+    [alias("Remove-DwTaskValueText")]
     <#
         .SYNOPSIS
         Clears a project date task.
@@ -20,7 +20,7 @@ function Remove-JuribaTaskValueDate {
         The type of object being updated.
 
         .EXAMPLE
-        PS> Remove-JuribaTaskValueDate -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85
+        PS> Remove-JuribaTaskValueText -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85
     #>
 
     [CmdletBinding(SupportsShouldProcess)]
@@ -54,8 +54,8 @@ function Remove-JuribaTaskValueDate {
             "Application"   {"application"}
             "Mailbox"       {"mailbox"}
         }
-    
-        $uri = '{0}/apiv1/{1}/{2}/removeTasksDateAndSlot' -f $Instance, $path, $ObjectKey
+        
+        $uri = '{0}/apiv1/{1}/{2}/removeTasksValueText' -f $Instance, $path, $ObjectKey
         $headers = @{
             'x-api-key' = $APIKey
             'content-type' = 'application/Json'
@@ -72,7 +72,7 @@ function Remove-JuribaTaskValueDate {
         try {
             if ($PSCmdlet.ShouldProcess($ObjectKey)) {
                 $response = Invoke-WebRequest -Uri $uri -Headers $headers -Body $body -Method PUT
-                $results = ($response.Content | ConvertFrom-Json)
+                $results = ($response.Content | ConvertFrom-Json).message
                 return $results
             }
         }

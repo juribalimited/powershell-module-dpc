@@ -55,7 +55,7 @@ function New-JuribaDashboardLineWidget {
         [Parameter(Mandatory=$false)]
         [ValidateSet ("Users","Devices","Applications","Mailboxes")]
         [string]$ObjectType = "Devices",
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [ValidateSet ("Count","Count Distinct","Max","Min","Sum","Average")]
         [string]$AggregateFunction = "Count",
         [Parameter(Mandatory=$true)]
