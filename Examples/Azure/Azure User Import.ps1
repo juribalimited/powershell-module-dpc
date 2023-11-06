@@ -175,7 +175,7 @@ Function Convert-DwAPIUserFromAzure($AzureDataTable){
     $dataTable.Columns.Add("givenName", [string]) | Out-Null
     $dataTable.Columns.Add("emailAddress", [string]) | Out-Null
     $dataTable.Columns.Add("userPrincipalName", [string]) | Out-Null
-
+    $dataTable.Columns.Add("UniqueIdentifier", [string]) | Out-Null
 
     foreach($Row in $AzureDataTable.Rows)
     {
@@ -192,7 +192,8 @@ Function Convert-DwAPIUserFromAzure($AzureDataTable){
         $NewRow.givenName = $Row.givenName
         $NewRow.emailAddress = $Row.userPrincipalName
         $NewRow.userPrincipalName = $Row.userPrincipalName
-
+        $NewRow.UniqueIdentifier = $Row.id
+        
         $dataTable.Rows.Add($NewRow)
     }
 
