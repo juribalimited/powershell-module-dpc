@@ -56,7 +56,7 @@ function New-JuribaImportUser {
     
         try {
             if ($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).username)) {
-                $result = Invoke-RestMethod -Uri $uri -Method POST -Headers $headers -ContentType "application/json" -Body $jsonBody
+                $result = Invoke-RestMethod -Uri $uri -Method POST -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonBody))
                 return $result
             }
         }
