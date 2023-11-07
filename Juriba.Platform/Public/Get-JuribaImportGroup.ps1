@@ -6,7 +6,7 @@ function Get-JuribaImportGroup {
         .DESCRIPTION
         Gets a Juriba Platform group from the import API.
         Takes the User import ImportId as an input.
-        Optionally takes a UnqiueIdentifier as an input and will return a single device with that UniqueIdentifier.
+        Optionally takes a UniqueIdentifier as an input and will return a single group with that UniqueIdentifier.
         Optionally takes a Name as an input and will return all groups matching the provided group name.
         Optionally takes a Filter as an input and will return all groups matching that filter. See swagger documentation for examples of using filters.
         If specified, only one of UniqueIdentifier, Name or Filter can be supplied. Omit all to return all objects for the import.
@@ -65,7 +65,7 @@ function Get-JuribaImportGroup {
         [parameter(Mandatory=$false, ParameterSetName="UniqueIdentifier")]
         [string]$UniqueIdentifier,
         [parameter(Mandatory=$false, ParameterSetName="Name")]
-        [string]$Hostname,
+        [string]$Name,
         [parameter(Mandatory=$false, ParameterSetName="Filter")]
         [string]$Filter,
         [parameter(Mandatory=$true)]
@@ -81,7 +81,7 @@ function Get-JuribaImportGroup {
 
     if ($APIKey -and $Instance) {
         $limit = 50 # page size
-        $uri = "{0}/apiv2/imports/devices/{1}/items" -f $Instance, $ImportId
+        $uri = "{0}/apiv2/imports/groups/{1}/items" -f $Instance, $ImportId
     
         switch ($PSCmdlet.ParameterSetName) {
             "UniqueIdentifier" {
@@ -89,7 +89,7 @@ function Get-JuribaImportGroup {
             }
             "Name" {
                 $uri += "?filter="
-                $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Hostname)
+                $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Name)
                 $uri += "&limit={0}" -f $limit
             }
             "Filter" {
@@ -106,11 +106,12 @@ function Get-JuribaImportGroup {
             'x-api-key' = $APIKey
             'cache-control' = 'no-cache'
         }
-    
-        $device = ""
+        
+        $group = ""
+        Write-Host $uri
         try {
             $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json"
-            $device = switch($InfoLevel) {
+            $group = switch($InfoLevel) {
                 "Basic" { ($result.Content | ConvertFrom-Json).UniqueIdentifier }
                 "Full"  { $result.Content | ConvertFrom-Json }
             }
@@ -120,13 +121,13 @@ function Get-JuribaImportGroup {
                 for ($page = 2; $page -le $totalPages; $page++) {
                     $pagedUri = $uri + "&page={0}" -f $page
                     $pagedResult = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $headers -ContentType "application/json"
-                    $device += switch($InfoLevel) {
+                    $group += switch($InfoLevel) {
                         "Basic" { ($pagedResult.Content | ConvertFrom-Json).UniqueIdentifier }
                         "Full"  { $pagedResult.Content | ConvertFrom-Json }
                     }
                 }
             }
-            return $device
+            return $group
         }
         catch {
             Write-Error $_.Exception.Response
