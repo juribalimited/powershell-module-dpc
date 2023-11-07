@@ -63,7 +63,7 @@ function Set-JuribaImportUser {
     
         try {
             if ($PSCmdlet.ShouldProcess($UniqueIdentifier)) {
-                $result = Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body $JsonBody
+                $result = Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($JsonBody))
                 return $result
             }
         }
