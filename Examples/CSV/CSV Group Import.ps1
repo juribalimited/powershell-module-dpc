@@ -19,6 +19,16 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$Path
 )
+<#
+    .PARAMETER JuribaInstance
+    Juriba Platform instance.
+    .PARAMETER JuribaAPIKey
+    Juriba Platform APIKey.
+    .PARAMETER JuribaFeedName
+    Name of the data import feed (Must be of type user import).
+    .PARAMETER Path
+    Path to CSV file containing groups details (refer to swagger docs for properties).
+#>
 
 #Requires -Version 7
 #Requires -Module @{ ModuleName = 'Juriba.Platform'; ModuleVersion = '0.0.39.0' }

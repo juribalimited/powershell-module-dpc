@@ -18,6 +18,18 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$Path
 )
+<#
+    .PARAMETER JuribaInstance
+    Juriba Platform instance.
+    .PARAMETER JuribaAPIKey
+    Juriba Platform APIKey.
+    .PARAMETER JuribaFeedName
+    Name of the data import feed (Must be of type user import).
+    .PARAMETER ParentGroupName
+    Name of the group that this script will add members (User, device or group) to.
+    .PARAMETER Path
+    Path to CSV file containing unique identifier(s) of member(s) (CSV heading should be UniqueIdentifier).
+#>
 
 #Requires -Version 7
 #Requires -Module @{ ModuleName = 'Juriba.Platform'; ModuleVersion = '0.0.39.0' }
