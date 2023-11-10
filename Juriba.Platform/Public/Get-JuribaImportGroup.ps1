@@ -108,7 +108,6 @@ function Get-JuribaImportGroup {
         }
         
         $group = ""
-        Write-Host $uri
         try {
             $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json"
             $group = switch($InfoLevel) {
