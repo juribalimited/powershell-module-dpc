@@ -61,8 +61,10 @@ $i = 0
 foreach ($row in $table){
     $i++
     # convert table row to json, exclude attributes we dont need
-    $jsonBody = $row | Select-Object * -ExcludeProperty ItemArray, Table, RowError, RowState, HasErrors | ConvertTo-Json
+    $jsonBody = $row | Select-Object * -ExcludeProperty ItemArray, Table, RowError, RowState, HasErrors
     $username = $row.username
+    $jsonBody | Add-Member -MemberType NoteProperty -Name 'UniqueIdentifier' -Value $row.objectguid
+    $jsonBody =  $jsonBody | ConvertTo-Json
 
     Write-Progress -Activity "Importing Users to Dashworks" -Status ("Processing user: {0}" -f $username) -PercentComplete (($i/$table.Count*100))
 
