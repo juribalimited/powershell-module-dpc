@@ -14,7 +14,7 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$JuribaFeedName,
     [Parameter(Mandatory=$true)]
-    [string]$ParentGroupName,
+    [string]$GroupName,
     [Parameter(Mandatory=$true)]
     [string]$Path
 )
@@ -25,7 +25,7 @@ param (
     Juriba Platform APIKey.
     .PARAMETER JuribaFeedName
     Name of the data import feed (Must be of type user import).
-    .PARAMETER ParentGroupName
+    .PARAMETER GroupName
     Name of the group that this script will add members (User, device or group) to.
     .PARAMETER Path
     Path to CSV file containing unique identifier(s) of member(s) (CSV heading should be UniqueIdentifier).
@@ -49,7 +49,7 @@ if (-Not $feed) {
 $importId = $feed.id
 
 # Get Juriba Parent Group
-$group = Get-JuribaImportGroup @DashworksParams -Name $ParentGroupName -ImportId $importId -ErrorAction SilentlyContinue -InfoLevel Full
+$group = Get-JuribaImportGroup @DashworksParams -Name $GroupName -ImportId $importId -ErrorAction SilentlyContinue -InfoLevel Full
 $uniqueIdentifier = $group.uniqueIdentifier
 # If it doesnt exist, exit
 if (-Not $group) {
