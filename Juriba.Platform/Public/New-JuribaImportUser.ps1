@@ -3,15 +3,15 @@ function New-JuribaImportUser {
     [alias("New-DwImportUser")]
     <#
         .SYNOPSIS
-        Creates a new Dashworks user using the import API.
+        Creates a new Juriba user using the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
 
         .DESCRIPTION
-        Creates a new Dashworks user using the import API.
+        Creates a new Juriba user using the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
         Takes the ImportId and JsonBody as an input.
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
@@ -52,11 +52,17 @@ function New-JuribaImportUser {
 
     if ($APIKey -and $Instance) {
         $uri = "{0}/apiv2/imports/users/{1}/items" -f $Instance, $ImportId
+        $bulkuri = "{0}/apiv2/imports/users/{1}/items/`$bulk" -f $Instance, $ImportId
         $headers = @{'x-api-key' = $APIKey}
     
         try {
-            if ($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).username)) {
-                $result = Invoke-RestMethod -Uri $uri -Method POST -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonBody))
+            if ($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueIdentifier) -and (($JsonBody | ConvertFrom-Json).Length -eq 1)) {
+                $result = Invoke-RestMethod -Uri $uri -Method POST -Headers $headers -ContentType "application/json" -Body $jsonBody
+                return $result
+            }
+            elseif ($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueIdentifier) -and (($JsonBody | ConvertFrom-Json).Length -gt 1)) {
+                <# Bulk operation request #>
+                $result = Invoke-RestMethod -Uri $bulkuri -Method POST -Headers $headers -ContentType "application/json" -Body $jsonBody
                 return $result
             }
         }

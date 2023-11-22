@@ -3,15 +3,15 @@ function Set-JuribaImportApplication {
     [alias("Set-DwImportApplication")]
     <#
         .SYNOPSIS
-        Updates a application in the import API.
+        Updates a application in the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
 
         .DESCRIPTION
-        Updates a application in the import API.
+        Updates a application in the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
         Takes the ImportId, UniqueIdentifier and jsonBody as an input.
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
@@ -19,7 +19,7 @@ function Set-JuribaImportApplication {
 
         .PARAMETER UniqueIdentifier
 
-        UniqueIdentifier for the application.
+        Optional. UniqueIdentifier for the application. Optional only when submitting a bulk request (UniqueIdentifier to be provided in payload instead)
 
         .PARAMETER ImportId
 
@@ -59,11 +59,17 @@ function Set-JuribaImportApplication {
 
     if ($APIKey -and $Instance) {
         $uri = "{0}/apiv2/imports/applications/{1}/items/{2}" -f $Instance, $ImportId, $UniqueIdentifier
+        $bulkuri = "{0}/apiv2/imports/applications/{1}/items/`$bulk" -f $Instance, $ImportId
         $headers = @{'x-api-key' = $APIKey}
     
         try {
-            if ($PSCmdlet.ShouldProcess($UniqueIdentifier)) {
+            if ($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).Length -eq 1)) {
                 $result = Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body $JsonBody
+                return $result
+            }
+            elseif ($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueIdentifier) -and (($JsonBody | ConvertFrom-Json).Length -gt 1)) {
+                <# Bulk operation request #>
+                $result = Invoke-RestMethod -Uri $bulkuri -Method PATCH -Headers $headers -ContentType "application/json" -Body $jsonBody
                 return $result
             }
         }
