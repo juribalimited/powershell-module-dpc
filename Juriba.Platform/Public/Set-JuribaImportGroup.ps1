@@ -2,10 +2,10 @@
 function Set-JuribaImportGroup {
     <#
         .SYNOPSIS
-        Updates a Group in the import API.
+        Updates a Group in the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
 
         .DESCRIPTION
-        Updates a Group in the import API.
+        Updates a Group in the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
         Takes the User import ImportId, UniqueIdentifier and jsonBody as an input.
 
         .PARAMETER Instance
@@ -18,7 +18,7 @@ function Set-JuribaImportGroup {
 
         .PARAMETER UniqueIdentifier
 
-        UniqueIdentifier for the Group.
+        Optional. UniqueIdentifier for the group. Optional only when submitting a bulk request (UniqueIdentifier to be provided in payload instead)
 
         .PARAMETER ImportId
 
@@ -58,11 +58,17 @@ function Set-JuribaImportGroup {
 
     if ($APIKey -and $Instance) {
         $uri = "{0}/apiv2/imports/groups/{1}/items/{2}" -f $Instance, $ImportId, $UniqueIdentifier
+        $bulkuri = "{0}/apiv2/imports/groups/{1}/items/`$bulk" -f $Instance, $ImportId
         $headers = @{'x-api-key' = $APIKey}
     
         try {
-            if ($PSCmdlet.ShouldProcess($UniqueIdentifier)) {
+            if ($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).Length -eq 1)) {
                 $result = Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body $JsonBody
+                return $result
+            }
+            elseif ($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueIdentifier) -and (($JsonBody | ConvertFrom-Json).Length -gt 1)) {
+                <# Bulk operation request #>
+                $result = Invoke-RestMethod -Uri $bulkuri -Method PATCH -Headers $headers -ContentType "application/json" -Body $jsonBody
                 return $result
             }
         }
