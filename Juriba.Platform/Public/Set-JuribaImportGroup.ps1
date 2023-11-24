@@ -62,11 +62,11 @@ function Set-JuribaImportGroup {
         $headers = @{'x-api-key' = $APIKey}
     
         try {
-            if ($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).Length -eq 1)) {
+            if (($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueIdentifier)) -and (($JsonBody | ConvertFrom-Json).Length -eq 1)) {
                 $result = Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body $JsonBody
                 return $result
             }
-            elseif ($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueIdentifier) -and (($JsonBody | ConvertFrom-Json).Length -gt 1)) {
+            elseif (($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueIdentifier)) -and (($JsonBody | ConvertFrom-Json).Length -gt 1)) {
                 <# Bulk operation request #>
                 $result = Invoke-RestMethod -Uri $bulkuri -Method PATCH -Headers $headers -ContentType "application/json" -Body $jsonBody
                 return $result
@@ -76,7 +76,8 @@ function Set-JuribaImportGroup {
             Write-Error $_
         }
 
-    } else {
+    } 
+    else {
         Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }

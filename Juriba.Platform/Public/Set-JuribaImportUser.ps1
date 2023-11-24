@@ -59,15 +59,15 @@ function Set-JuribaImportUser {
 
     if ($APIKey -and $Instance) {
         $uri = "{0}/apiv2/imports/users/{1}/items/{2}" -f $Instance, $ImportId, $UniqueIdentifier
-        $bulkuri = "{0}/apiv2/imports/users/{1}/items/`$bulk" -f $Instance, $ImportId
+        $bulkuri = "{0}/apiv2/imports/users/{1}/items/`$bulk" -f $Instance, $ImportId, $UniqueIdentifier
         $headers = @{'x-api-key' = $APIKey}
     
         try {
-            if ($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).Length -eq 1)) {
+            if (($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueIdentifier)) -and (($JsonBody | ConvertFrom-Json).Length -eq 1)) {
                 $result = Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body $JsonBody
                 return $result
             }
-            elseif ($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueIdentifier) -and (($JsonBody | ConvertFrom-Json).Length -gt 1)) {
+            elseif (($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueIdentifier)) -and (($JsonBody | ConvertFrom-Json).Length -gt 1)) {
                 <# Bulk operation request #>
                 $result = Invoke-RestMethod -Uri $bulkuri -Method PATCH -Headers $headers -ContentType "application/json" -Body $jsonBody
                 return $result
@@ -77,7 +77,8 @@ function Set-JuribaImportUser {
             Write-Error $_
         }
 
-    } else {
+    }
+    else {
         Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }
