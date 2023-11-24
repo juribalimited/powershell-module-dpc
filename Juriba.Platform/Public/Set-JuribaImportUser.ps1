@@ -59,7 +59,7 @@ function Set-JuribaImportUser {
 
     if ($APIKey -and $Instance) {
         $uri = "{0}/apiv2/imports/users/{1}/items/{2}" -f $Instance, $ImportId, $UniqueIdentifier
-        $bulkuri = "{0}/apiv2/imports/users/{1}/items/`$bulk" -f $Instance, $ImportId, $UniqueIdentifier
+        $bulkuri = "{0}/apiv2/imports/users/{1}/items/`$bulk" -f $Instance, $ImportId
         $headers = @{'x-api-key' = $APIKey}
     
         try {
