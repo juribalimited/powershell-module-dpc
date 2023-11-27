@@ -16,7 +16,7 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$JuribaInstance,
     [Parameter(Mandatory=$true)]
-    [string]$JuribaAPIKey,
+    [string]$APIKey,
     [Parameter(Mandatory=$true)]
     [string]$FeedName,
     [Parameter(Mandatory=$true)]
