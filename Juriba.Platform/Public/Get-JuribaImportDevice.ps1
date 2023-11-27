@@ -111,6 +111,7 @@ function Get-JuribaImportDevice {
         $device = ""
         try {
             $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json"
+            if ($result.Content -eq '[]') {return $device}
             $device = switch($InfoLevel) {
                 "Basic" { ($result.Content | ConvertFrom-Json).UniqueIdentifier }
                 "Full"  { $result.Content | ConvertFrom-Json }
