@@ -1,5 +1,4 @@
 function Get-JuribaImportDevice {
-    [alias("Get-DwImportDevice")]
     <#
         .SYNOPSIS
         Gets one or more Dashworks devices from the import API.
@@ -55,8 +54,9 @@ function Get-JuribaImportDevice {
         .EXAMPLE
         PS> Get-JuribaImportDevice -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
 
-         #>
-
+    #>
+    [alias("Get-DwImportDevice")]
+    [OutputType([Object[]])]
     [CmdletBinding(DefaultParameterSetName="Default")]
     param (
         [Parameter(Mandatory=$false)]
@@ -108,7 +108,7 @@ function Get-JuribaImportDevice {
             'cache-control' = 'no-cache'
         }
     
-        $device = ""
+        $device = @()
         try {
             $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json"
             if ($result.Content -eq '[]') {return $device}
