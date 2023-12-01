@@ -74,7 +74,7 @@ foreach ($line in $csvFile) {
         $result = New-JuribaImportGroup @DashworksParams -ImportId $importId -JsonBody $jsonBody
         #check result, for a new group we expect the return object to contain the group
         if (-Not $result.name) {
-            Write-Error "Group not crated successfully."
+            Write-Error "Group not created successfully."
         }
     }
 }

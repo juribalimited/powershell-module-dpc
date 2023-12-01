@@ -62,7 +62,7 @@ function Set-JuribaImportGroup {
         $headers = @{'x-api-key' = $APIKey}
     
         try {
-            if (($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueIdentifier)) -and (($JsonBody | ConvertFrom-Json).Length -eq 1)) {
+            if (($PSCmdlet.ShouldProcess($UniqueIdentifier)) -and (($JsonBody | ConvertFrom-Json).Length -eq 1)) {
                 $result = Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body $JsonBody
                 return $result
             }
