@@ -41,13 +41,12 @@ $DashworksParams = @{
 # Get Juriba User Import feed
 $feed = Get-JuribaImportUserFeed @DashworksParams -Name $JuribaFeedName
 # If it doesnt exist, create it
-if (-Not $feed) {
+if (-Not $feed.id) {
     $feed = New-JuribaImportUserFeed @DashworksParams -Name $JuribaFeedName -Enabled $true
 }
 $importId = $feed.id
 
 Write-Information ("Using feed id {0}" -f $importId) -InformationAction Continue
-
 # Get data from CSV file
 $csvFile = Import-Csv -Path $Path
 
@@ -56,23 +55,26 @@ foreach ($line in $csvFile) {
     $i++
     # convert line to json
     $jsonBody = $line | ConvertTo-Json
-    $jsonBody
     $groupname = $line.Name
+    $groupidentifier = $line.UniqueIdentifier
     Write-Progress -Activity "Importing groups to Juriba Platform" -Status ("Processing group: {0}" -f $groupname) -PercentComplete (($i/$csvFile.Count*100))
 
     $existinggroup = Get-JuribaImportGroup @DashworksParams -ImportId $importId -Name $groupname -ErrorAction SilentlyContinue 
     if ($existinggroup) {
-        $result = Set-JuribaImportGroup @DashworksParams -ImportId $importId -UniqueIdentifier $groupname -JsonBody $jsonBody
+        Write-Information ("Updating existing group: {0}" -f $groupname) -InformationAction Continue
+        $updatedJsonBody = ($jsonBody | ConvertFrom-Json) | Select-Object -ExcludeProperty UniqueIdentifier
+        $result = Set-JuribaImportGroup @DashworksParams -ImportId $importId -UniqueIdentifier $groupidentifier -JsonBody ($updatedJsonBody | ConvertTo-Json)
         # check result, for an update we are expecting status code 204
         if ($result.StatusCode -ne 204) {
             Write-Error $result
         }
     }
     else {
+        Write-Information ("Creating new group: {0}" -f $groupname) -InformationAction Continue
         $result = New-JuribaImportGroup @DashworksParams -ImportId $importId -JsonBody $jsonBody
         #check result, for a new group we expect the return object to contain the group
-        if (-Not $result.groupname) {
-            Write-Error $result
+        if (-Not $result.name) {
+            Write-Error "Group not crated successfully."
         }
     }
 }
