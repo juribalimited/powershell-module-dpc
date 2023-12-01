@@ -42,7 +42,7 @@ $DashworksParams = @{
 # Get Juriba User Import feed
 $feed = Get-JuribaImportUserFeed @DashworksParams -Name $JuribaFeedName
 # If it doesnt exist, exit
-if (-Not $feed) {
+if (-Not $feed.id) {
     Write-Error "Juriba import feed with name: $JuribaFeedName not found. Script will terminate."
     Exit
 }
