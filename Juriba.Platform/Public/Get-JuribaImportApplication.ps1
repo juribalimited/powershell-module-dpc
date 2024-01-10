@@ -48,7 +48,7 @@ function Get-JuribaImportApplication {
         PS> Get-JuribaImportApplication -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Manufacturer, 'zxy123456')"
 
     #>
-
+    [OutputType([string])]
     [CmdletBinding(DefaultParameterSetName="UniqueIdentifier")]
     param (
         [Parameter(Mandatory=$true)]
@@ -108,7 +108,6 @@ function Get-JuribaImportApplication {
                     }
                 }
             }
-            return $application
         }
         catch {
             if ($_.Exception.Response.StatusCode.Value__ -eq 404) {
@@ -120,6 +119,7 @@ function Get-JuribaImportApplication {
                 Write-Error $_
             }
         }
+        return $application
 
     } else {
         Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
