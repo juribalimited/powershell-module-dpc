@@ -48,7 +48,7 @@ function Get-JuribaImportApplication {
         PS> Get-JuribaImportApplication -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Manufacturer, 'zxy123456')"
 
     #>
-
+    [OutputType([string])]
     [CmdletBinding(DefaultParameterSetName="UniqueIdentifier")]
     param (
         [Parameter(Mandatory=$true)]
