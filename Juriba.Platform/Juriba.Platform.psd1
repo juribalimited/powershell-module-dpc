@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.Platform.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.0.50.0'
+    ModuleVersion     = '0.0.49.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -91,7 +91,6 @@
         'Get-JuribaEvergreenSelfServicePage',
         'Get-JuribaImportApplication',
         'Get-JuribaImportApplicationFeed',
-        'Get-JuribaImportDepartment',
         'Get-JuribaImportDepartmentFeed',
         'Get-JuribaImportDevice',
         'Get-JuribaImportDeviceFeed',
@@ -134,11 +133,9 @@
         'New-JuribaEvergreenSelfServicePage',
         'New-JuribaImportApplication',
         'New-JuribaImportApplicationFeed',
-		'New-JuribaImportDepartment',
         'New-JuribaImportDepartmentFeed',
         'New-JuribaImportDevice',
         'New-JuribaImportDeviceFeed',
-        'New-JuribaImportLocation',
         'New-JuribaImportLocationFeed',
         'New-JuribaImportMailbox',
         'New-JuribaImportMailboxFeed',
@@ -155,22 +152,18 @@
         'Remove-JuribaDashboard',
         'Remove-JuribaEvergreenSelfServicePortal',
         'Remove-JuribaImportApplication',
-        'Remove-JuribaImportApplicationFeed',
-        'Remove-JuribaImportDepartment',
         'Remove-JuribaImportDepartmentFeed',
         'Remove-JuribaImportDevice',
         'Remove-JuribaImportDeviceFeed',
-        'Remove-JuribaImportLocation',
         'Remove-JuribaImportLocationFeed',
         'Remove-JuribaImportMailbox',
         'Remove-JuribaImportMailboxFeed',
-        'Remove-JuribaImportUser',
         'Remove-JuribaImportUserFeed',
         'Remove-JuribaImportGroup',
         'Remove-JuribaList',
         'Remove-JuribaTag',
         'Remove-JuribaTaskValueDate',
-		'Remove-JuribaTaskValueText',
+		    'Remove-JuribaTaskValueText',
         'Remove-JuribaTeam',
         'Set-JuribaAutomation',
         'Set-JuribaAutomationAction',
@@ -183,10 +176,8 @@
         'Set-JuribaEvergreenSelfServiceComponent',
         'Set-JuribaEvergreenSelfServicePage',
         'Set-JuribaImportApplication',
-        'Set-JuribaImportDepartment',
         'Set-JuribaImportDevice',
         'Set-JuribaImportDeviceFeed',
-        'Set-JuribaImportLocation',
         'Set-JuribaImportMailbox',
         'Set-JuribaImportMailboxFeed',
         'Set-JuribaImportUser',

@@ -49,7 +49,7 @@ function Get-JuribaImportApplication {
 
     #>
     [OutputType([string])]
-    [CmdletBinding(DefaultParameterSetName="Default")]
+    [CmdletBinding(DefaultParameterSetName="UniqueIdentifier")]
     param (
         [Parameter(Mandatory=$true)]
         [string]$Instance,

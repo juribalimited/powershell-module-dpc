@@ -77,8 +77,7 @@ function Get-JuribaImportUser {
     
         switch ($PSCmdlet.ParameterSetName) {
             "Username" {
-                $uri += "?filter="
-                $uri += [System.Web.HttpUtility]::UrlEncode("eq(Username,'{0}')" -f $Username)
+                $uri += "/{0}" -f $Username
             }
             "Filter" {
                 $uri += "?filter="
