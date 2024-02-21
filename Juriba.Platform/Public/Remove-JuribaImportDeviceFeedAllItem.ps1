@@ -1,21 +1,17 @@
 #requires -Version 7
-function Remove-JuribaImportUserFeedAllItems {
-    [alias("Remove-DwImportUserFeedAllItems")]
+function Remove-JuribaImportDeviceFeedAllItem {
+    [alias("Remove-DwImportDeviceFeedAllItem")]
     <#
         .SYNOPSIS
-        Deletes all users in a feed.
+        Deletes all devices in a feed.
 
         .DESCRIPTION
-        Deletes all users in a feed.
+        Deletes all devices in a feed.
         Takes Id of feed to be deleted.
 
         .PARAMETER Instance
 
         Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
-
-        .PARAMETER Port
-
-        Dashworks API port number. Default = 8443
 
         .PARAMETER APIKey
 
@@ -23,15 +19,15 @@ function Remove-JuribaImportUserFeedAllItems {
 
         .PARAMETER ImportId
 
-        The Id of the user feed to be deleted.
+        The Id of the device feed to be deleted.
 
         .EXAMPLE
 
-        PS> Remove-JuribaImportUserFeedAllItems -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Remove-JuribaImportDeviceFeedAllItem -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
         .EXAMPLE
 
-        PS> Remove-JuribaImportUserFeedAllItems -Confirm:$false -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Remove-JuribaImportDeviceFeedAllItem -Confirm:$false -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
     [CmdletBinding(
@@ -52,7 +48,7 @@ function Remove-JuribaImportUserFeedAllItems {
     }
 
     if ($APIKey -and $Instance) {
-        $uri = "{0}/apiv2/imports/users/{1}/Items" -f $Instance, $ImportId
+        $uri = "{0}/apiv2/imports/devices/{1}/items" -f $Instance, $ImportId
         $headers = @{'x-api-key' = $APIKey}
     
         try {
