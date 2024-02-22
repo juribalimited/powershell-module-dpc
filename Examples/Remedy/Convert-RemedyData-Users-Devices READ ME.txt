@@ -1,0 +1,28 @@
+This script performs several key functions aimed at processing and importing Remedy data (specifically users and devices) into a Juriba instance using bulk import techniques for efficiency. 
+
+Initialization and Setup: 
+The script starts by importing necessary modules and setting up parameters such as the API endpoint, API key, import names, and a flag for console logging. It defines global parameters to be used throughout the script.
+
+Logging Setup: 
+Utilizes a custom logging module to start logging operations, capturing and recording significant events, parameters, and errors as the script progresses.
+
+Data Preparation:
+Reads JSON data from a specified file path, which contains Remedy data about users and devices.
+Initializes two System.Data.DataTable objects, one for users and one for devices, preparing them to hold mapped data from the JSON file.
+Data Mapping and Validation:
+
+Iterates through the JSON data, mapping relevant information to the corresponding DataTables for users and devices.
+For users, it checks for duplicate entries based on user IDs to ensure that each user is processed only once.
+For devices, it validates the presence of a serial number for each device entry. If a serial number is missing, the device entry is skipped, and a log entry is made to indicate the omission.
+
+Custom Field Handling: 
+Dynamically maps custom field values for both users and devices if they are present and not just whitespace, adding these as additional columns in the respective DataTables.
+
+Bulk Import Preparation: 
+Constructs parameter objects ($paramsForUserBulkImport and $paramsForDeviceBulkImport) containing necessary details such as the instance endpoint, API key, DataTables, and batch sizes for the bulk import operations.
+
+Bulk Import Execution:
+Utilizes custom functions (Invoke-JuribaBulkImportUserFeedDataTable and Invoke-JuribaBulkImportDeviceFeedDataTable) to perform bulk import operations for both users and devices into the Juriba system.
+These functions are called with the prepared parameter objects using PowerShell splatting to simplify passing multiple parameters.
+Implements error handling to catch and log any exceptions that occur during the bulk import process, ensuring any issues are recorded for troubleshooting.
+Logging and Cleanup: Closes the logging session and performs any necessary cleanup before the script terminates
