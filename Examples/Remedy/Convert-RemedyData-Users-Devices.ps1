@@ -241,8 +241,8 @@ if ([string]::IsNullOrWhiteSpace($item.ASSET_SerialNumber)) {
     # Dynamically set custom fields if present and not just whitespace
     if (-not [string]::IsNullOrWhiteSpace($item.ASSET_SystemEnvironment)) {
         $userRow["RemedySystemEnvironment"] = $item.ASSET_SystemEnvironment}
-    if (-not [string]::IsNullOrWhiteSpace($item.ASSET_Status)) {
-        $userRow["RemedyStatus"] = $item.ASSET_Status}
+    if (-not [string]::IsNullOrWhiteSpace($item.ASSET_LifecycleStatus)) {
+        $userRow["RemedyStatus"] = $item.ASSET_LifecycleStatus}
 }
    
 
