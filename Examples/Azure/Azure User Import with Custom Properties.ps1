@@ -1,4 +1,3 @@
-
 [CmdletBinding()]
 param(
     [parameter(Mandatory=$True)]
@@ -176,6 +175,9 @@ Function Convert-DwAPIUserFromAzure($AzureDataTable){
     $dataTable.Columns.Add("emailAddress", [string]) | Out-Null
     $dataTable.Columns.Add("userPrincipalName", [string]) | Out-Null
     $dataTable.Columns.Add("UniqueIdentifier", [string]) | Out-Null
+    $dataTable.Columns.Add("officeLocation", [string]) | Out-Null
+    $dataTable.Columns.Add("businessPhone", [string]) | Out-Null
+    $dataTable.Columns.Add("jobTitle", [string]) | Out-Null
 
     foreach($Row in $AzureDataTable.Rows)
     {
@@ -193,6 +195,9 @@ Function Convert-DwAPIUserFromAzure($AzureDataTable){
         $NewRow.emailAddress = $Row.userPrincipalName
         $NewRow.userPrincipalName = $Row.userPrincipalName
         $NewRow.UniqueIdentifier = $Row.id
+        $NewRow.officeLocation = $Row.officeLocation
+        $NewRow.businessPhone = $row.businessPhones
+        $NewRow.jobTitle = $row.jobTitle
         
         $dataTable.Rows.Add($NewRow)
     }
@@ -303,7 +308,12 @@ function Invoke-DwImportUserFeedDataTable {
     foreach($Row in $DWUserDataTable)
     {
         $Body = $null
-        $Body = $Row | Select-Object * -ExcludeProperty ItemArray, Table, RowError, RowState, HasErrors | ConvertTo-Json
+        
+        $customProps = @(@{Name="OfficeLocation"; Value=@(,$row.officeLocation)} 
+                        ,@{Name="BusinessPhone"; Value=@(,($row.businessPhone.Replace('"', "")))} 
+                        ,@{Name="JobTitle"; Value=@(,$row.jobTitle)}    
+        )
+        $Body = $Row | Select-Object -Property username, commonObjectName, displayName, objectGuid, lastLogonDate, disabled, surname, givenName, emailAddress, userPrincipalName, UniqueIdentifier, @{Name = "Properties"; Expression={ $customProps }} | ConvertTo-Json -Depth 10
 
         Invoke-RestMethod -Headers $Postheaders -Uri $uri -Method Post -Body $Body | out-null
 

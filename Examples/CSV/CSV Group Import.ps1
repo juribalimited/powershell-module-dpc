@@ -47,7 +47,6 @@ if (-Not $feed) {
 $importId = $feed.id
 
 Write-Information ("Using feed id {0}" -f $importId) -InformationAction Continue
-
 # Get data from CSV file
 $csvFile = Import-Csv -Path $Path
 

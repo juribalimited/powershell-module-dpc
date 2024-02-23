@@ -1,12 +1,12 @@
 #Requires -Version 7
-function New-JuribaImportUser {
-    [alias("New-DwImportUser")]
+function New-JuribaImportLocation {
+    [alias("New-DwImportLocation")]
     <#
         .SYNOPSIS
-        Creates a new Juriba user using the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
+        Creates a new Juriba location using the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
 
         .DESCRIPTION
-        Creates a new Juriba user using the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
+        Creates a new Juriba location using the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
         Takes the ImportId and JsonBody as an input.
 
         .PARAMETER Instance
@@ -19,14 +19,14 @@ function New-JuribaImportUser {
 
         .PARAMETER ImportId
 
-        ImportId for the user.
+        ImportId for the location.
 
         .PARAMETER JsonBody
 
-        Json payload with updated user details.
+        Json payload with updated location details.
 
         .EXAMPLE
-        PS> New-JuribaImportUser -ImportId 1 -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> New-JuribaImportLocation -ImportId 1 -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
 
     [CmdletBinding(SupportsShouldProcess)]
@@ -38,9 +38,9 @@ function New-JuribaImportUser {
         [parameter(Mandatory=$true)]
         [int]$ImportId,
         [ValidateScript({
-            ((Test-Json $_) -and (($_ | ConvertFrom-Json).username))
+            ((Test-Json $_) -and (($_ | ConvertFrom-Json).name))
         },
-        ErrorMessage = "JsonBody is not valid json or does not contain a username"
+        ErrorMessage = "JsonBody is not valid json or does not contain a name"
         )]
         [parameter(Mandatory=$true)]
         [string]$JsonBody
@@ -51,8 +51,8 @@ function New-JuribaImportUser {
     }
 
     if ($APIKey -and $Instance) {
-        $uri = "{0}/apiv2/imports/users/{1}/items" -f $Instance, $ImportId
-        $bulkuri = "{0}/apiv2/imports/users/{1}/items/`$bulk" -f $Instance, $ImportId
+        $uri = "{0}/apiv2/imports/locations/{1}/items" -f $Instance, $ImportId
+        $bulkuri = "{0}/apiv2/imports/locations/{1}/items/`$bulk" -f $Instance, $ImportId
         $headers = @{'x-api-key' = $APIKey}
     
         try {

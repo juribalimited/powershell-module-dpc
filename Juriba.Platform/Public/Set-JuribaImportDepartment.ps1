@@ -1,12 +1,12 @@
 #Requires -Version 7
-function Set-JuribaImportApplication {
-    [alias("Set-DwImportApplication")]
+function Set-JuribaImportDepartment {
+    [alias("Set-DwImportDepartment")]
     <#
         .SYNOPSIS
-        Updates a application in the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
+        Updates a department in the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
 
         .DESCRIPTION
-        Updates a application in the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
+        Updates a department in the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
         Takes the ImportId, UniqueIdentifier and jsonBody as an input.
 
         .PARAMETER Instance
@@ -19,18 +19,18 @@ function Set-JuribaImportApplication {
 
         .PARAMETER UniqueIdentifier
 
-        Optional. UniqueIdentifier for the application. Optional only when submitting a bulk request (UniqueIdentifier to be provided in payload instead)
+        Optional. UniqueIdentifier for the department. Optional only when submitting a bulk request (UniqueIdentifier to be provided in payload instead)
 
         .PARAMETER ImportId
 
-        ImportId for the application.
+        ImportId for the department.
 
         .PARAMETER JsonBody
 
-        Json payload with updated application details.
+        Json payload with updated department details.
 
         .EXAMPLE
-        PS> Set-JuribaImportApplication -ImportId 1 -UniqueIdentifier "app123" -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Set-JuribaImportDepartment -ImportId 1 -Name "w123abc" -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
 
@@ -40,7 +40,7 @@ function Set-JuribaImportApplication {
         [string]$Instance,
         [Parameter(Mandatory=$false)]
         [string]$APIKey,
-        [parameter(Mandatory=$true)]
+        [parameter(Mandatory=$false)]
         [string]$UniqueIdentifier,
         [parameter(Mandatory=$true)]
         [int]$ImportId,
@@ -58,8 +58,8 @@ function Set-JuribaImportApplication {
     }
 
     if ($APIKey -and $Instance) {
-        $uri = "{0}/apiv2/imports/applications/{1}/items/{2}" -f $Instance, $ImportId, $UniqueIdentifier
-        $bulkuri = "{0}/apiv2/imports/applications/{1}/items/`$bulk" -f $Instance, $ImportId
+        $uri = "{0}/apiv2/imports/departments/{1}/items/{2}" -f $Instance, $ImportId, $UniqueIdentifier
+        $bulkuri = "{0}/apiv2/imports/departments/{1}/items/`$bulk" -f $Instance, $ImportId
         $headers = @{'x-api-key' = $APIKey}
     
         try {
@@ -67,7 +67,7 @@ function Set-JuribaImportApplication {
                 $result = Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($JsonBody))
                 return $result
             }
-            elseif ($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueIdentifier) -and (($JsonBody | ConvertFrom-Json).Length -gt 1)) {
+            elseif (($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueIdentifier)) -and (($JsonBody | ConvertFrom-Json).Length -gt 1)) {
                 <# Bulk operation request #>
                 $result = Invoke-RestMethod -Uri $bulkuri -Method PATCH -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($JsonBody))
                 return $result
@@ -77,7 +77,8 @@ function Set-JuribaImportApplication {
             Write-Error $_
         }
 
-    } else {
+    }
+    else {
         Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }
