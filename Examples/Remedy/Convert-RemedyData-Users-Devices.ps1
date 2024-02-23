@@ -31,6 +31,7 @@ Ensure that the Juriba instance API endpoint, API key, and feed names are correc
 The script includes error handling to log and exit gracefully in case of encountered errors during the import process.
 
 #>
+<#
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)]
@@ -47,11 +48,20 @@ param(
     
     [Parameter(Mandatory=$true)]
     [string]$DeviceImportName,
-    
+      
     [Parameter(Mandatory=$true)]
     [bool]$WriteToConsole = $true
 )
+#>
 
+Import-Module -Name Juriba.Platform -RequiredVersion 0.0.52.0
+
+$JuribaApiEndpoint = "https://dw-noel-demo.dwlabs.local:8443" 
+$JuribaAPIKey = "oo3qcwyR7em7c4Z6aIRDpH4WzkO/Ua4pbU0suz66mBzZZinE+AgkL3OTHAvXqHRm5YtNBOz9BnCFxBd/5EaZLw==" 
+$UserImportName = "Remedy Users"
+$DeviceImportName = "Remedy Devices" 
+$jsonFilePath = "F:\Projects\Remedy\SampleData\remedy_data.json"
+$WriteToConsole = $true # Switch logging so it also creates a console entry for faster debugging
 
 # Define $JuribaParams globally
 $global:JuribaParams = @{
@@ -84,6 +94,7 @@ if (Test-Path -Path $bulkImportModulePath) {
     Add-LogEntry -Entry "Juriba-BulkImport module file not found at path: $bulkImportModulePath" -JuribaLogLevel "Error"
 }
 
+
 Start-JuribaLog @JuribaParams
 
 # Log the parameters
@@ -115,43 +126,43 @@ $devicesWithoutOwner = 0  # Initialize a variable to count devices without owner
 # =====================================================================================
 
     # Create DataTable for Users
-    $userTable = New-Object System.Data.DataTable
-    $userTable.Columns.Add("uniqueIdentifier", [string])
-    $userTable.Columns.Add("username", [string])
-    $userTable.Columns.Add("emailAddress", [string])
-    $userTable.Columns.Add("givenName", [string])
-    $userTable.Columns.Add("displayName", [string])
-    $userTable.Columns.Add("surname", [string])
-    $userTable.Columns.Add("disabled", [string])
-    $userTable.Columns.Add("RemedyDeskLocation", [string])
-    $userTable.Columns.Add("RemedyEmployeeID", [string])
-    $userTable.Columns.Add("RemedyJobTitle", [string])
-    $userTable.Columns.Add("RemedyManagerEmail", [string])
-    $userTable.Columns.Add("RemedyManagersName", [string])
-    $userTable.Columns.Add("RemedyPhoneNumberBusiness", [string])
+$userTable = New-Object System.Data.DataTable
+[void]$userTable.Columns.Add("uniqueIdentifier", [string])
+[void]$userTable.Columns.Add("username", [string])
+[void]$userTable.Columns.Add("emailAddress", [string])
+[void]$userTable.Columns.Add("givenName", [string])
+[void]$userTable.Columns.Add("displayName", [string])
+[void]$userTable.Columns.Add("surname", [string])
+[void]$userTable.Columns.Add("disabled", [string])
+[void]$userTable.Columns.Add("RemedyDeskLocation", [string])
+[void]$userTable.Columns.Add("RemedyEmployeeID", [string])
+[void]$userTable.Columns.Add("RemedyJobTitle", [string])
+[void]$userTable.Columns.Add("RemedyManagersEmail", [string])
+[void]$userTable.Columns.Add("RemedyManagersName", [string])
+[void]$userTable.Columns.Add("RemedyPhoneNumberBusiness", [string])
 
+# Create DataTable for Devices
+$deviceTable = New-Object System.Data.DataTable
+[void]$deviceTable.Columns.Add("uniqueIdentifier", [string])
+[void]$deviceTable.Columns.Add("hostname", [string])
+[void]$deviceTable.Columns.Add("operatingSystemName", [string])
+[void]$deviceTable.Columns.Add("computerManufacturer", [string])
+[void]$deviceTable.Columns.Add("computerModel", [string])
+[void]$deviceTable.Columns.Add("chassisType", [string])
+[void]$deviceTable.Columns.Add("virtualMachine", [string])
+[void]$deviceTable.Columns.Add("lastSeenDate", [System.DateTime])
+[void]$deviceTable.Columns.Add("buildDate", [System.DateTime])
+[void]$deviceTable.Columns.Add("serialNumber", [string])
+[void]$deviceTable.Columns.Add("owner", [string])
+[void]$deviceTable.Columns.Add("RemedySystemEnvironment", [string])
+[void]$deviceTable.Columns.Add("RemedyStatus", [string])
 
-    # Create DataTable for Devices
-    $deviceTable = New-Object System.Data.DataTable
-    $deviceTable.Columns.Add("uniqueIdentifier", [string])
-    $deviceTable.Columns.Add("hostname", [string])
-    $deviceTable.Columns.Add("operatingSystemName", [string])
-    $deviceTable.Columns.Add("computerManufacturer", [string])
-    $deviceTable.Columns.Add("computerModel", [string])
-    $deviceTable.Columns.Add("chassisType", [string])
-    $deviceTable.Columns.Add("virtualMachine", [string])
-    $deviceTable.Columns.Add("lastSeenDate", [System.DateTime])
-    $deviceTable.Columns.Add("buildDate", [System.DateTime])
-    $deviceTable.Columns.Add("serialNumber", [string])
-    $deviceTable.Columns.Add("owner", [string])
-    $deviceTable.Columns.Add("RemedySystemEnvironment", [string])
-    $deviceTable.Columns.Add("RemedyStatus", [string])
 
 # ====================================================
 # Initialize and populate array for customFieldNmes
 # ====================================================
 
-$userCustomFieldNames = @("RemedyDeskLocation","RemedyEmployeeID","RemedyJobTitle","RemedyManagerEmail","RemedyManagersName","RemedyPhoneNumberBusiness")
+$userCustomFieldNames = @("RemedyDeskLocation","RemedyEmployeeID","RemedyJobTitle","RemedyManagersEmail","RemedyManagersName","RemedyPhoneNumberBusiness")
 $deviceCustomFieldNames = @("RemedySystemEnvironment","RemedyStatus")
 
 
@@ -191,7 +202,7 @@ foreach ($item in $remedyData) {
     if (-not [string]::IsNullOrWhiteSpace($item."USER_JobTitle")) {
         $userRow["RemedyJobTitle"] = $item."USER_JobTitle"}
     if (-not [string]::IsNullOrWhiteSpace($item."USER_Manager E-mail")) {
-        $userRow["RemedyManagerEmail"] = $item."USER_Manager E-mail"}
+        $userRow["RemedyManagersEmail"] = $item."USER_Manager E-mail"}
     if (-not [string]::IsNullOrWhiteSpace($item."USER_ManagersName")) {
         $userRow["RemedyManagersName"] = $item."USER_ManagersName"}
     if (-not [string]::IsNullOrWhiteSpace($item."USER_Phone Number Business")) {
@@ -237,12 +248,12 @@ if ([string]::IsNullOrWhiteSpace($item.ASSET_SerialNumber)) {
     $deviceRow["lastSeenDate"] = $item.ASSET_LastScanDate
     $deviceRow["buildDate"] = $item.ASSET_InstallationDate
     $deviceRow["serialNumber"] = $item.ASSET_SerialNumber
-    $deviceRow["owner"] = $item.USER_LANID      # This has now been altered after we used it in user feed to be the full path
+    $deviceRow["owner"] = $item.USER_LANID      
     # Dynamically set custom fields if present and not just whitespace
     if (-not [string]::IsNullOrWhiteSpace($item.ASSET_SystemEnvironment)) {
-        $userRow["RemedySystemEnvironment"] = $item.ASSET_SystemEnvironment}
-    if (-not [string]::IsNullOrWhiteSpace($item.ASSET_LifecycleStatus)) {
-        $userRow["RemedyStatus"] = $item.ASSET_LifecycleStatus}
+        $deviceRow["RemedySystemEnvironment"] = $item.ASSET_SystemEnvironment}
+    if (-not [string]::IsNullOrWhiteSpace($item.ASSET_Status)) {
+        $deviceRow["RemedyStatus"] = $item.ASSET_Status}
 }
    
 
@@ -253,25 +264,21 @@ if ([string]::IsNullOrWhiteSpace($item.ASSET_SerialNumber)) {
 
 $paramsForUserBulkImport = @{
     Instance           = $JuribaApiEndpoint
-    JuribaUserDataTable= $userTable # Assuming $userTable is your prepared DataTable for users
+    JuribaUserDataTable= $userTable 
     APIKey             = $JuribaAPIKey
-    ImportId           = $UserImportID # Assuming you have fetched or set this ID earlier in your script
-    CustomFields       = $userCustomFieldNames # Assuming this array contains the names of your custom fields
-    BatchSize          = 1000 # Or whatever batch size you have deemed appropriate
+    ImportName         = $UserImportName 
+    CustomFields       = $userCustomFieldNames 
+    BatchSize          = 1 # Or whatever batch size you have deemed appropriate
 }
 
 $paramsForDeviceBulkImport = @{
     Instance           = $JuribaApiEndpoint
-    JuribaUserDataTable= $deviceTable # Assuming $userTable is your prepared DataTable for users
+    JuribaDeviceDataTable= $deviceTable 
     APIKey             = $JuribaAPIKey
-    ImportId           = $deviceImportID # Assuming you have fetched or set this ID earlier in your script
-    CustomFields       = $deviceCustomFieldNames # Assuming this array contains the names of your custom fields
-    BatchSize          = 1000 # Or whatever batch size you have deemed appropriate
+    ImportName         = $deviceImportName 
+    CustomFields       = $deviceCustomFieldNames 
+    BatchSize          = 1 # Or whatever batch size you have deemed appropriate
 }
-
-
-
-
 # =================================================
 #  Now we will call the Function that Bulk Imports
 #==================================================
@@ -287,6 +294,17 @@ try {
     Invoke-JuribaBulkImportDeviceFeedDataTable @paramsForDeviceBulkImport
 } catch {
     Add-LogEntry -Entry "Error using Bulk Import Device Feed DataTable: $($_.Exception.Message)" -JuribaLogLevel Fatal
+    # Select specific elements for debugging
+    $selectedParamsForLogging = @{
+    ImportName = $paramsForDeviceBulkImport.ImportName
+    Instance   = $paramsForDeviceBulkImport.Instance
+    BatchSize  = $paramsForDeviceBulkImport.BatchSize
+    }
+
+    # Convert selected parameters to JSON for logging
+    $selectedParamsJson = $selectedParamsForLogging | ConvertTo-Json
+    Add-LogEntry -Entry "Selected Parameters for Device Bulk Import: `n$selectedParamsJson" -SendToJuriba $false
+
     exit
     }
     

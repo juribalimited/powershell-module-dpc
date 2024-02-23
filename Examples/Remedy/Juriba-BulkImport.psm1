@@ -12,7 +12,7 @@ function Invoke-JuribaBulkImportDeviceFeedDataTable{
     .Parameter APIKey
     The APIKey for a user with access to the required resources.
 
-    .Parameter FeedName
+    .Parameter ImportName
     The name of the feed to be searched for and used.
 
     .Parameter ImportId
@@ -34,41 +34,45 @@ function Invoke-JuribaBulkImportDeviceFeedDataTable{
     Param (
         [parameter(Mandatory=$True)]
         [string]$Instance,
+
         [Parameter(Mandatory=$True)]
         [System.Data.DataTable]$JuribaDeviceDataTable,
+
         [Parameter(Mandatory=$True)]
         [string]$APIKey,
-        [parameter(Mandatory=$False)]
-        [string]$ImportId,
+
+        [parameter(Mandatory=$True)]
+        [string]$ImportName,
+
         [parameter(Mandatory=$False)]
         [array]$CustomFields = @(),
+
         [parameter(Mandatory=$False)]
         [int]$BatchSize = 1000
     )
 
+#Requires -Module @{ModuleName="Juriba.Platform"; ModuleVersion="0.0.52.0"}
 # Get Juriba Device Feed
-$Devicefeed = Get-JuribaImportDeviceFeed @JuribaParams -Name $DeviceImportName 
+$Devicefeed = Get-JuribaImportDeviceFeed @JuribaParams -Name $ImportName 
+Add-LogEntry -Entry "Devicefeed: $Devicefeed"
+Add-LogEntry -Entry "ImportName: $ImportName"
 
 # If it doesn't exist, create it
 if (-Not $Devicefeed) {
-    $Devicefeed = New-JuribaImportDeviceFeed @JuribaParams -Name $DeviceImportName -Enabled $true
+    $Devicefeed = New-JuribaImportDeviceFeed @JuribaParams -Name $ImportName -Enabled $true
     Add-LogEntry -Entry "Device Import Doesn't exists, creating feed." 
 }
+
 $DeviceImportID = $Devicefeed.id
 Add-LogEntry -Entry "DeviceImportID: $DeviceImportID"  
 
 
 # Remove previous device feed data
-try {Remove-JuribaImportDeviceFeedAllItem @JuribaParams -ImportId $DeviceImportID -Confirm:$false -ErrorVariable apiError
+try {Remove-DwImportDeviceFeedAllItem @JuribaParams -ImportId $DeviceImportID -Confirm:$false 
 
 } catch {
     Add-LogEntry -Entry "Error removing device feed: $($_.Exception.Message)"  -JuribaLogLevel Fatal
-    if ($apiError) {
-        # Log detailed error info
-        Add-LogEntry -Entry "API Error: $($apiError | ConvertTo-Json -Depth 10)" 
         }
-    return
-    }
 
 
     $Postheaders = @{
@@ -76,8 +80,20 @@ try {Remove-JuribaImportDeviceFeedAllItem @JuribaParams -ImportId $DeviceImportI
         "X-API-KEY" = "$APIKey"
     }
 
+
+    # Log the parameters
+Add-LogEntry -Entry "WriteToConsole: $WriteToConsole"  -SendToJuriba $false
+Add-LogEntry -Entry "Instance: $Instance"  -SendToJuriba $false
+Add-LogEntry -Entry "APIKey: $APIKey"  -SendToJuriba $false
+Add-LogEntry -Entry "DeviceImportName: $ImportName" 
+Add-LogEntry -Entry "CustomFields: $CustomFields" 
+Add-LogEntry -Entry "BatchSize: $BatchSize" 
+Add-LogEntry -Entry "Instance: $Instance" 
+Add-LogEntry -Entry "deviceImportId: $deviceImportId" 
+
    # Call the endpoint directly
-$uri = '{0}/apiv2/imports/devices/{1}/items/$bulk' -f $Instance, $ImportId
+$uri = '{0}/apiv2/imports/devices/{1}/items/$bulk' -f $Instance, $deviceImportId
+Add-LogEntry -Entry "uri: $uri" -SendToJuriba $false
 $ExcludeProperty = @("ItemArray", "Table", "RowError", "RowState", "HasErrors")
 if ($CustomFields.count -gt 0) {
     $ExcludeProperty += $CustomFields
@@ -118,6 +134,7 @@ foreach ($Row in $JuribaDeviceDataTable.Rows) {
         } catch {
             $timeNow = (Get-date -Format 'o')
             Add-LogEntry -Entry "$timeNow; Error during bulk upload: $($_.Exception.Message)" -JuribaLogLevel "Error"
+            Add-LogEntry -Entry "uri: $uri" -SendToJuriba $false
         }
         $BulkUploadObject = @()
     }
@@ -140,8 +157,8 @@ function Invoke-JuribaBulkImportUserFeedDataTable{
     .Parameter APIKey
     The APIKey for a user with access to the required resources.
 
-    .Parameter ImportId
-    The id of the user feed to be used.
+    .Parameter ImportName
+    The name of the feed to be searched for and used.
 
     .Parameter JuribaDataTable
     [System.Data.DataTable] Data table containing the fields required to insert data into the Juriba user API.
@@ -166,11 +183,8 @@ function Invoke-JuribaBulkImportUserFeedDataTable{
         [Parameter(Mandatory=$True)]
         [string]$APIKey,
 
-        [parameter(Mandatory=$False)]
-        [string]$FeedName = $null,
-
-        [parameter(Mandatory=$False)]
-        [string]$ImportId,
+        [parameter(Mandatory=$True)]
+        [string]$ImportName,
 
         [parameter(Mandatory=$False)]
         [array]$CustomFields = @(),
@@ -179,13 +193,20 @@ function Invoke-JuribaBulkImportUserFeedDataTable{
         [int]$BatchSize = 500
     )
 
+    
+    $Postheaders = @{
+        "X-API-KEY" = $APIKey
+        "Content-Type" = "application/json"
+    }
+    
 
+    
 # Get Juriba User Feed
-$Userfeed = Get-JuribaImportUserFeed @JuribaParams -Name $UserImportName
+$Userfeed = Get-JuribaImportUserFeed @JuribaParams -Name $ImportName
 
 # If it doesn't exist, create it
 if (-Not $Userfeed) {
-    $Userfeed = New-JuribaImportUserFeed @JuribaParams -Name $UsersviceImportName -Enabled $true
+    $Userfeed = New-JuribaImportUserFeed @JuribaParams -Name $ImportName -Enabled $true
     Add-LogEntry -Entry "User Import Doesn't exists, creating feed." 
 }
 $UserImportID = $Userfeed.id
@@ -193,28 +214,22 @@ Add-LogEntry -Entry "UserImportID: $UserImportID"
 
 
 # remove previous user feed data
-try {Remove-JuribaImportUserFeedAllItem @JuribaParams -ImportId $UserImportID -Confirm:$false -ErrorVariable apiError 
+try {Remove-JuribaImportUserFeedAllItem @JuribaParams -ImportId $UserImportID -Confirm:$false 
 } catch {
-    Add-LogEntry -Entry "Error removing user feed: $($_.Exception.Message)"  -JuribaLogLevel Fatal
-    if ($apiError) {
-        # Log detailed error info
-        Add-LogEntry -Entry "API Error: $($apiError | ConvertTo-Json -Depth 10)" 
-        }
-    exit
-    }
+    Add-LogEntry -Entry "Error removing user feed: $($_.Exception.Message)"  
+       }
 
-    $Postheaders = @{
-        "content-type" = "application/json"
-        "X-API-KEY" = "$APIKey"
-    }
+# Log the parameters
+Add-LogEntry -Entry "WriteToConsole: $WriteToConsole"  -SendToJuriba $false
+Add-LogEntry -Entry "Instance: $Instance"  -SendToJuriba $false
+Add-LogEntry -Entry "APIKey: $APIKey"  -SendToJuriba $false
+Add-LogEntry -Entry "UserImportName: $ImportName" 
+Add-LogEntry -Entry "CustomFields: $CustomFields" 
+Add-LogEntry -Entry "BatchSize: $BatchSize" 
 
-    $Postheaders = @{
-        "content-type" = "application/json"
-        "X-API-KEY" = "$APIKey"
-    }
-    
+
     # Call the endpoint directly
-    $uri = '{0}/apiv2/imports/users/{1}/items/$bulk' -f $Instance, $ImportId
+    $uri = '{0}/apiv2/imports/users/{1}/items/$bulk' -f $Instance, $UserImportId
     $ExcludeProperty = @("ItemArray", "Table", "RowError", "RowState", "HasErrors")
     if ($CustomFields.count -gt 0) {$ExcludeProperty += $CustomFields}
     
@@ -253,11 +268,12 @@ try {Remove-JuribaImportUserFeedAllItem @JuribaParams -ImportId $UserImportID -C
             } catch {
                 $timeNow = (Get-date -Format 'o')
                 Add-LogEntry -Entry "$timeNow; Error during bulk upload: $($_.Exception.Message)" -JuribaLogLevel "Error"
+                Add-LogEntry -Entry "uri: $uri" -SendToJuriba $false
             }
             $BulkUploadObject = @()
         }
     }
-    # Assuming you are returning a count of processed rows or similar
+    # Return a count of processed rows
     Return ("{0} users sent" -f $JuribaUserDataTable.Rows.Count)
 }
     
