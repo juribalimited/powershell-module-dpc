@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.Platform.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.0.53.0'
+    ModuleVersion     = '0.0.54.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -158,9 +158,9 @@
         'Remove-JuribaImportApplicationFeed',
         'Remove-JuribaImportDepartment',
         'Remove-JuribaImportDepartmentFeed',
-        'Remove-JuribaImportDepartmentFeedAllItem',
         'Remove-JuribaImportDevice',
         'Remove-JuribaImportDeviceFeed',
+        'Remove-JuribaImportDeviceFeedAllItem',
         'Remove-JuribaImportLocation',
         'Remove-JuribaImportLocationFeed',
         'Remove-JuribaImportLocationFeedAllItem',
