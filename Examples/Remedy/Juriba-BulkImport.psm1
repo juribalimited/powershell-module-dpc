@@ -51,7 +51,7 @@ function Invoke-JuribaBulkImportDeviceFeedDataTable{
         [int]$BatchSize = 1000
     )
 
-#Requires -Module @{ModuleName="Juriba.Platform"; ModuleVersion="0.0.52.0"}
+#Requires -Module @{ModuleName="Juriba.Platform"; ModuleVersion="0.0.54.0"}
 # Get Juriba Device Feed
 $Devicefeed = Get-JuribaImportDeviceFeed @JuribaParams -Name $ImportName 
 Add-LogEntry -Entry "Devicefeed: $Devicefeed"

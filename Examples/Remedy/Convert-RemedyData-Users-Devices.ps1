@@ -31,7 +31,6 @@ Ensure that the Juriba instance API endpoint, API key, and feed names are correc
 The script includes error handling to log and exit gracefully in case of encountered errors during the import process.
 
 #>
-<#
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)]
@@ -52,16 +51,9 @@ param(
     [Parameter(Mandatory=$true)]
     [bool]$WriteToConsole = $true
 )
-#>
 
-Import-Module -Name Juriba.Platform -RequiredVersion 0.0.52.0
 
-$JuribaApiEndpoint = "https://dw-noel-demo.dwlabs.local:8443" 
-$JuribaAPIKey = "oo3qcwyR7em7c4Z6aIRDpH4WzkO/Ua4pbU0suz66mBzZZinE+AgkL3OTHAvXqHRm5YtNBOz9BnCFxBd/5EaZLw==" 
-$UserImportName = "Remedy Users"
-$DeviceImportName = "Remedy Devices" 
-$jsonFilePath = "F:\Projects\Remedy\SampleData\remedy_data.json"
-$WriteToConsole = $true # Switch logging so it also creates a console entry for faster debugging
+Import-Module -Name Juriba.Platform -RequiredVersion 0.0.54.0
 
 # Define $JuribaParams globally
 $global:JuribaParams = @{
