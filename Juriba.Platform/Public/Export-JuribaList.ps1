@@ -40,7 +40,9 @@ function Export-JuribaList {
         [int]$ListId,
         [Parameter(Mandatory = $true)]
         [ValidateSet("Device", "User", "Application", "Mailbox", "DeviceApplication", "UserApplication")]
-        [string]$ObjectType
+        [string]$ObjectType,
+        [Parameter(Mandatory=$false)]
+        [int]$PageSize
     )
 
     $path = switch($ObjectType) {
@@ -58,13 +60,33 @@ function Export-JuribaList {
     }
 
     if ($APIKey -and $Instance) {
-        $uri = '{0}/apiv1/{1}?$listid={2}' -f $Instance, $path, $ListId
+        if ($PageSize -gt 0)
+        {
+            $uri = '{0}/apiv1/{1}?$top={2}&$skip=0&$listid={3}' -f $Instance, $path, $PageSize ,$ListId
+        }
+        else
+        {
+            $uri = '{0}/apiv1/{1}?$listid={2}' -f $Instance, $path, $ListId
+        }
         $headers = @{'x-api-key' = $APIKey}
-    
+
         try {
             $response = Invoke-WebRequest -uri $uri -Headers $headers -Method GET
             $results = ($response.Content | ConvertFrom-Json).results
             $metadata = ($response.Content | ConvertFrom-Json).metadata
+
+            if($metadata.count -gt $PageSize -and $PageSize -gt 0)
+            {
+                #More rows to process
+                for($i=1 ;$i -le [Math]::Floor(($metadata.count)/$PageSize);$i++)
+                {
+                    $uri = '{0}/apiv1/{1}?$top={2}&$skip={3}&keySetID={4}&$listid={5}' -f $Instance, $path, $PageSize, ($PageSize*$i), ($metadata.keySetId), $ListId
+                    $response = Invoke-WebRequest -uri $uri -Headers $headers -Method GET
+                    $results += ($response.Content | ConvertFrom-Json).results
+                }
+            }
+
+
             #check for an error in the metadata
             if ($metadata.errorMessage) {
                 throw $metadata.errorMessage
