@@ -56,7 +56,6 @@ foreach ($line in $csvFile) {
     $i++
     # convert line to json
     $jsonBody = $line | ConvertTo-Json
-    $jsonBody
     $groupname = $line.Name
     Write-Progress -Activity "Importing groups to Juriba Platform" -Status ("Processing group: {0}" -f $groupname) -PercentComplete (($i/$csvFile.Count*100))
 
