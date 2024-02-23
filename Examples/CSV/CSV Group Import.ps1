@@ -41,7 +41,7 @@ $DashworksParams = @{
 # Get Juriba User Import feed
 $feed = Get-JuribaImportUserFeed @DashworksParams -Name $JuribaFeedName
 # If it doesnt exist, create it
-if (-Not $feed.id) {
+if (-Not $feed) {
     $feed = New-JuribaImportUserFeed @DashworksParams -Name $JuribaFeedName -Enabled $true
 }
 $importId = $feed.id
@@ -56,25 +56,21 @@ foreach ($line in $csvFile) {
     # convert line to json
     $jsonBody = $line | ConvertTo-Json
     $groupname = $line.Name
-    $groupidentifier = $line.UniqueIdentifier
     Write-Progress -Activity "Importing groups to Juriba Platform" -Status ("Processing group: {0}" -f $groupname) -PercentComplete (($i/$csvFile.Count*100))
 
     $existinggroup = Get-JuribaImportGroup @DashworksParams -ImportId $importId -Name $groupname -ErrorAction SilentlyContinue 
     if ($existinggroup) {
-        Write-Information ("Updating existing group: {0}" -f $groupname) -InformationAction Continue
-        $updatedJsonBody = ($jsonBody | ConvertFrom-Json) | Select-Object -ExcludeProperty UniqueIdentifier
-        $result = Set-JuribaImportGroup @DashworksParams -ImportId $importId -UniqueIdentifier $groupidentifier -JsonBody ($updatedJsonBody | ConvertTo-Json)
+        $result = Set-JuribaImportGroup @DashworksParams -ImportId $importId -UniqueIdentifier $groupname -JsonBody $jsonBody
         # check result, for an update we are expecting status code 204
         if ($result.StatusCode -ne 204) {
             Write-Error $result
         }
     }
     else {
-        Write-Information ("Creating new group: {0}" -f $groupname) -InformationAction Continue
         $result = New-JuribaImportGroup @DashworksParams -ImportId $importId -JsonBody $jsonBody
         #check result, for a new group we expect the return object to contain the group
-        if (-Not $result.name) {
-            Write-Error "Group not created successfully."
+        if (-Not $result.groupname) {
+            Write-Error $result
         }
     }
 }
