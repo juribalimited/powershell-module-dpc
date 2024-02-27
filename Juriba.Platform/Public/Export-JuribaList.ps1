@@ -24,9 +24,15 @@ function Export-JuribaList {
 
         Object type of the list. One of Device, User, Application, Mailbox
 
+        .PARAMETER PageSize
+        When a value greater than 0 is provided for the PageSize parameter, 
+        the function constructs the API request URI to include query parameters that limit the number of items returned ($top) and specify the offset for the items to be fetched ($skip). 
+
         .EXAMPLE
 
         PS> Export-JuribaList -ListId 1234 -ObjectType Device -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        Export-JuribaList -ListId 1234 -ObjectType Device -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -PageSize 100
+
     #>
 
     [CmdletBinding()]
