@@ -313,6 +313,7 @@ Function Convert-DwAPIDeviceFromInTune($IntuneDataTable){
 Function Convert-DwAPIUserFromAzure($AzureDataTable){
     [OutputType([System.Data.DataTable])]
     $dataTable = New-Object System.Data.DataTable
+    $dataTable.Columns.Add("uniqueIdentifier", [string]) | Out-Null
     $dataTable.Columns.Add("username", [string]) | Out-Null
     $dataTable.Columns.Add("commonObjectName", [string]) | Out-Null
     $dataTable.Columns.Add("displayName", [string]) | Out-Null
@@ -329,6 +330,7 @@ Function Convert-DwAPIUserFromAzure($AzureDataTable){
     {
         $NewRow = $null
         $NewRow = $dataTable.NewRow()
+        $NewRow.uniqueIdentifier = $Row.userPrincipalName
         $NewRow.username = $Row.userPrincipalName
         $NewRow.commonObjectName = $Row.userPrincipalName
         $NewRow.displayName = $Row.displayName
