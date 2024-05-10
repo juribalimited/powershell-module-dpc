@@ -103,6 +103,7 @@ Function Get-AzDataTable{
     Param (
         [parameter(Mandatory=$True)]
         [string]$accessToken,
+
         [parameter(Mandatory=$True)]
         [string]$GraphEndpoint
     )
@@ -110,59 +111,78 @@ Function Get-AzDataTable{
     <#
     .Synopsis
     Get a datatable containing all data returned by the endpoint.
+
     .Description
     Uses the /Graph endpoint to pull all information into a data table for insersion into a SQL database.
+
     .Parameter accessToken
     The access token for the session you are pulling information from.
+
     .Parameter GraphEndpoint
     The Graph endpoint you are pulling information from.
+
     .Outputs
     Output type [system.data.datatable]
     A datatable containing all of the rows returned by the /deviceManagement/managedDevices Graph API Endpoint.
+
     .Notes
     Any nested data returned by Azure will be pushed into the data table as a string containing the nested JSON.
+
     .Example
     # Get the InTune data for the access token passed.
     $dtInTuneData = Get-IntuneDevices -accessToken $AccessToken
     #>
 
     [OutputType([PSObject])]
+
     $dtResults = New-Object System.Data.DataTable
+
     $uri=$GraphEndpoint
+
     $CreateTable = $True
+
     Do
     {
-        $GraphData = Invoke-RestMethod -Headers @{Authorization = "Bearer $($accessToken)" } -Uri $uri -Method Get -MaximumRetryCount 3 -RetryIntervalSec 10
-        $ScriptBlock=$null
-        foreach($object_properties in $($GraphData.Value[0] | Get-Member | where-object{($_.MemberType -eq "NoteProperty") -and ($_.Name -ne '@odata.type')}))
-        {
-            if($CreateTable)
-            {
-                $DataType = switch ($object_properties.Definition.substring(0,$object_properties.Definition.IndexOf(' ')))
-                {
-                    'datetime' {'datetime'}
-                    'bool' {'boolean'}
-                    'long' {'int64'}
-                    'string' {'string'}
-                    'object' {'string'}
-                    default {'string'}
-                }
-                $dtResults.Columns.Add($object_properties.Name,$datatype) | Out-Null
-            }
-            $ScriptBlock += 'if ($entry.' + $object_properties.Name + ' -ne $null) {if ($entry.' + $object_properties.Name + '.Value -ne $null) { $DataRow.' + $object_properties.Name + ' = $entry.' + $object_properties.Name + '.Value }else{ if ($entry.' + $object_properties.Name + '.GetType().Name -eq "Object[]") { $DataRow.' + $object_properties.Name + ' = ($entry.' + $object_properties.Name + ' | ConvertTo-JSON).ToString() } else { $DataRow.' + $object_properties.Name + ' = $entry.' + $object_properties.Name + ' } } } else {$DataRow.' + $object_properties.Name + " = [DBNULL]::Value}`n"
-        }
-        $CreateTable = $False #After the first iteration, don't try to add the data columns
-        $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($ScriptBlock)
+        $GraphData = Invoke-RestMethod -Headers @{Authorization = "Bearer $($accessToken)" } -Uri $uri -Method Get -Proxy $Proxy -MaximumRetryCount 3 -RetryIntervalSec 10
 
-        foreach($entry in $GraphData.Value)
+        $ScriptBlock=$null
+
+        foreach($entry in $GraphData.Value) 
         {
+            $ScriptBlock=$null
+
+            foreach($object_properties in $($entry | Get-Member | where-object{($_.MemberType -eq "NoteProperty") -and ($_.Name -ne '@odata.type')}))
+            {
+                if($dtResults.Columns.contains($object_properties))
+                {
+                    $DataType = switch ($object_properties.Definition.substring(0,$object_properties.Definition.IndexOf(' ')))
+                    {
+                        'datetime' {'datetime'}
+                        'bool' {'boolean'}
+                        'long' {'int64'}
+                        'string' {'string'}
+                        'object' {'string'}
+                        default {'string'}
+                    }
+                    $dtResults.Columns.Add($object_properties.Name,$datatype) | Out-Null
+                }
+
+                $ScriptBlock += 'if ($entry.' + $object_properties.Name + ' -ne $null) {if ($entry.' + $object_properties.Name + '.Value -ne $null) { $DataRow.' + $object_properties.Name + ' = $entry.' + $object_properties.Name + '.Value }else{ if ($entry.' + $object_properties.Name + '.GetType().Name -eq "Object[]") { $DataRow.' + $object_properties.Name + ' = ($entry.' + $object_properties.Name + ' | ConvertTo-JSON).ToString() } else { $DataRow.' + $object_properties.Name + ' = $entry.' + $object_properties.Name + ' } } } else {$DataRow.' + $object_properties.Name + " = [DBNULL]::Value}`n"
+            }
+
+            $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($ScriptBlock)
+
             $DataRow = $dtResults.NewRow()
+
             & $ScriptBlock
+
             $dtResults.Rows.Add($DataRow)
+ 
         }
         $uri = $GraphData.'@odata.nextLink'
     }
     while ($null -ne $GraphData.'@odata.nextLink')
+
     return @(,($dtResults))
 }
 Function Convert-DwImportManagedAppsFromInTune($IntuneAppTable){
