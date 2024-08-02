@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.Platform.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.0.54.0'
+    ModuleVersion     = '0.0.55.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -151,6 +151,7 @@
         'Remove-JuribaAutomation',
         'Remove-JuribaBucket',
         'Remove-JuribaCapacitySlot',
+        'Remove-JuribaCapacityUnit',
         'Remove-JuribaCustomField',
         'Remove-JuribaDashboard',
         'Remove-JuribaEvergreenSelfServicePortal',
@@ -179,6 +180,7 @@
         'Set-JuribaAutomationAction',
         'Set-JuribaBucket',
         'Set-JuribaCapacitySlot',
+        'Set-JuribaCapacityUnit',
         'Set-JuribaDashboardSection',
         'Set-JuribaDashboardWidgetColour',
         'Set-JuribaEvergreenSelfService',

@@ -186,7 +186,7 @@ function Set-JuribaCapacitySlot {
         $headers = @{ 'X-API-KEY' = $ApiKey }
         $uri = "{0}/apiv1/admin/projects/{1}/updateCapacitySlot" -f $Instance, $ProjectID
     
-        if ($PSCmdlet.ShouldProcess($Name)) {
+        if ($PSCmdlet.ShouldProcess($SlotName)) {
             $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -Method PUT -ContentType $contentType
             return ($result.Content | ConvertFrom-Json).message
         }
