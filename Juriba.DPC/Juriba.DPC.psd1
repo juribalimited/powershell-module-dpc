@@ -203,6 +203,7 @@
         'Set-JuribaTeam',
         'Start-JuribaETLJob',
         'Stop-JuribaETLJob',
+        'Update-ApplicationOwner',
         'Update-JuribaCustomFieldValue'
     )
 
