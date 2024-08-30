@@ -1,16 +1,16 @@
 # Send Apps to App Owner
 
-The purpose of this script is to automate the process of exporting applications / users from DPC for use in Application Owner.
+This script automates the process of exporting applications and users from DPC for use in Application Owner.
 
 ## Requirements
 
-To be able to perform the export / import process you will require API keys for both DPC and AOM.
+To perform the export/import process, you will need API keys for both DPC and AOM.
 
 ## Limits
 
-The import process is limited to a maximum of 10,000 applications in a single batch.  If there are more than 10,000 applications in your DPC instance you will need to process them in batches.
+The import process is limited to a maximum of 10,000 applications in a single batch. If there are more than 10,000 applications in your DPC instance, you will need to process them in multiple batches.
 
-If you only have a trial license for AOM then you are limited to a maximum of 100 users.  If an export / import process increases the user count to the limit then it will be aborted preventing any more applications being imported.
+If you have a trial licence for AOM, you are restricted to 100 users during the trial. Your cannot run an import if it would cause your account to exceed this limit.
 
 ### Usage
 
@@ -29,16 +29,16 @@ The following optional parameters can also be provided:
 |-----------|-------------|-------------------------|------------|
 | InputBatchLength | The maximum number of records returned in a single call to DPC | 10,000 | Must be between 1 & 10,000 |
 | InputBatchStartOffset | The offset within the initial batch to start from, can be used to skip previously processed data | 0 | Must be >= 0 | 
-| InputBatchLimit | The number of applications to process | 0 | Must be >= 0 and no less than `InputBatchStartOffset` |
+| InputBatchLimit | The maximum number of applications to process, or 0 for all | 0 | Must be >= 0 |
 | OutputBatchLength | The maximum number of records sent in a single call to AOM | 10,000 | Must be between 1 & 10,000 |
 
 #### Example Command Line
-```
+```powershell
 .\SendAppsToAppOwner.ps1 https://master.internal.juriba.com:8443 pCyty***** https://ao-uat.eu.juriba.app hoF7k***** 
 ```
 
-N.B.  Errors are logged to the error stream so they can be captured to a file by redirecting std err.
+Note: errors are logged to the error stream so they can be captured to a file if desired.
 
-```
+```powershell
 .\SendAppsToAppOwner.ps1 https://master.internal.juriba.com:8443 pCyty***** https://ao-uat.eu.juriba.app hoF7k***** 2>err.log
 ```

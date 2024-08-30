@@ -28,7 +28,7 @@ param (
             throw "Value must be greater than or equal to 0."
         }
     })]
-    [int]$InputBatchLimit = 0,
+    [int]$MaximumAppsToImport = 0,
     [Parameter(Mandatory=$false)]
     [ValidateRange(1, 10000)]
     [int]$OutputBatchLength = 10000
@@ -64,9 +64,6 @@ $results = @()
 # Loop until no more data is returned from the REST call or the limit is reached
 do {
     $BatchLength = $InputBatchLength
-    if ($InputBatchLimit -gt 0 -and $InputBatchStartOffset + $BatchLength -gt $InputBatchLimit) {
-        $BatchLength = $InputBatchLimit - $InputBatchStartOffset
-    }
     Write-Host "Fetching next $BatchLength records from DPC, starting from $InputBatchStartOffset"
     # Build the URI with the dynamic parameters
     $uri = "$DpcInstance/apiv1/applications?`$top=$BatchLength&`$skip=$InputBatchStartOffset&`$select=packageName,packageManufacturer,packageVersion,ownerEMailAddress,ownerDisplayName,ownerDistinguishedName,ownerCommonName"
@@ -76,11 +73,14 @@ do {
         'X-Api-Key' = $DpcApiKey
     }
     # Append the results defined in the JSON to the existing results array
-    $results += $jsonResponse.results | ForEach-Object {
+    $jsonResponse.results | ForEach-Object {
         # Perform the projection here
         # Example: Select specific properties from the JSON response
-        if (![string]::IsNullOrEmpty($_.packageName)) {
-            [PSCustomObject]@{
+        if ($MaximumAppsToImport -ne 0 -and $results.Count -ge $MaximumAppsToImport) {
+            break
+        }
+        elseif (![string]::IsNullOrEmpty($_.packageName)) {
+            $results += [PSCustomObject]@{
                 packageName = $_.packageName
                 packageManufacturer = if ($_.packageManufacturer) { $_.packageManufacturer } else { "Unknown" }
                 packageVersion = if ($_.packageVersion) { $_.packageVersion } else { "Unknown" }
@@ -94,7 +94,7 @@ do {
 
     # Increment the InputBatchStartOffset by BatchLength for the next iteration
     $InputBatchStartOffset += $BatchLength
-} while ($jsonResponse.results -and ($InputBatchLimit -eq 0 -or $results.Count -lt $InputBatchLimit))
+} while ($jsonResponse.results -and ($MaximumAppsToImport -eq 0 -or $results.Count -lt $MaximumAppsToImport))
 
 # Group the results by packageName
 $groupedResults = $results | Group-Object -Property packageName
