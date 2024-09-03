@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'Juriba.Platform/**'
+      - 'Juriba.DPC/**'
 
 jobs:
   scriptanalyzer:
@@ -17,5 +17,5 @@ jobs:
         run: Install-Module PSScriptAnalyzer -Force
         shell: pwsh
       - name: 'Run PSScriptAnalyzer'
-        run: Invoke-ScriptAnalyzer -Path .\Juriba.Platform -Recurse -EnableExit -ExcludeRule PSAvoidTrailingWhitespace | Format-List -Property ScriptName, RuleName, Severity, Line, Column, Message
+        run: Invoke-ScriptAnalyzer -Path .\Juriba.DPC -Recurse -EnableExit -ExcludeRule PSAvoidTrailingWhitespace | Format-List -Property ScriptName, RuleName, Severity, Line, Column, Message
         shell: pwsh
