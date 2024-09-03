@@ -9,10 +9,10 @@
 @{
 
     # Script module or binary module file associated with this manifest.
-    RootModule        = 'Juriba.Platform.psm1'
+    RootModule        = 'Juriba.DPC.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.0.55.0'
+    ModuleVersion     = '1.0.0.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -30,7 +30,7 @@
     Copyright         = '(c) Juriba. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description       = 'PowerShell Module to interact with Juriba Platform.'
+    Description       = 'PowerShell Module to interact with Juriba DPC.'
 
     # Minimum version of the PowerShell engine required by this module
     # PowerShellVersion = ''
@@ -174,7 +174,7 @@
         'Remove-JuribaList',
         'Remove-JuribaTag',
         'Remove-JuribaTaskValueDate',
-		'Remove-JuribaTaskValueText',
+		    'Remove-JuribaTaskValueText',
         'Remove-JuribaTeam',
         'Set-JuribaAutomation',
         'Set-JuribaAutomationAction',
@@ -233,13 +233,13 @@
             # Tags = @()
 
             # A URL to the license for this module.
-            LicenseUri = 'https://raw.githubusercontent.com/juribalimited/powershell-module-platform/main/LICENSE'
+            LicenseUri = 'https://raw.githubusercontent.com/juribalimited/powershell-module-dpc/main/LICENSE'
 
             # A URL to the main website for this project.
-            ProjectUri = 'https://github.com/juribalimited/powershell-module-platform'
+            ProjectUri = 'https://github.com/juribalimited/powershell-module-dpc'
 
             # A URL to an icon representing this module.
-            IconUri    = 'https://raw.githubusercontent.com/juribalimited/powershell-module-platform/main/resources/juriba_logo.jpeg'
+            IconUri    = 'https://raw.githubusercontent.com/juribalimited/powershell-module-dpc/main/resources/juriba_logo.jpeg'
 
             # ReleaseNotes of this module
             # ReleaseNotes = ''
