@@ -35,7 +35,7 @@ param (
 )
 
 #Requires -Version 7
-#Requires -Module @{ ModuleName = 'Juriba.Platform'; ModuleVersion = '0.0.56.0' }
+#Requires -Module @{ ModuleName = 'Juriba.DPC'; ModuleVersion = '1.0.0.1' }
 
 Update-ApplicationOwner `
     -DpcInstance $DpcInstance `

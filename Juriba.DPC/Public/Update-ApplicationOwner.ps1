@@ -131,9 +131,11 @@ function Update-ApplicationOwner {
         $packageName = $group.Name
         $groupedApps = $group.Group
         $uniqueManufacturers = $groupedApps | Select-Object -ExpandProperty packageManufacturer -Unique
-        $manufacturerCount = $uniqueManufacturers.Count
-        if ($manufacturerCount -gt 1) {
-            Write-Debug "More than one manufacturer found for package $packageName."
+        if (($uniqueManufacturers).GetType() -ne [String]) {
+            $manufacturerCount = $uniqueManufacturers.Count
+            if ($manufacturerCount -gt 1) {
+                Write-Debug "More than one manufacturer found for package $packageName."
+            }
         }
     }
 
