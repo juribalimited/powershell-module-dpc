@@ -35,9 +35,9 @@ function Update-ApplicationOwner {
         [Parameter(Mandatory=$true)]
         [string]$DpcApiKey,
         [Parameter(Mandatory=$true)]
-        [string]$AoInstance,
-        [Parameter(Mandatory=$true)]
         [string]$AoApiKey,
+        [Parameter(Mandatory=$false)]
+        [string]$AoInstance = "https://ao.juriba.com",
         [Parameter(Mandatory=$false)]
         [ValidateRange(1, 10000)]
         [int]$InputBatchLength = 10000,

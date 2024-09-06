@@ -20,13 +20,13 @@ The script `UpdateAppOwner.ps1` should be executed with the following mandatory 
 |-----------|-------------|---------------|
 | DpcInstance | The DPC instance to export from | https://master.internal.juriba.com:8443 |
 | DpcApiKey | A valid API key for your DPC instance | pCyty***** |
-| AppOwnerInstance | The App Owner instance to import to | https://ao-uat.eu.juriba.app |
 | AppOwnerApiKey | A valid API key for your App Owner tenant | hoF7k***** |
 
 The following optional parameters can also be provided:
 
 | Parameter | Description | Default if not provided | Validation |
 |-----------|-------------|-------------------------|------------|
+| AppOwnerInstance | The App Owner instance to import to | https://ao.juriba.com | |
 | InputBatchLength | The maximum number of records returned in a single call to DPC | 10,000 | Must be between 1 & 10,000 |
 | InputBatchStartOffset | The offset within the initial batch to start from, can be used to skip previously processed data | 0 | Must be >= 0 | 
 | MaximumAppsToImport | The maximum number of applications to process, or 0 for all | 0 | Must be >= 0 |
@@ -34,11 +34,11 @@ The following optional parameters can also be provided:
 
 #### Example Command Line
 ```powershell
-.\UpdateAppOwner.ps1 https://master.internal.juriba.com:8443 pCyty***** https://ao-uat.eu.juriba.app hoF7k***** 
+.\UpdateAppOwner.ps1 https://master.internal.juriba.com:8443 pCyty***** hoF7k***** 
 ```
 
 Note: errors are logged to the error stream so they can be captured to a file if desired.
 
 ```powershell
-.\UpdateAppOwner.ps1 https://master.internal.juriba.com:8443 pCyty***** https://ao-uat.eu.juriba.app hoF7k***** 2>err.log
+.\UpdateAppOwner.ps1 https://master.internal.juriba.com:8443 pCyty***** hoF7k***** 2>err.log
 ```
