@@ -1,5 +1,7 @@
 #Requires -Version 7
 
+$ErrorActionPreference = "Stop"
+
 function Update-ApplicationOwner {
     <#
 		.SYNOPSIS
@@ -78,7 +80,7 @@ function Update-ApplicationOwner {
         Write-Information "Trial is limited to $userLimit users, with $inUse already in use."
     }
 
-    $tenancyDetails = Invoke-RestMethod -Method Get -Uri "$AoInstance/api/tenant/$tenantId" -Headers @{'x-api-key' = $AoApiKey}
+    $tenancyDetails = Invoke-RestMethod -Method Get -Uri "$AoInstance/api/tenant/$tenantId/admin-settings" -Headers @{'x-api-key' = $AoApiKey}
     if ($null -eq $tenancyDetails.checkInIntervalInDays) {
         throw "Unable to obtain tenancy details for tenant $tenantId."
     }
@@ -130,12 +132,10 @@ function Update-ApplicationOwner {
     foreach ($group in $groupedResults) {
         $packageName = $group.Name
         $groupedApps = $group.Group
-        $uniqueManufacturers = $groupedApps | Select-Object -ExpandProperty packageManufacturer -Unique
-        if (($uniqueManufacturers).GetType() -ne [String]) {
-            $manufacturerCount = $uniqueManufacturers.Count
-            if ($manufacturerCount -gt 1) {
-                Write-Debug "More than one manufacturer found for package $packageName."
-            }
+        [array]$uniqueManufacturers = $groupedApps | Select-Object -ExpandProperty packageManufacturer -Unique
+        $manufacturerCount = $uniqueManufacturers.Count
+        if ($manufacturerCount -gt 1) {
+            Write-Debug "More than one manufacturer found for package $packageName."
         }
     }
 
@@ -173,7 +173,7 @@ function Update-ApplicationOwner {
             'Content-Type' = 'application/json'
         }
         try {
-            $batch = $aomData | Select-Object -Skip $OutputBatchOffset -First $OutputBatchLength
+            [array]$batch = $aomData | Select-Object -Skip $OutputBatchOffset -First $OutputBatchLength
             Write-Information "Uploading packages $($OutputBatchOffset + 1) to $($OutputBatchOffset + $batch.Count) of $($aomData.Count)"
             $response = Invoke-RestMethod -Method Post -Uri "$AoInstance/api/tenant/$tenantId/application/bulk-import" -Body (@{ "applications" = $batch } | ConvertTo-Json -Depth 5) -Headers $headers    
             Write-Information "  Status: $($response.imported) packages, $($response.failed) failed."
@@ -182,7 +182,9 @@ function Update-ApplicationOwner {
         catch {
             $response = $_ | ConvertFrom-Json -AsHashtable
             Write-Warning $response.title
-            Write-Warning "  $($response['detail'])."
+            if ($null -ne $response['detail']) {
+                Write-Warning "  $($response['detail'])."
+            }
             Write-Warning "There were $($response.errors.Keys.Count) errors."
             foreach ($Key in $response["errors"].Keys) {
                 foreach ($item in $response["errors"][$Key]) {

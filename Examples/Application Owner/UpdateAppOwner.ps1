@@ -37,6 +37,8 @@ param (
 #Requires -Version 7
 #Requires -Module @{ ModuleName = 'Juriba.DPC'; ModuleVersion = '1.0.0.1' }
 
+$InformationPreference = 'Continue'
+
 Update-ApplicationOwner `
     -DpcInstance $DpcInstance `
     -DpcApiKey $DpcApiKey `
@@ -45,5 +47,4 @@ Update-ApplicationOwner `
     -InputBatchLength $InputBatchLength `
     -InputBatchStartOffset $InputBatchStartOffset `
     -MaximumAppsToImport $MaximumAppsToImport `
-    -OutputBatchLength $OutputBatchLength `
-    -ErrorAction Stop
+    -OutputBatchLength $OutputBatchLength
