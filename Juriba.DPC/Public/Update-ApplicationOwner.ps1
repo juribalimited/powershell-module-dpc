@@ -124,7 +124,9 @@ function Update-ApplicationOwner {
         $InputBatchStartOffset += $BatchLength
     } while ($jsonResponse.results -and ($MaximumAppsToImport -eq 0 -or $results.Count -lt $MaximumAppsToImport))
 
-    if ($results.Count -gt 0) {
+    if ($results.Count -eq 0) {
+        Write-Information "No data found in DPC.  Upload terminated."
+    } else {
         # Group the results by packageName
         [array]$groupedResults = $results | Group-Object -Property packageName
 
@@ -202,7 +204,5 @@ function Update-ApplicationOwner {
         } else {
             Write-Information "Upload FAILED"
         }
-    }  else {
-        Write-Information "No data found in DPC.  Upload terminated."
     }
 }
