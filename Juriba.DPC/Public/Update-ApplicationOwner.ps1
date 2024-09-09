@@ -124,81 +124,85 @@ function Update-ApplicationOwner {
         $InputBatchStartOffset += $BatchLength
     } while ($jsonResponse.results -and ($MaximumAppsToImport -eq 0 -or $results.Count -lt $MaximumAppsToImport))
 
-    # Group the results by packageName
-    $groupedResults = $results | Group-Object -Property packageName
+    if ($results.Count -gt 0) {
+        # Group the results by packageName
+        [array]$groupedResults = $results | Group-Object -Property packageName
 
-    Write-Information "Fetched $($results.Count) results with $($groupedResults.Count) unique packages."
+        Write-Information "Fetched $($results.Count) results with $($groupedResults.Count) unique packages."
 
-    # Access the required properties from the grouped results
-    foreach ($group in $groupedResults) {
-        $packageName = $group.Name
-        $groupedApps = $group.Group
-        [array]$uniqueManufacturers = $groupedApps | Select-Object -ExpandProperty packageManufacturer -Unique
-        $manufacturerCount = $uniqueManufacturers.Count
-        if ($manufacturerCount -gt 1) {
-            Write-Debug "More than one manufacturer found for package $packageName."
-        }
-    }
-
-    # create JSON for import to aom using /api/tenant/{tenantId}/application/bulk-import
-    $aomData = @()
-    $users = @{}
-    foreach ($group in $groupedResults) {
-        $packageName = $group.Name
-        [array]$allVersions = $group.Group | Select-Object -ExpandProperty packageVersion -Unique | Where-Object { $_ -ne "Unknown" } | Sort-Object -Descending
-        if ($null -eq $allVersions) {
-            $highestVersion = "Unknown"
-        } else {
-            $highestVersion = $allVersions[0]
-        }
-        if ($users.ContainsKey($group.Group[0].ownerEMailAddress)) {
-            $users.Add($group.Group[0].ownerEMailAddress, $group.Group[0].ownerDisplayName)
-        }
-        
-        $aomData += [PSCustomObject]@{
-            name = $group.Name
-            manufacturer = $group.Group[0].packageManufacturer
-            currentVersion = $highestVersion
-            ownerEmail = $group.Group[0].ownerEMailAddress
-            ownerName = $group.Group[0].ownerDisplayName
-            ownerNotRequired = $false
-            checkInInterval = "$($tenancyDetails.checkInIntervalInDays)"
-        }
-    }
-
-    $OutputBatchOffset = 0
-    $Failed = $false
-    do {
-        $headers = @{
-            'x-api-key' = $AoApiKey
-            'Content-Type' = 'application/json'
-        }
-        try {
-            [array]$batch = $aomData | Select-Object -Skip $OutputBatchOffset -First $OutputBatchLength
-            Write-Information "Uploading packages $($OutputBatchOffset + 1) to $($OutputBatchOffset + $batch.Count) of $($aomData.Count)"
-            $response = Invoke-RestMethod -Method Post -Uri "$AoInstance/api/tenant/$tenantId/application/bulk-import" -Body (@{ "applications" = $batch } | ConvertTo-Json -Depth 5) -Headers $headers    
-            Write-Information "  Status: $($response.imported) packages, $($response.failed) failed."
-            $OutputBatchOffset += $OutputBatchLength
-        }
-        catch {
-            $response = $_ | ConvertFrom-Json -AsHashtable
-            Write-Warning $response.title
-            if ($null -ne $response['detail']) {
-                Write-Warning "  $($response['detail'])."
+        # Access the required properties from the grouped results
+        foreach ($group in $groupedResults) {
+            $packageName = $group.Name
+            $groupedApps = $group.Group
+            [array]$uniqueManufacturers = $groupedApps | Select-Object -ExpandProperty packageManufacturer -Unique
+            $manufacturerCount = $uniqueManufacturers.Count
+            if ($manufacturerCount -gt 1) {
+                Write-Debug "More than one manufacturer found for package $packageName."
             }
-            Write-Warning "There were $($response.errors.Keys.Count) errors."
-            foreach ($Key in $response["errors"].Keys) {
-                foreach ($item in $response["errors"][$Key]) {
-                    Write-Error -Message $item["message"] -ErrorAction Continue
+        }
+
+        # create JSON for import to aom using /api/tenant/{tenantId}/application/bulk-import
+        $aomData = @()
+        $users = @{}
+        foreach ($group in $groupedResults) {
+            $packageName = $group.Name
+            [array]$allVersions = $group.Group | Select-Object -ExpandProperty packageVersion -Unique | Where-Object { $_ -ne "Unknown" } | Sort-Object -Descending
+            if ($null -eq $allVersions) {
+                $highestVersion = "Unknown"
+            } else {
+                $highestVersion = $allVersions[0]
+            }
+            if ($users.ContainsKey($group.Group[0].ownerEMailAddress)) {
+                $users.Add($group.Group[0].ownerEMailAddress, $group.Group[0].ownerDisplayName)
+            }
+            
+            $aomData += [PSCustomObject]@{
+                name = $group.Name
+                manufacturer = $group.Group[0].packageManufacturer
+                currentVersion = $highestVersion
+                ownerEmail = $group.Group[0].ownerEMailAddress
+                ownerName = $group.Group[0].ownerDisplayName
+                ownerNotRequired = $false
+                checkInInterval = "$($tenancyDetails.checkInIntervalInDays)"
+            }
+        }
+
+        $OutputBatchOffset = 0
+        $Failed = $false
+        do {
+            $headers = @{
+                'x-api-key' = $AoApiKey
+                'Content-Type' = 'application/json'
+            }
+            try {
+                [array]$batch = $aomData | Select-Object -Skip $OutputBatchOffset -First $OutputBatchLength
+                Write-Information "Uploading packages $($OutputBatchOffset + 1) to $($OutputBatchOffset + $batch.Count) of $($aomData.Count)"
+                $response = Invoke-RestMethod -Method Post -Uri "$AoInstance/api/tenant/$tenantId/application/bulk-import" -Body (@{ "applications" = $batch } | ConvertTo-Json -Depth 5) -Headers $headers    
+                Write-Information "  Status: $($response.imported) packages, $($response.failed) failed."
+                $OutputBatchOffset += $OutputBatchLength
+            }
+            catch {
+                $response = $_ | ConvertFrom-Json -AsHashtable
+                Write-Warning $response.title
+                if ($null -ne $response['detail']) {
+                    Write-Warning "  $($response['detail'])."
                 }
+                Write-Warning "There were $($response.errors.Keys.Count) errors."
+                foreach ($Key in $response["errors"].Keys) {
+                    foreach ($item in $response["errors"][$Key]) {
+                        Write-Error -Message $item["message"] -ErrorAction Continue
+                    }
+                }
+                $Failed = $true
             }
-            $Failed = $true
-        }
-    } while (!$Failed -and $OutputBatchOffset -lt $aomData.Count);
+        } while (!$Failed -and $OutputBatchOffset -lt $aomData.Count);
 
-    if (!$Failed) {
-        Write-Information "Upload complete"
-    } else {
-        Write-Information "Upload FAILED"
+        if (!$Failed) {
+            Write-Information "Upload complete"
+        } else {
+            Write-Information "Upload FAILED"
+        }
+    }  else {
+        Write-Information "No data found in DPC.  Upload terminated."
     }
 }
