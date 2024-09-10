@@ -189,10 +189,12 @@ function Update-ApplicationOwner {
                 if ($null -ne $response['detail']) {
                     Write-Warning "  $($response['detail'])."
                 }
-                Write-Warning "There were $($response.errors.Keys.Count) errors."
-                foreach ($Key in $response["errors"].Keys) {
-                    foreach ($item in $response["errors"][$Key]) {
-                        Write-Error -Message $item["message"] -ErrorAction Continue
+                if ($null -ne $response['errors']) {
+                    Write-Warning "There were $($response.errors.Keys.Count) errors."
+                    foreach ($Key in $response["errors"].Keys) {
+                        foreach ($item in $response["errors"][$Key]) {
+                            Write-Error -Message $item["message"] -ErrorAction Continue
+                        }
                     }
                 }
                 $Failed = $true
