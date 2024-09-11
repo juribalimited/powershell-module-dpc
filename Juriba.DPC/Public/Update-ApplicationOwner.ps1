@@ -81,7 +81,7 @@ function Update-ApplicationOwner {
         Write-Information "Trial is limited to $userLimit users, with $inUse already in use."
     }
 
-    $tenancyDetails = Invoke-RestMethod -Method Get -Uri "$AoInstance/api/tenant/$tenantId" -Headers @{'x-api-key' = $AoApiKey}
+    $tenancyDetails = Invoke-RestMethod -Method Get -Uri "$AoInstance/api/tenant/$tenantId/admin-settings" -Headers @{'x-api-key' = $AoApiKey}
     if ($null -eq $tenancyDetails.checkInIntervalInDays) {
         throw "Unable to obtain tenancy details for tenant $tenantId."
     }
