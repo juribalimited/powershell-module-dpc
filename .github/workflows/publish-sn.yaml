@@ -1,0 +1,19 @@
+name: Publish ServiceNow
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Juriba.DPC.ServiceNow/**'
+
+jobs:
+  publishpsgallery:
+    name: 'PowerShell Gallery'
+    runs-on: ubuntu-latest
+    env:
+      NUGET_API_KEY: ${{ secrets.NUGETAPIKEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - shell: pwsh
+        run: Publish-Module -Path .\Juriba.DPC.ServiceNow -NuGetApiKey $env:NUGET_API_KEY -Verbose

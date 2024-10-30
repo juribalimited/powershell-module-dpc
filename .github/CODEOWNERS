@@ -1,3 +1,4 @@
 *                     @juribalimited/devops
 /Examples/    @juribalimited/product
-/Juriba.Platform/    @juribalimited/product
+/Juriba.DPC/    @juribalimited/product
+/Juriba.DPC.ServiceNow/ @juribalimited/product
