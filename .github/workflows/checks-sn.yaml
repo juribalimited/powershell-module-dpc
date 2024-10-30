@@ -1,0 +1,21 @@
+name: Checks ServiceNow
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'Juriba.DPC.ServiceNow/**'
+
+jobs:
+  scriptanalyzer:
+    runs-on: ubuntu-latest
+    name: 'PowerShell Script Analyzer'
+    steps:
+      - uses: actions/checkout@v4
+      - name: 'Install PSScriptAnalyzer PowerShell module'
+        run: Install-Module PSScriptAnalyzer -Force
+        shell: pwsh
+      - name: 'Run PSScriptAnalyzer'
+        run: Invoke-ScriptAnalyzer -Path .\Juriba.DPC.ServiceNow -Recurse -EnableExit -ExcludeRule PSAvoidTrailingWhitespace | Format-List -Property ScriptName, RuleName, Severity, Line, Column, Message
+        shell: pwsh

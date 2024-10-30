@@ -1,6 +1,9 @@
-# Juriba DPC PowerShell Module
+# Juriba DPC PowerShell Modules
 
-A PowerShell module that can be used to interact with the Juriba DPC API.
+Multiple PowerShell modules that can be used to interact with the Juriba DPC.
+
+- Juriba.DPC
+- Juriba.DPC.ServiceNow
 
 ## Installation
 
