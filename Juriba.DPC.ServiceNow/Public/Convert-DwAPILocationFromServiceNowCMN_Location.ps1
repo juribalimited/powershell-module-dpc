@@ -30,7 +30,7 @@ function Convert-DwAPILocationFromServiceNowCMN_Location {
     # Convert the data for use in the DWAPI
     $dtDashworksInput = Convert-DwAPIlocationFromServiceNowCMN_location -SerivceNowDataTable $dtlocation
     #>
-    Write-Host ("INFO: Starting conversion for cmn_location to DWAPI format.")
+    Write-Debug ("INFO: Starting conversion for cmn_location to DWAPI format.")
 
     $dataTable = New-Object System.Data.DataTable
     $dataTable.Columns.Add("uniqueIdentifier", [string]) | Out-Null
@@ -89,6 +89,6 @@ function Convert-DwAPILocationFromServiceNowCMN_Location {
         $dataTable.Rows.Add($NewRow)
     }
     
-    Write-Host ("INFO: Finished conversion for cmn_location to DWAPI format.")
+    Write-Debug ("INFO: Finished conversion for cmn_location to DWAPI format.")
     Return ,$dataTable
 }

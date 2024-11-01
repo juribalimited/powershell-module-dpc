@@ -76,7 +76,7 @@ function Invoke-JuribaAPIBulkImportUserFeedDataTable{
             $Deleteuri = "{0}/apiv2/imports/users/{1}/items" -f $Instance, $ImportId
             Invoke-RestMethod -Headers $Deleteheaders -Uri $Deleteuri -Method Delete | out-null
 
-            Write-Host ("$(get-date -format 'o'):INFO: Deleted records for ImportID $ImportID, $Feedname")
+            Write-Debug ("$(get-date -format 'o'):INFO: Deleted records for ImportID $ImportID, $Feedname")
         }
     }
     #wait until all of the objects are deleted from the feed.
@@ -157,7 +157,7 @@ function Invoke-JuribaAPIBulkImportUserFeedDataTable{
             $JSONBody = $BulkUploadObject | ConvertTo-Json -Depth 10
             $ByteArrayBody = [System.Text.Encoding]::UTF8.GetBytes($JSONBody)
             try{
-                $dummy = Invoke-RestMethod -Headers $Postheaders -Uri $uri -Method Post -Body $ByteArrayBody -MaximumRetryCount 3 -RetryIntervalSec 20
+                Invoke-RestMethod -Headers $Postheaders -Uri $uri -Method Post -Body $ByteArrayBody -MaximumRetryCount 3 -RetryIntervalSec 20 | Out-Null
                 write-debug "$(Get-date -Format 'o'):$RowCount rows processed"
             }catch{
                 $timeNow = (Get-date -Format 'o')

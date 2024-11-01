@@ -39,7 +39,7 @@ function Get-ServiceNowToken {
             $Reply | Add-Member -NotePropertyName AuthHeader -NotePropertyValue "Bearer $($Reply.access_token)"
             $Reply | Add-Member -NotePropertyName refresh_token_expires -NotePropertyValue (get-date).AddDays(100)
         }
-        write-debug "New Auth Token Obtained - expires $($Reply.Expires)"
+        Write-Debug "New Auth Token Obtained - expires $($Reply.Expires)"
     }
     return $Reply
 }

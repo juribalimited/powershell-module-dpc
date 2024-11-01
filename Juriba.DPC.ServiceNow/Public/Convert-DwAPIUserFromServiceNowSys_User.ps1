@@ -24,7 +24,7 @@ function Convert-DwAPIUserFromServiceNowSys_User {
     $dtDashworksInput = Convert-DwAPIUserFromServiceNowSys_User -SerivceNowDataTable $dtSysUser
     #>
 
-    Write-Host ("INFO: Starting conversion for Sys_User to DWAPI format.")
+    Write-Debug ("INFO: Starting conversion for Sys_User to DWAPI format.")
 
     $dataTable = New-Object System.Data.DataTable
     $dataTable.Columns.Add("uniqueIdentifier", [string]) | Out-Null
@@ -77,6 +77,6 @@ function Convert-DwAPIUserFromServiceNowSys_User {
 
     }
 
-    Write-Host ("INFO: Finished conversion for Sys_User to DWAPI format.")
+    Write-Debug ("INFO: Finished conversion for Sys_User to DWAPI format.")
     Return ,$dataTable
 }

@@ -5,9 +5,9 @@ function Update-ServiceNowToken {
     
     $Reply = New-Object -TypeName PSCustomObject
 
-    $body = [System.Text.Encoding]::UTF8.GetBytes(‘grant_type=refresh_token&client_id=’+[uri]::EscapeDataString($OAuthToken.ClientID)+’&client_secret=’+[uri]::EscapeDataString($OAuthToken.ClientSecret)+’&refresh_token=’+[uri]::EscapeDataString($OAuthToken.Refresh_Token))
+    $body = [System.Text.Encoding]::UTF8.GetBytes('grant_type=refresh_token&client_id='+[uri]::EscapeDataString($OAuthToken.ClientID)+'&client_secret='+[uri]::EscapeDataString($OAuthToken.ClientSecret)+'&refresh_token='+[uri]::EscapeDataString($OAuthToken.Refresh_Token))
     try{
-        $Reply = Invoke-RestMethod -Uri "$($OAuthToken.ServerURL)/oauth_token.do" -Body $Body -ContentType ‘application/x-www-form-urlencoded’ -Method Post
+        $Reply = Invoke-RestMethod -Uri "$($OAuthToken.ServerURL)/oauth_token.do" -Body $Body -ContentType 'application/x-www-form-urlencoded' -Method Post
 
         if ($Reply.GetType().Name -eq 'string')
         {
@@ -25,7 +25,7 @@ function Update-ServiceNowToken {
         #write-output "Auth Token Refreshed - expires $($OAuthToken.expires)" 
     }
     catch{
-        write-error "Auth Token Refresh Failed - $_"
+        write-error "Auth Token Refresh Failed - $($_.exception)"
     }
     return ,$Reply
 }

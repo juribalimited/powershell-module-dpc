@@ -25,7 +25,7 @@ function Convert-DwAPIDeviceFromServiceNowAlm_Asset {
     $dtDashworksInput = Convert-DwAPIDeviceFromServiceNowCMDB_CI_Computer -SerivceNowDataTable $dtCMDB_CI_Computer -UserFeedID 3
     #>
 
-    Write-Host ("INFO: Starting conversion for ALM_Asset to DWAPI format.")
+    Write-Debug ("INFO: Starting conversion for ALM_Asset to DWAPI format.")
 
     $dataTable = New-Object System.Data.DataTable
     $dataTable.Columns.Add("uniqueIdentifier", [string]) | Out-Null
@@ -95,6 +95,6 @@ function Convert-DwAPIDeviceFromServiceNowAlm_Asset {
         $dataTable.Rows.Add($NewRow)
     }
 
-    Write-Host ("INFO: Finished conversion for ALM_Asset to DWAPI format.")
+    Write-Debug ("INFO: Finished conversion for ALM_Asset to DWAPI format.")
     Return @(,($dataTable))
 }

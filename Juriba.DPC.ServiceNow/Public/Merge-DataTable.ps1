@@ -28,7 +28,7 @@ function Merge-DataTable {
      Merge-ServiceNowTable -primaryTable $CMDB_CI_Data -secondaryTable $sysUser -LeftjoinKeyProperty "assigned_to" -LeftjoinKeySubProperty "link" -rightjoinkeyproperty "sys_id" -AddColumn "user_name"
     #>
     
-    Write-Host ("INFO: Starting merge between data tables.")
+    Write-Debug ("INFO: Starting merge between data tables.")
     $dtMerge = $primaryTable.Copy()
     $ScriptBlock=$null
     $LeftJoinField= '$Row.''' + $LeftjoinKeyProperty + ''''
@@ -55,31 +55,6 @@ function Merge-DataTable {
         & $ScriptBlock
     }
 
-    <#$primaryTable | ForEach-Object -Parallel {
-        $Row = $_
-        if ($Using:LeftjoinKeySubProperty) {
-                if ($Using:LeftjoinKeySubProperty -eq 'Link') {
-                    $leftjoinkeyfull = $Row.$Using:LeftjoinKeyProperty.$Using:LeftjoinKeySubProperty
-                        If ($leftjoinkeyfull) {
-                            $leftjoinkey = $leftjoinkeyfull.substring($leftjoinkeyfull.LastIndexOf("/")+1,$leftjoinkeyfull.Length-($leftjoinkeyfull.LastIndexOf("/")+1))
-                            }
-                    } 
-                else {
-                    $leftjoinkey = $Row.$Using:LeftjoinKeyProperty.$Using:LeftjoinKeySubProperty
-                }
-            } else {
-            $leftjoinkey = $Row.$Using:LeftjoinKeyProperty
-        }
-            
-        If ($leftjoinkey) {
-
-            Foreach ($AddColumn in $Using:AddColumns) {
-                $AddColumnValue = ($Using:secondaryTable | Where-Object -Property $Using:rightjoinkeyproperty -eq $leftjoinkey).$AddColumn
-                $Row | Add-Member -MemberType 'NoteProperty' -Name $AddColumn -Value $AddColumnValue -Force
-            }
-        
-    } }-ThrottleLimit 25#>
-
-    Write-Host ("INFO: Finished merge between data tables. $AddedColumnList added to primary table.")
+    Write-Debug ("INFO: Finished merge between data tables. $AddedColumnList added to primary table.")
     return @(,($dtMerge)) 
 }

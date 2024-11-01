@@ -51,9 +51,9 @@ param (
     )
     $OAuthToken=$AuthToken.PSObject.Copy()
 
-    Write-Host ("INFO: Get-ServiceNowTable")
-    Write-Host ("INFO: Table Name: {0}" -f $tablename)
-    Write-Host ("INFO: Chunk Size: {0}" -f $ChunkSize)
+    Write-Debug ("INFO: Get-ServiceNowTable")
+    Write-Debug ("INFO: Table Name: {0}" -f $tablename)
+    Write-Debug ("INFO: Chunk Size: {0}" -f $ChunkSize)
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
@@ -82,7 +82,7 @@ param (
         #Check to see if the OAuth token is still going to be valid for the request. If not, get a new one.
         if ($OAuthToken.expires -lt (Get-date).AddMinutes(10))
         {
-            Write-Host ("INFO: Token Expires at: {0}, current time: {1} - forcing new OAuth token" -f $OAuth.expires, (get-date))
+            Write-Debug ("INFO: Token Expires at: {0}, current time: {1} - forcing new OAuth token" -f $OAuth.expires, (get-date))
             $OAuthToken = Update-ServiceNowToken -OAuthToken $OAuthToken
             [void]$headers.Remove("Authorization")
             [void]$headers.Add('Authorization',$OAuthToken.AuthHeader)
@@ -91,20 +91,20 @@ param (
         # Specify endpoint uri
         $uri="$($OAuthToken.ServerURL)/api/now/table/$TableName"+"?sysparm_limit={1}&sysparm_offset={0}&sysparm_display_value=true" -f $offset, $limit
         if($NameValuePairs){$uri = $uri + '&' + $NameValuePairs}
-        Write-Host ("INFO: URI: {0}" -f $URI)
+        Write-Debug ("INFO: URI: {0}" -f $URI)
         try{
             $pagedresponse = (Invoke-RestMethod -Headers $headers -Method $method -Uri $uri -ContentType 'application/json' -UseBasicParsing).result
         }catch{
-            Write-Host ("ERROR: Service Now request failed")
-            Write-Host ("ERROR: StatusCode: {0}" -f $_.Exception.Response.StatusCode.value__)
-            Write-Host ("ERROR: StatusDescription: {0}" -f $_.Exception.Response.StatusDescription)
-            Write-Host ("ERROR: Message: {0}" -f $_.Exception.Message)
+            Write-Debug ("ERROR: Service Now request failed")
+            Write-Debug ("ERROR: StatusCode: {0}" -f $_.Exception.Response.StatusCode.value__)
+            Write-Debug ("ERROR: StatusDescription: {0}" -f $_.Exception.Response.StatusDescription)
+            Write-Debug ("ERROR: Message: {0}" -f $_.Exception.Message)
             break;
         }
         $response += $pagedresponse
         $count = $pagedresponse.count
         $offset = $offset + $limit
-        Write-Host ("INFO: Read: {0} rows from: {1}" -f $response.Count, $TableName)
+        Write-Debug ("INFO: Read: {0} rows from: {1}" -f $response.Count, $TableName)
     }
 
     $dtResults = New-Object System.Data.DataTable
