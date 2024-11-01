@@ -15,7 +15,7 @@ function Update-ServiceNowToken {
                 "Confirm ServiceNow Token Update"
                 )
         ) {
-            $Reply = Invoke-RestMethod -Uri "$($OAuthToken.ServerURL)/oauth_token.do" -Body $Body -ContentType 'application/x-www-form-urlencoded' -Method Post
+            [PSCustomObject]$Reply = Invoke-RestMethod -Uri "$($OAuthToken.ServerURL)/oauth_token.do" -Body $Body -ContentType 'application/x-www-form-urlencoded' -Method Post
         }
 
         if ($Reply.GetType().Name -eq 'string')
