@@ -1,4 +1,5 @@
 function Get-ServiceNowToken {
+    [OutputType([System.Management.Automation.PSCustomObject[]])]
     param (
             [Parameter(Mandatory=$true)][ValidateSet("OAuth", "Basic")][string] $AuthType,
             [Parameter(Mandatory=$true)][string] $Server,

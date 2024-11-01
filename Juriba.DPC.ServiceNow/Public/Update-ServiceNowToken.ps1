@@ -1,5 +1,6 @@
 function Update-ServiceNowToken {
     [CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='High')]
+    [OutputType([System.Management.Automation.PSCustomObject[]])]
     param (
         [Parameter(Mandatory=$true)][PSObject] $OAuthToken
     )
