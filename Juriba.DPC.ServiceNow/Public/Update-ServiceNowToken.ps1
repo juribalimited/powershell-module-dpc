@@ -1,4 +1,5 @@
 function Update-ServiceNowToken {
+    [CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='High')]
     param (
         [Parameter(Mandatory=$true)][PSObject] $OAuthToken
     )
@@ -7,7 +8,14 @@ function Update-ServiceNowToken {
 
     $body = [System.Text.Encoding]::UTF8.GetBytes('grant_type=refresh_token&client_id='+[uri]::EscapeDataString($OAuthToken.ClientID)+'&client_secret='+[uri]::EscapeDataString($OAuthToken.ClientSecret)+'&refresh_token='+[uri]::EscapeDataString($OAuthToken.Refresh_Token))
     try{
-        $Reply = Invoke-RestMethod -Uri "$($OAuthToken.ServerURL)/oauth_token.do" -Body $Body -ContentType 'application/x-www-form-urlencoded' -Method Post
+        if ($PSCmdlet.ShouldProcess(
+                ("Updating Token"),
+                ("This will update the ServiceNow Token, continue?"),
+                "Confirm ServiceNow Token Update"
+                )
+        ) {
+            $Reply = Invoke-RestMethod -Uri "$($OAuthToken.ServerURL)/oauth_token.do" -Body $Body -ContentType 'application/x-www-form-urlencoded' -Method Post
+        }
 
         if ($Reply.GetType().Name -eq 'string')
         {

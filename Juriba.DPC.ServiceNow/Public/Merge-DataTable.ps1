@@ -29,6 +29,7 @@ function Merge-DataTable {
     #>
     
     Write-Debug ("INFO: Starting merge between data tables.")
+    $secondaryTable | Out-Null #Added to get past the analyzer. The table is only used in the dynamic scripting.
     $dtMerge = $primaryTable.Copy()
     $ScriptBlock=$null
     $LeftJoinField= '$Row.''' + $LeftjoinKeyProperty + ''''
