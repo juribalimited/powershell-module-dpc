@@ -69,7 +69,23 @@ Description       = 'PowerShell Module to integrate Juriba DPC with ServiceNow.'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @()
+FunctionsToExport = @(
+	'Add-JPLogMessage',
+	'Close-JPLog',
+	'Start-JPLog',
+	'Convert-DwAPIDeptFromServiceNowSys_User',
+	'Convert-DwAPIDeviceFromServiceNowAlm_Asset',
+	'Convert-DwAPILocationFromServiceNowCMN_Location',
+	'Convert-DwAPIUserFromServiceNowSys_User',
+	'Get-ServiceNowTable',
+	'Get-ServiceNowToken',
+	'Invoke-JuribaAPIBulkImportAppFeedDataTable',
+	'Invoke-JuribaAPIBulkImportDeviceFeedDataTable',
+	'Invoke-JuribaAPIBulkImportUserFeedDataTable',
+	'IsValidEmail',
+	'Merge-DataTable',
+	'Update-ServiceNowToken'
+)
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 # CmdletsToExport = @()
