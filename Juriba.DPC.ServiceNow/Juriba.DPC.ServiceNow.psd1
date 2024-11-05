@@ -33,7 +33,7 @@ Copyright = '(c) Juriba. All rights reserved.'
 Description       = 'PowerShell Module to integrate Juriba DPC with ServiceNow.'
 
 # Minimum version of the PowerShell engine required by this module
-PowerShellVersion = '7'
+PowerShellVersion = '7.1'
 
 # Name of the PowerShell host required by this module
 # PowerShellHostName = ''
