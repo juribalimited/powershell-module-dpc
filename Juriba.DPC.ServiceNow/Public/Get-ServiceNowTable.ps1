@@ -142,12 +142,12 @@ param (
                 $ScriptBlock += 'if ($entry.' + $DataColumn.Name + ' -ne $null) {$DataRow.' + $DataColumn.Name + ' = $entry.' + $DataColumn.Name + ' } else {$DataRow.' + $DataColumn.Name + " = [DBNULL]::Value};`n"
             }
         }
-        $scriptBlockToRun = [scriptblock]::Create($ScriptBlock)
+        $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($ScriptBlock)
         foreach($entry in $response)
         {
             $DataRow = $dtResults.NewRow()
 
-            $scriptBlockToRun.Invoke()
+            . $ScriptBlock
 
             $dtResults.Rows.Add($DataRow)
         }
