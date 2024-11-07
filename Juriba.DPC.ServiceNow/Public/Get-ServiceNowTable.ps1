@@ -125,8 +125,8 @@ param (
 
                 $dtResults.Columns.Add($DataColumn.Name,$datatype) | Out-Null
                 $dtResults.Columns.Add($DataColumn.Name + "_link",$datatype) | Out-Null
-                $ScriptBlock += 'if ($entry.' + $DataColumn.Name + '.display_value) {$DataRow.' + $DataColumn.Name + ' = $entry.' + $DataColumn.Name + '.display_value} else {$DataRow.' + $DataColumn.Name + " = [DBNULL]::Value};`n"
-                $ScriptBlock += 'if ($entry.' + $DataColumn.Name + '.link) {$DataRow.' + $DataColumn.Name + '_link = $entry.' + $DataColumn.Name + '.link.substring($entry.' + $DataColumn.Name + '.link.LastIndexOf(''/'')+1) } else {$DataRow.' + $DataColumn.Name + " = [DBNULL]::Value};`n"
+                $ScriptBlock += 'if ($entry.' + $DataColumn.Name + '.getType().Name -eq "PSCustomObject") {$DataRow.' + $DataColumn.Name + ' = $entry.' + $DataColumn.Name + '.display_value} else {$DataRow.' + $DataColumn.Name + " = [DBNULL]::Value};`n"
+                $ScriptBlock += 'if ($entry.' + $DataColumn.Name + '.getType().Name -eq "PSCustomObject") {$DataRow.' + $DataColumn.Name + '_link = $entry.' + $DataColumn.Name + '.link.substring($entry.' + $DataColumn.Name + '.link.LastIndexOf(''/'')+1) } else {$DataRow.' + $DataColumn.Name + " = [DBNULL]::Value};`n"
             }
             else {
                 $DataType = switch ($DataColumn.Definition.substring(0,$DataColumn.Definition.IndexOf(' ')))
