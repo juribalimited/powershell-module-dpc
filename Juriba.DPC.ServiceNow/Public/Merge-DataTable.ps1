@@ -53,7 +53,7 @@ function Merge-DataTable {
     $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($ScriptBlock)
 
     Foreach ($Row in $dtMerge) {
-        & $ScriptBlock
+        . $ScriptBlock
     }
 
     Write-Debug ("INFO: Finished merge between data tables. $AddedColumnList added to primary table.")

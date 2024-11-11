@@ -74,7 +74,7 @@ function Convert-DwAPIDeviceFromServiceNowAlm_Asset {
         if ($Row.install_date -ne [DBNULL]::Value) {$NewRow.buildDate = $Row.install_date}
         if ($Row.serial_number -ne [DBNULL]::Value) {$NewRow.serialNumber = $Row.serial_number}
         if ($Row.cpu_count -ne [DBNULL]::Value) {$NewRow.processorCount = $Row.cpu_count}
-        if ($Row.cpu_speed -ne [DBNULL]::Value) {$NewRow.buildDate = ([int]$Row.cpu_speed)}
+        if ($Row.cpu_speed -ne [DBNULL]::Value) {$NewRow.processorSpeed = ([int]$Row.cpu_speed)}
         if ($Row.cpu_type -ne [DBNULL]::Value) {$NewRow.processorManufacturer = $Row.cpu_type}
         if ($Row.disk_space -ne [DBNULL]::Value) {$NewRow.totalHDDSpaceMb = ([int]$Row.disk_space)*1024}
         if ($Row.ram -ne [DBNULL]::Value) {$NewRow.memoryMB = ([int]$Row.ram)*1024}

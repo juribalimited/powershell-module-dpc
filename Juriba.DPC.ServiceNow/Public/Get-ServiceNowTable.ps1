@@ -76,7 +76,8 @@ param (
     $offset=0
     $limit = $ChunkSize
     $count=$limit
-
+    $stopwatch =  [system.diagnostics.stopwatch]::StartNew()
+    $stopwatch2 =  [system.diagnostics.stopwatch]::StartNew()
     while ($count -eq $limit)
     {
         #Check to see if the OAuth token is still going to be valid for the request. If not, get a new one.
@@ -96,61 +97,79 @@ param (
             $pagedresponse = (Invoke-RestMethod -Headers $headers -Method $method -Uri $uri -ContentType 'application/json' -UseBasicParsing).result
         }catch{
             Write-Debug ("ERROR: Service Now request failed")
-            Write-Debug ("ERROR: StatusCode: {0}" -f $_.Exception.Response.StatusCode.value__)
-            Write-Debug ("ERROR: StatusDescription: {0}" -f $_.Exception.Response.StatusDescription)
+            #Write-Debug ("ERROR: StatusCode: {0}" -f $_.Exception.Response.StatusCode.value__)
+            #Write-Debug ("ERROR: StatusDescription: {0}" -f $_.Exception.Response.StatusDescription)
             Write-Debug ("ERROR: Message: {0}" -f $_.Exception.Message)
             break;
         }
         $response += $pagedresponse
         $count = $pagedresponse.count
         $offset = $offset + $limit
-        Write-Debug ("INFO: Read: {0} rows from: {1}" -f $response.Count, $TableName)
+        Write-Debug ("INFO: Read: {0} rows from: {1}. This batch took {2}ms" -f $response.Count, $TableName, $stopwatch2.ElapsedMilliseconds)
+        $stopwatch2.Restart()
     }
-
+    Write-Debug ("INFO: Time to Pull from ServiceNow: {0}ms" -f $stopwatch.ElapsedMilliseconds)
+    $stopwatch.Restart()
     $dtResults = New-Object System.Data.DataTable
     $ScriptBlock=$null
-
+    $ScriptBlock += '$entryColumnList = ($entry | Get-Member -MemberType NoteProperty).Name'+"`n"
     if ($response.count -gt 0)
     {
-        foreach($DataColumn in $($response[0] | Get-Member | where-object{($_.MemberType -eq "NoteProperty")}))
+        $DataColumnList = @{}
+        $response | foreach-Object {$_ | get-member -MemberType NoteProperty} | Where-Object {$null -eq $DataColumnList[$($_.Name)]} | foreach-Object {$DataColumnList.Add($_.Name,$_.Name) | Out-Null}
+        foreach($DataColumnName in ($DataColumnList.GetEnumerator()).Name)
         {
-            $GetPopulatedEntryBlock='if($response | where-object{$_.' + $DataColumn.Name + ' -ne [DBNULL]::Value} | select-object -First 1) {$response | where-object{$_.' + $DataColumn.Name + ' -ne [DBNULL]::Value} | select-object -First 1 | Get-Member | where-object{$_.MemberType -eq "NoteProperty"} | where-object{$_.Name -eq ''' + $DataColumn.Name + '''}}'
-            $GetPopulatedEntryBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($GetPopulatedEntryBlock)
-            $PopulatedOutput = & $GetPopulatedEntryBlock
-            if ($PopulatedOutput) {$DataColumn = $PopulatedOutput}
-
-            if ($DataColumn.Definition.substring(0,$DataColumn.Definition.IndexOf(' ')) -eq 'System.Management.Automation.PSCustomObject')
+            if (!$dtResults.Columns.Contains($DataColumnName))
             {
-                $datatype = 'string'
-
-                $dtResults.Columns.Add($DataColumn.Name,$datatype) | Out-Null
-                $dtResults.Columns.Add($DataColumn.Name + "_link",$datatype) | Out-Null
-                $ScriptBlock += 'if ($entry.' + $DataColumn.Name + '.display_value) {$DataRow.' + $DataColumn.Name + ' = $entry.' + $DataColumn.Name + '.display_value} else {$DataRow.' + $DataColumn.Name + " = [DBNULL]::Value};`n"
-                $ScriptBlock += 'if ($entry.' + $DataColumn.Name + '.link) {$DataRow.' + $DataColumn.Name + '_link = $entry.' + $DataColumn.Name + '.link.substring($entry.' + $DataColumn.Name + '.link.LastIndexOf(''/'')+1) } else {$DataRow.' + $DataColumn.Name + " = [DBNULL]::Value};`n"
-            }
-            else {
-                $DataType = switch ($DataColumn.Definition.substring(0,$DataColumn.Definition.IndexOf(' ')))
-                {
-                    'datetime' {'datetime'}
-                    'bool' {'boolean'}
-                    'long' {'int64'}
-                    'string' {'string'}
-                    'object' {'string'}
-                    default {'string'}
+                $stopwatch2.Restart()
+                $GetPopulatedEntryBlock='if($response | where-object{$_.' + $DataColumnName + ' -ne [DBNULL]::Value} | select-object -First 1) {$response | where-object{$_.' + $DataColumnName + ' -ne [DBNULL]::Value} | select-object -First 1 | Get-Member | where-object{$_.MemberType -eq "NoteProperty"} | where-object{$_.Name -eq ''' + $DataColumnName + '''}}'
+                $GetPopulatedEntryBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($GetPopulatedEntryBlock)
+                $PopulatedOutput = & $GetPopulatedEntryBlock
+                if ($PopulatedOutput){
+                    $DataColumn = $PopulatedOutput
                 }
-                $dtResults.Columns.Add($DataColumn.Name,$datatype) | Out-Null
-                $ScriptBlock += 'if ($entry.' + $DataColumn.Name + ' -ne $null) {$DataRow.' + $DataColumn.Name + ' = $entry.' + $DataColumn.Name + ' } else {$DataRow.' + $DataColumn.Name + " = [DBNULL]::Value};`n"
+                else{
+                    $DataColumn = $response | select-object -First 1 | Get-Member | where-object{$_.MemberType -eq "NoteProperty"} | where-object{$_.Name -eq $DataColumnName}
+                }
+
+                if ($DataColumn.Definition.substring(0,$DataColumn.Definition.IndexOf(' ')) -eq 'System.Management.Automation.PSCustomObject')
+                {
+                    $datatype = 'string'
+
+                    $dtResults.Columns.Add($DataColumn.Name,$datatype) | Out-Null
+                    $dtResults.Columns.Add($DataColumn.Name + "_link",$datatype) | Out-Null
+                    $ScriptBlock += 'if ($entryColumnList.Contains(''' + $DataColumn.Name + ''') -and $entry.' + $DataColumn.Name + '.getType().Name -eq "PSCustomObject") {$DataRow.' + $DataColumn.Name + ' = $entry.' + $DataColumn.Name + '.display_value} else {$DataRow.' + $DataColumn.Name + " = [DBNULL]::Value};`n"
+                    $ScriptBlock += 'if ($entryColumnList.Contains(''' + $DataColumn.Name + ''') -and $entry.' + $DataColumn.Name + '.getType().Name -eq "PSCustomObject") {$DataRow.' + $DataColumn.Name + '_link = $entry.' + $DataColumn.Name + '.link.substring($entry.' + $DataColumn.Name + '.link.LastIndexOf(''/'')+1) } else {$DataRow.' + $DataColumn.Name + " = [DBNULL]::Value};`n"
+                }
+                else {
+                    $DataType = switch ($DataColumn.Definition.substring(0,$DataColumn.Definition.IndexOf(' ')))
+                    {
+                        'datetime' {'datetime'}
+                        'bool' {'boolean'}
+                        'long' {'int64'}
+                        'string' {'string'}
+                        'object' {'string'}
+                        default {'string'}
+                    }
+                    $dtResults.Columns.Add($DataColumn.Name,$datatype) | Out-Null
+                    $ScriptBlock += 'if ($entryColumnList.Contains(''' + $DataColumn.Name + ''')) {$DataRow.' + $DataColumn.Name + ' = $entry.' + $DataColumn.Name + ' } else {$DataRow.' + $DataColumn.Name + " = [DBNULL]::Value};`n"
+                }
             }
         }
-        $scriptBlockToRun = [scriptblock]::Create($ScriptBlock)
+        Write-Debug ("INFO: Time to Process Columns: {0}ms" -f $stopwatch.ElapsedMilliseconds)
+
+        $ScriptBlockToRun = $ExecutionContext.InvokeCommand.NewScriptBlock($ScriptBlock)
+        $stopwatch.Restart()
         foreach($entry in $response)
         {
             $DataRow = $dtResults.NewRow()
 
-            $scriptBlockToRun.Invoke()
+            . $ScriptBlockToRun
 
             $dtResults.Rows.Add($DataRow)
         }
+        Write-Debug ("INFO: Time to Process Rows: {0}ms" -f $stopwatch.ElapsedMilliseconds)
+        $stopwatch = $null
     }
     return @(,($dtResults))
 }
