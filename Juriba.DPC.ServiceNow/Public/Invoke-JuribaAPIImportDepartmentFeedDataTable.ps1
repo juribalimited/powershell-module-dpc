@@ -71,7 +71,7 @@ function Invoke-JuribaAPIImportDepartmentFeedDataTable{
             $Deleteuri = "{0}/apiv2/imports/departments/{1}/items" -f $Instance, $ImportId
             Invoke-RestMethod -Headers $Deleteheaders -Uri $Deleteuri -Method DELETE | out-null
 
-            Write-Host ("INFO: Deleted records for ImportID $ImportID, $Feedname")
+            Write-Debug ("INFO: Deleted records for ImportID $ImportID, $Feedname")
         }
     }
 

@@ -74,7 +74,7 @@ function Invoke-JuribaAPIBulkImportDeviceFeedDataTable{
         } else {
             $Deleteuri = "{0}/apiv2/imports/devices/{1}/items" -f $Instance, $ImportId
             Invoke-RestMethod -Headers $Deleteheaders -Uri $Deleteuri -Method Delete| out-null
-            Write-Host ("$(get-date -format 'o'):INFO: Deleted records for ImportID $ImportID, $Feedname")
+            Write-Debug ("$(get-date -format 'o'):INFO: Deleted records for ImportID $ImportID, $Feedname")
         }
     }
 
@@ -83,7 +83,7 @@ function Invoke-JuribaAPIBulkImportDeviceFeedDataTable{
         while(((Invoke-RestMethod -uri "$Instance/apiv1/admin/data-imports" -Method Get -Headers $Deleteheaders) | Where-Object{$_.typeName -eq 'hardware-inventory' -and $_.id -eq $ImportID}).ObjectsCount -gt 0)
         {
             Start-sleep 2
-            write-debug "$(get-date -format 'o'):Waiting for delete to complete"
+            Write-Debug "$(get-date -format 'o'):Waiting for delete to complete"
         }
     } catch {
         write-error $_.Exception
