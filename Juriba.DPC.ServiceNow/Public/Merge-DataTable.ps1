@@ -40,7 +40,7 @@ function Merge-DataTable {
         {
             $dtMerge.Columns.Add($AddColumn.Value) | Out-Null
         }
-        $ScriptBlock += '$Row.''' + $($AddColumn.Value) + ''' = $joinRow.''' + $($AddColumn.Name) + "'`n"
+        $ScriptBlock += 'if ($joinRow.length -gt 0) {$Row.''' + $($AddColumn.Value) + ''' = $joinRow.''' + $($AddColumn.Name) + "'}`n"
         if ($AddColumn.Value -eq $AddColumn.Name) {
             $AddedColumnList += ", $($AddColumn.Name)"
         }

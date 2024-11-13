@@ -12,7 +12,7 @@
 RootModule = 'Juriba.DPC.ServiceNow.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.0.4'
+ModuleVersion = '0.0.0.5'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -82,6 +82,8 @@ FunctionsToExport = @(
 	'Invoke-JuribaAPIBulkImportAppFeedDataTable',
 	'Invoke-JuribaAPIBulkImportDeviceFeedDataTable',
 	'Invoke-JuribaAPIBulkImportUserFeedDataTable',
+        'Invoke-JuribaAPIImportDepartmentFeedDataTable',
+        'Invoke-JuribaAPIImportLocationFeedDataTable',
 	'IsValidEmail',
 	'Merge-DataTable',
 	'Update-ServiceNowToken'

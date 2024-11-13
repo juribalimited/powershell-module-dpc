@@ -54,7 +54,6 @@ function Convert-DwAPIUserFromServiceNowSys_User {
         $NewRow.Username = $Row.user_name
         $NewRow.commonObjectName = $Row.user_name
         $NewRow.displayName = $Row.name
-        $NewRow.objectGuid = $Row.u_correlation_id
         if ($Row.last_login_time -ne '') {$NewRow.lastLogonDate = $Row.last_login_time}
         If ($Row.active -eq $true) {$NewRow.disabled = $false} else {$NewRow.disabled = $true}
         $NewRow.surname = $Row.last_name
