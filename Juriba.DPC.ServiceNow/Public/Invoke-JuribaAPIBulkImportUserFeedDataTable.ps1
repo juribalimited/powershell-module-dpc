@@ -46,7 +46,7 @@ function Invoke-JuribaAPIBulkImportUserFeedDataTable{
         [parameter(Mandatory=$False)]
         [string]$FeedName = $null,
         [parameter(Mandatory=$False)]
-        [string]$ImportId,
+        [string]$ImportId = $null,
         [parameter(Mandatory=$False)]
         [array]$CustomFields = @(),
         [parameter(Mandatory=$False)]
@@ -55,6 +55,7 @@ function Invoke-JuribaAPIBulkImportUserFeedDataTable{
         [int]$BatchSize = 500
     )
 
+    $Deleteheaders = @{"X-API-KEY" = "$APIKey"}
 
     if (-not $ImportId)
     {
@@ -62,28 +63,34 @@ function Invoke-JuribaAPIBulkImportUserFeedDataTable{
         {
             return 'User feed not found by name or ID'
         }
-
-        $ImportId = (Get-JuribaImportUserFeed -Instance $Instance -ApiKey $APIKey -Name $FeedName).id
+        try{
+            $ImportId = (Get-JuribaImportUserFeed -Instance $Instance -ApiKey $APIKey -Name $FeedName).id
+        }
+        catch {
+            write-error "User feed lookup returned no results"
+            exit 1
+        }
 
         if (-not $ImportId)
         {
             return 'User feed not found by name or ID'
         } else {
-            
-            $Deleteheaders = @{
-                                "X-API-KEY" = "$APIKey"
-                            }
             $Deleteuri = "{0}/apiv2/imports/users/{1}/items" -f $Instance, $ImportId
             Invoke-RestMethod -Headers $Deleteheaders -Uri $Deleteuri -Method Delete | out-null
-
             Write-Debug ("$(get-date -format 'o'):INFO: Deleted records for ImportID $ImportID, $Feedname")
         }
     }
+
     #wait until all of the objects are deleted from the feed.
-    while(((Invoke-RestMethod -uri "$Instance/apiv1/admin/data-imports" -Method Get -Headers $Deleteheaders) | Where-Object{$_.typeName -eq 'directory' -and $_.id -eq $ImportID}).ObjectsCount -gt 0)
-    {
-        Start-sleep 2
-        write-debug "$(get-date -format 'o'):Waiting for delete to complete"
+    try{
+        while(((Invoke-RestMethod -uri "$Instance/apiv1/admin/data-imports" -Method Get -Headers $Deleteheaders) | Where-Object{$_.typeName -eq 'directory' -and $_.id -eq $ImportID}).ObjectsCount -gt 0)
+        {
+            Start-sleep 2
+            write-debug "$(get-date -format 'o'):Waiting for delete to complete"
+        }
+    } catch {
+        write-error "Reading of data imports failed, check the APIv1 is accessible to external tools"
+        exit 1
     }
 
     $Postheaders = @{
@@ -104,7 +111,7 @@ function Invoke-JuribaAPIBulkImportUserFeedDataTable{
         $Body = $Row | Select-Object *,CustomFieldValues,Properties,applications -ExcludeProperty $ExcludeProperty
 
         $applications = @()
-        if ($DPCUserAppDataTable.Rows.Count -gt 0)
+        if ($null -ne $DPCUserAppDataTable -and $DPCUserAppDataTable.Rows.Count -gt 0)
         {
             foreach($App in $DPCUserAppDataTable.select("userUniqueIdentifier='$($Row.uniqueIdentifier)'"))
             {
@@ -128,7 +135,7 @@ function Invoke-JuribaAPIBulkImportUserFeedDataTable{
             $ScriptBlock = $null
             $ScriptBlock = $CFVtemplate.Replace('###',$CustomFieldName)
             $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($ScriptBlock)
-            $CustomFieldValues += & $ScriptBlock
+            $CustomFieldValues += . $ScriptBlock
         }
         $Body.CustomFieldValues = $CustomFieldValues
 
@@ -146,7 +153,7 @@ function Invoke-JuribaAPIBulkImportUserFeedDataTable{
             $ScriptBlock = $null
             $ScriptBlock=$PropertyTemplate.Replace('###',$Property)
             $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($ScriptBlock)
-            $PropertyEntries += & $ScriptBlock
+            $PropertyEntries += . $ScriptBlock
         }
         $Body.Properties = $PropertyEntries
 

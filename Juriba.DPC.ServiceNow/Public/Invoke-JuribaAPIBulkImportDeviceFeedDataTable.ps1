@@ -1,4 +1,4 @@
-function Invoke-DwBulkImportDeviceFeedDataTable{
+function Invoke-JuribaAPIBulkImportDeviceFeedDataTable{
     <#
     .Synopsis
     Loops a correctly formatted data table inserting all of the rows it contains.
@@ -35,19 +35,24 @@ function Invoke-DwBulkImportDeviceFeedDataTable{
         [parameter(Mandatory=$True)]
         [string]$Instance,
         [Parameter(Mandatory=$True)]
-        [System.Data.DataTable]$DWDeviceDataTable,
+        [System.Data.DataTable]$DPCDeviceDataTable,
+        [Parameter(Mandatory=$false)]
+        [System.Data.DataTable]$DPCDeviceAppDataTable,
         [Parameter(Mandatory=$True)]
         [string]$APIKey,
         [parameter(Mandatory=$False)]
         [string]$FeedName = $null,
         [parameter(Mandatory=$False)]
-        [string]$ImportId,
+        [string]$ImportId = $null,
         [parameter(Mandatory=$False)]
         [array]$CustomFields = @(),
+        [parameter(Mandatory=$False)]
+        [array]$Properties = @(),
         [parameter(Mandatory=$False)]
         [int]$BatchSize = 500
     )
 
+    $Deleteheaders = @{"X-API-KEY" = "$APIKey"}
 
     if (-not $ImportId)
     {
@@ -56,20 +61,34 @@ function Invoke-DwBulkImportDeviceFeedDataTable{
             return 'Device feed not found by name or ID'
         }
 
-        $ImportId = (Get-JuribaImportDeviceFeed -Instance $Instance -ApiKey $APIKey -Name $FeedName).id
+        try{
+            $ImportId = (Get-JuribaImportDeviceFeed -Instance $Instance -ApiKey $APIKey -Name $FeedName).id
+        } catch {
+            write-error "Device feed lookup returned no results"
+            exit 1
+        }
 
         if (-not $ImportId)
         {
             return 'Device feed not found by name or ID'
         } else {
-            $Deleteheaders = @{
-                                "X-API-KEY" = "$APIKey"
-                            }
             $Deleteuri = "{0}/apiv2/imports/devices/{1}/items" -f $Instance, $ImportId
             Invoke-RestMethod -Headers $Deleteheaders -Uri $Deleteuri -Method Delete| out-null
-
-            Write-Debug ("$(get-date -format 'o'):INFO: Deleted records for ImportID $ImportID, $Feedname")
+            Write-Host ("$(get-date -format 'o'):INFO: Deleted records for ImportID $ImportID, $Feedname")
         }
+    }
+
+    #wait until all of the objects are deleted from the feed.
+    try{
+        while(((Invoke-RestMethod -uri "$Instance/apiv1/admin/data-imports" -Method Get -Headers $Deleteheaders) | Where-Object{$_.typeName -eq 'hardware-inventory' -and $_.id -eq $ImportID}).ObjectsCount -gt 0)
+        {
+            Start-sleep 2
+            write-debug "$(get-date -format 'o'):Waiting for delete to complete"
+        }
+    } catch {
+        write-error $_.Exception
+        write-error "Reading of data imports failed, check the APIv1 is accessible to external tools"
+        exit 1
     }
 
     $Postheaders = @{
@@ -80,15 +99,27 @@ function Invoke-DwBulkImportDeviceFeedDataTable{
     $uri = '{0}/apiv2/imports/devices/{1}/items/$bulk' -f $Instance, $ImportId
     $ExcludeProperty = @("ItemArray", "Table", "RowError", "RowState", "HasErrors")
     if ($CustomFields.count -gt 0) {$ExcludeProperty += $CustomFields}
+    if ($Properties.count -gt 0) {$ExcludeProperty += $Properties}
 
     $BulkUploadObject = @()
     $RowCount = 0
-    foreach($Row in $DWDeviceDataTable){
+    foreach($Row in $DPCDeviceDataTable){
         $RowCount++
         
         $Body = $null
-        $Body = $Row | Select-Object *,CustomFieldValues -ExcludeProperty $ExcludeProperty
-        
+
+        $Body = $Row | Select-Object *,CustomFieldValues,applications,properties -ExcludeProperty $ExcludeProperty
+
+        $applications = @()
+        if ($null -ne $DPCDeviceAppDataTable -and $DPCDeviceAppDataTable.Rows.Count -gt 0)
+        {
+            foreach($App in $DPCDeviceAppDataTable.select("DeviceUniqueIdentifier='$($Row.uniqueIdentifier)'"))
+            {
+                $applications += @{"applicationDistHierId"=$App.applicationDistHierId;"applicationBusinessKey"=$App.AppUniqueIdentifier;"installed" = $true}
+            }
+        }
+        $Body.applications = $applications
+
         $CustomFieldValues = @()       
         $CFVtemplate = 'if ($Row.### -ne [dbnull]::value)
                         {
@@ -104,25 +135,43 @@ function Invoke-DwBulkImportDeviceFeedDataTable{
             $ScriptBlock = $null
             $ScriptBlock=$CFVtemplate.Replace('###',$CustomFieldName)
             $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($ScriptBlock)
-            $CustomFieldValues += & $ScriptBlock
+            $CustomFieldValues += . $ScriptBlock
         }
         $Body.CustomFieldValues = $CustomFieldValues
 
+        $PropertyEntries = @()
+        $PropertyTemplate = 'if ($Row.### -ne [dbnull]::value)
+        {
+            $PropertyEntry = @{
+                name = "###"
+                value = @($Row.###)
+            }
+            $PropertyEntry
+        }'
+        foreach($Property in $Properties)
+        {
+            $ScriptBlock = $null
+            $ScriptBlock=$PropertyTemplate.Replace('###',$Property)
+            $ScriptBlock = $ExecutionContext.InvokeCommand.NewScriptBlock($ScriptBlock)
+            $PropertyEntries += . $ScriptBlock
+        }
+        $Body.Properties = $PropertyEntries
+
         $BulkUploadObject += $Body
 
-        if ($BulkUploadObject.Count -eq $BatchSize -or $RowCount -eq $DWDeviceDataTable.Rows.Count)
+        if ($BulkUploadObject.Count -eq $BatchSize -or $RowCount -eq $DPCDeviceDataTable.Rows.Count)
         {
             $JSONBody = $BulkUploadObject | ConvertTo-Json -Depth 10
             $ByteArrayBody = [System.Text.Encoding]::UTF8.GetBytes($JSONBody)
             try{
-                Invoke-RestMethod -Headers $Postheaders -Uri $uri -Method Post -Body $ByteArrayBody -MaximumRetryCount 3 -RetryIntervalSec 20 | Out-Null
+                $dummy = Invoke-RestMethod -Headers $Postheaders -Uri $uri -Method Post -Body $ByteArrayBody # -MaximumRetryCount 3 -RetryIntervalSec 20
                 write-debug "$(Get-date -Format 'o'):$RowCount rows processed"
             }catch{
                 $timeNow = (Get-date -Format 'o')
-                write-error "$timeNow;$_"
+                write-error "$timeNow;$_;"#$JSONBody"
             }
             $BulkUploadObject = @()
         }
     }
-    Return ("{0} devices sent" -f $DWDeviceDataTable.Rows.Count)
+    Return ("{0} devices sent" -f $DPCDeviceDataTable.Rows.Count)
 }
