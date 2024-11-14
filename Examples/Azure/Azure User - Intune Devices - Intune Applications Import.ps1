@@ -153,7 +153,7 @@ Function Get-AzDataTable{
 
             foreach($object_properties in $($entry | Get-Member | where-object{($_.MemberType -eq "NoteProperty") -and ($_.Name -ne '@odata.type')}))
             {
-                if($dtResults.Columns.contains($object_properties))
+                if(!$dtResults.Columns.contains($object_properties.Name))
                 {
                     $DataType = switch ($object_properties.Definition.substring(0,$object_properties.Definition.IndexOf(' ')))
                     {
