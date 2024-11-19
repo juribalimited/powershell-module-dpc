@@ -74,9 +74,6 @@ function Get-JuribaImportApplication {
         $limit = 1000 # page size
 
         # Retrieve Juriba product version
-        $versionParts = $version -split '\.'
-        $major = [int]$versionParts[0]
-        $minor = [int]$versionParts[1]
         $versionUri = "{0}/apiv1/" -f $Instance
         $versionResult = Invoke-WebRequest -Uri $versionUri -Method GET -Headers $headers -ContentType "application/json"
         # Regular expression to match the version pattern
@@ -84,6 +81,9 @@ function Get-JuribaImportApplication {
 
         # Extract the version
         $version = $regex.Match($versionResult).Value
+        $versionParts = $version -split '\.'
+        $major = [int]$versionParts[0]
+        $minor = [int]$versionParts[1]
 
         # Check if the version is 5.13 or older
         if ($major -lt 5 -or ($major -eq 5 -and $minor -le 13)) {
