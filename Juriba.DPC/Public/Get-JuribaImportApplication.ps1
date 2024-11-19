@@ -90,9 +90,8 @@ function Get-JuribaImportApplication {
             $uri = "{0}/apiv2/imports/applications/{1}/items" -f $Instance, $ImportId
         } else {
             $uri = "{0}/apiv2/imports/{1}/applications" -f $Instance, $ImportId
-            }
         }
-    
+           
         switch ($PSCmdlet.ParameterSetName) {
             "UniqueIdentifier" {
                 $uri += "/{0}" -f $UniqueIdentifier
