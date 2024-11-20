@@ -102,6 +102,7 @@
         'Get-JuribaImportUser',
         'Get-JuribaImportUserFeed',
         'Get-JuribaImportGroup',
+        'Get-JuribaImportFeed'
         'Get-JuribaList',
         'Get-JuribaProject',
         'Get-JuribaProjectDetail',

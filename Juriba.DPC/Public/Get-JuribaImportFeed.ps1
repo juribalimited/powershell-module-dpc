@@ -1,25 +1,24 @@
 #requires -Version 7
-function Get-JuribaImportMailboxFeed {
-    [alias("Get-DwImportMailboxFeed")]
+function Get-JuribaImportFeed {
     <#
         .SYNOPSIS
-        Gets mailbox imports.
+        Gets universal imports.
 
         .DESCRIPTION
-        Gets one or more mailbox feeds.
+        Gets one or more universal feeds.
         Use ImportId to get a specific feed or omit for all feeds.
 
         .PARAMETER ImportId
 
-        Optional. The id for the mailbox feed. Omit to get all mailbox feeds.
+        Optional. The id for the universal feed. Omit to get all universal feeds.
 
         .PARAMETER Name
 
-        Optional. Name of mailbox feed to find. Can only be used when ImportId is not specified.
+        Optional. Name of universal feed to find. Can only be used when ImportId is not specified.
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. DPC instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
@@ -27,11 +26,11 @@ function Get-JuribaImportMailboxFeed {
 
         .EXAMPLE
 
-        PS> Get-JuribaImportMailboxFeed -ImportId 1
+        PS> Get-JuribaImportFeed -ImportId 1
 
         .EXAMPLE
 
-        PS> Get-JuribaImportMailboxFeed -Name "My Mailbox Feed"
+        PS> Get-JuribaImportFeed -Name "My Universal Feed"
 
     #>
     [CmdletBinding(DefaultParameterSetName="Name")]
@@ -67,7 +66,7 @@ function Get-JuribaImportMailboxFeed {
 
             # Check if the version is 5.13 or older
             if ($major -lt 5 -or ($major -eq 5 -and $minor -le 13)) {
-                $uri = "{0}/apiv2/imports/mailboxes" -f $Instance
+                throw "This function is only supported on Juriba DPC 5.14 and later."
             } else {
                 $uri = "{0}/apiv2/imports" -f $Instance
             }
