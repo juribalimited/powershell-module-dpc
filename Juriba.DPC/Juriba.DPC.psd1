@@ -199,6 +199,7 @@
         'Set-JuribaImportMailboxFeed',
         'Set-JuribaImportUser',
         'Set-JuribaImportGroup',
+        'Set-JuribaImportFeed',
         'Set-JuribaProjectCapacityDetail',
         'Set-JuribaTaskValueDate',
         'Set-JuribaTaskValueSelect',
