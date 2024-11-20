@@ -173,6 +173,7 @@
         'Remove-JuribaImportUserFeed',
         'Remove-JuribaImportUserFeedAllItem',
         'Remove-JuribaImportGroup',
+        'Remove-JuribaImportFeed',
         'Remove-JuribaList',
         'Remove-JuribaTag',
         'Remove-JuribaTaskValueDate',

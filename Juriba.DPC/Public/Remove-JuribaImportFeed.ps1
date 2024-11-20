@@ -1,21 +1,20 @@
 #requires -Version 7
-function Remove-JuribaImportDepartmentFeed {
-    [alias("Remove-DwImportDepartmentFeed")]
+function Remove-JuribaImportFeed {
     <#
         .SYNOPSIS
-        Deletes a department feed.
+        Deletes a universal feed.
 
         .DESCRIPTION
-        Deletes a department feed.
+        Deletes a universal feed.
         Takes Id of feed to be deleted.
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. DPC instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER Port
 
-        Dashworks API port number. Default = 8443
+        DPC API port number. Default = 8443
 
         .PARAMETER APIKey
 
@@ -23,15 +22,15 @@ function Remove-JuribaImportDepartmentFeed {
 
         .PARAMETER ImportId
 
-        The Id of the department feed to be deleted.
+        The Id of the universal feed to be deleted.
 
         .EXAMPLE
 
-        PS> Remove-JuribaImportDepartmentFeed -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Remove-JuribaImportFeed -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
 
         .EXAMPLE
 
-        PS> Remove-JuribaImportDepartmentFeed -Confirm:$false -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Remove-JuribaImportFeed -Confirm:$false -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
 
     #>
     [CmdletBinding(
@@ -66,7 +65,7 @@ function Remove-JuribaImportDepartmentFeed {
 
         # Check if the version is 5.13 or older
         if ($major -lt 5 -or ($major -eq 5 -and $minor -le 13)) {
-            $uri = "{0}/apiv2/imports/departments/{1}" -f $Instance, $ImportId
+            throw "This function is only supported on Juriba DPC 5.14 and later."
         } else {
             $uri = "{0}/apiv2/imports/{1}" -f $Instance, $ImportId
         }
