@@ -1,17 +1,16 @@
 #requires -Version 7
-function New-JuribaImportDepartmentFeed {
-    [alias("New-DwImportDepartmentFeed")]
+function New-JuribaImportFeed {
     <#
         .SYNOPSIS
-        Creates a new Department feed.
+        Creates a new universal feed.
 
         .DESCRIPTION
-        Creates a new Department feed using the import API.
+        Creates a new universal feed using the import API.
         Takes the feed name and an enabled boolean.
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443:8443
+        Optional. DPC instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443:8443
 
         .PARAMETER APIKey
 
@@ -19,7 +18,7 @@ function New-JuribaImportDepartmentFeed {
 
         .PARAMETER Name
 
-        The name of the new departments feed.
+        The name of the new universal feed.
 
         .PARAMETER Enabled
 
@@ -27,7 +26,7 @@ function New-JuribaImportDepartmentFeed {
 
         .EXAMPLE
 
-        PS> New-JuribaImportDepartmentFeed -Name "My New Import" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> New-JuribaImportFeed -Name "My New Import" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
 
     #>
     [CmdletBinding(SupportsShouldProcess)]
@@ -61,7 +60,7 @@ function New-JuribaImportDepartmentFeed {
 
         # Check if the version is 5.13 or older
         if ($major -lt 5 -or ($major -eq 5 -and $minor -le 13)) {
-            $uri = "{0}/apiv2/imports/departments" -f $Instance
+            throw "This function is only supported on Juriba DPC 5.14 and later."
         } else {
             $uri = "{0}/apiv2/imports" -f $Instance
         }
