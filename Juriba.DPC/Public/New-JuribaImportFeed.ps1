@@ -1,37 +1,45 @@
 #requires -Version 7
-function Get-JuribaImportUserFeed {
-    [alias("Get-DwImportUserFeed")]
+function New-JuribaImportFeed {
     <#
         .SYNOPSIS
-        Gets user imports.
+        Creates a new universal feed.
+
         .DESCRIPTION
-        Gets one or more user feeds.
-        Use ImportId to get a specific feed or omit for all feeds.
+        Creates a new universal feed using the import API.
+        Takes the feed name and an enabled boolean.
+
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+
+        Optional. DPC instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443:8443
+
         .PARAMETER APIKey
+
         Optional. API key to be provided if not authenticating using Connect-Juriba.
-        .PARAMETER ImportId
-        Optional. The id for the user feed. Omit to get all user feeds.
+
         .PARAMETER Name
-        Optional. Name of user feed to find. Can only be used when ImportId is not specified.
+
+        The name of the new universal feed.
+
+        .PARAMETER Enabled
+
+        Should the new feed be enabled. Default = True.
+
         .EXAMPLE
-        PS> Get-JuribaImportUserFeed -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
-        .EXAMPLE
-        PS> Get-JuribaImportUserFeed -Name "My User Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+
+        PS> New-JuribaImportFeed -Name "My New Import" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+
     #>
-    [CmdletBinding(DefaultParameterSetName="Name")]
+    [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory=$false)]
         [string]$Instance,
         [Parameter(Mandatory=$false)]
         [string]$APIKey,
-        [parameter(Mandatory=$false, ParameterSetName="ImportId")]
-        [int]$ImportId,
-        [parameter(Mandatory=$false, ParameterSetName="Name")]
-        [string]$Name
+        [parameter(Mandatory=$true)]
+        [string]$Name,
+        [parameter(Mandatory=$false)]
+        [bool]$Enabled = $true
     )
-
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
         $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
         $Instance = $dwConnection.instance
@@ -52,22 +60,23 @@ function Get-JuribaImportUserFeed {
 
         # Check if the version is 5.13 or older
         if ($major -lt 5 -or ($major -eq 5 -and $minor -le 13)) {
-            $uri = "{0}/apiv2/imports/users" -f $Instance
+            throw "This function is only supported on Juriba DPC 5.14 and later."
         } else {
             $uri = "{0}/apiv2/imports" -f $Instance
         }
-        
-        if ($ImportId) {$uri += "/{0}" -f $ImportId}
-        if ($Name) {
-            $uri += "?filter="
-            $uri += [System.Web.HttpUtility]::UrlEncode("eq(name,'{0}')" -f $Name)
-        }
-    
         $headers = @{'x-api-key' = $APIKey}
     
+        $payload = @{}
+        $payload.Add("name", $Name)
+        $payload.Add("enabled", $Enabled)
+    
+        $JsonBody = $payload | ConvertTo-Json
+    
         try {
-            $result = Invoke-RestMethod -Uri $uri -Method GET -Headers $headers
-            return $result
+            if ($PSCmdlet.ShouldProcess($Name)) {
+                $result = Invoke-RestMethod -Uri $uri -Method POST -Headers $headers -ContentType "application/json" -Body $jsonBody
+                return $result
+            }
         }
         catch {
             Write-Error $_

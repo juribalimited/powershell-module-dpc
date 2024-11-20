@@ -58,12 +58,36 @@ function Set-JuribaImportMailbox {
     }
 
     if ($APIKey -and $Instance) {
-        $uri = "{0}/apiv2/imports/mailboxes/{1}/items/{2}" -f $Instance, $ImportId, $UniqueIdentifier
+        # Retrieve Juriba product version
+        $versionUri = "{0}/apiv1/" -f $Instance
+        $versionResult = Invoke-WebRequest -Uri $versionUri -Method GET -Headers $headers -ContentType "application/json"
+        # Regular expression to match the version pattern
+        $regex = [regex]"\d+\.\d+\.\d+"
+
+        # Extract the version
+        $version = $regex.Match($versionResult).Value
+        $versionParts = $version -split '\.'
+        $major = [int]$versionParts[0]
+        $minor = [int]$versionParts[1]
+
+        # Check if the version is 5.13 or older
+        if ($major -lt 5 -or ($major -eq 5 -and $minor -le 13)) {
+            $uri = "{0}/apiv2/imports/mailboxes/{1}/items/{2}" -f $Instance, $ImportId, $UniqueIdentifier
+            $bulkuri = "{0}/apiv2/imports/mailboxes/{1}/items/`$bulk" -f $Instance, $ImportId
+        } else {
+            $uri = "{0}/apiv2/imports/{1}/mailboxes/{2}" -f $Instance, $ImportId, $UniqueIdentifier
+            $bulkuri = "{0}/apiv2/imports/{1}/mailboxes/`$bulk" -f $Instance, $ImportId
+        }
         $headers = @{'x-api-key' = $APIKey}
     
         try {
-            if ($PSCmdlet.ShouldProcess($UniqueIdentifier)) {
-                $result = Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body $JsonBody
+            if (($PSCmdlet.ShouldProcess($UniqueIdentifier)) -and (($JsonBody | ConvertFrom-Json).Length -eq 1)) {
+                $result = Invoke-WebRequest -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($JsonBody))
+                return $result
+            }
+            elseif (($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueIdentifier)) -and (($JsonBody | ConvertFrom-Json).Length -gt 1)) {
+                <# Bulk operation request #>
+                $result = Invoke-RestMethod -Uri $bulkuri -Method PATCH -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($JsonBody))
                 return $result
             }
         }

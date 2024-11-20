@@ -18,7 +18,7 @@ Function Add-JuribaListTag {
         [Parameter(Mandatory = $false)]
         [string]$APIKey,
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Device", "User", "Application", "Mailbox", "ApplicationUser", "ApplciationDevice")]
+        [ValidateSet("Device", "User", "Application", "Mailbox", "ApplicationUser", "ApplicationDevice")]
         [string]$ObjectType,
         [Parameter(Mandatory = $true)]
         [int]$ListId,

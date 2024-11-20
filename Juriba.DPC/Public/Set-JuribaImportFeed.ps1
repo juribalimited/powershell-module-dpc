@@ -1,21 +1,17 @@
 #requires -Version 7
-function Remove-JuribaImportDepartmentFeed {
-    [alias("Remove-DwImportDepartmentFeed")]
+function Set-JuribaImportFeed {
+    [alias("Set-DwImportDeviceFeed")]
     <#
         .SYNOPSIS
-        Deletes a department feed.
+        Updates a universal feed.
 
         .DESCRIPTION
-        Deletes a department feed.
-        Takes Id of feed to be deleted.
+        Updates a universal feed using the import API.
+        Takes the new name and/or enabled status.
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
-
-        .PARAMETER Port
-
-        Dashworks API port number. Default = 8443
+        Optional. DPC instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
 
         .PARAMETER APIKey
 
@@ -23,28 +19,33 @@ function Remove-JuribaImportDepartmentFeed {
 
         .PARAMETER ImportId
 
-        The Id of the department feed to be deleted.
+        Id of feed to be updated.
+
+        .PARAMETER Name
+
+        The name of the new device feed.
+
+        .PARAMETER Enabled
+
+        Should the new feed be enabled.
 
         .EXAMPLE
 
-        PS> Remove-JuribaImportDepartmentFeed -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
-
-        .EXAMPLE
-
-        PS> Remove-JuribaImportDepartmentFeed -Confirm:$false -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Set-JuribaImportFeed -ImportId 1 -Name "My New Import Name" -Enabled $false -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
-    [CmdletBinding(
-        SupportsShouldProcess,
-        ConfirmImpact = 'High'
-    )]
+    [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory=$false)]
         [string]$Instance,
         [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [parameter(Mandatory=$true)]
-        [int]$ImportId
+        [int]$ImportId,
+        [parameter(Mandatory=$false)]
+        [string]$Name,
+        [parameter(ParameterSetName = 'FeedEnabled', Mandatory = $false)]
+        [bool]$Enabled
     )
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
         $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
@@ -52,6 +53,9 @@ function Remove-JuribaImportDepartmentFeed {
     }
 
     if ($APIKey -and $Instance) {
+        if (-Not $Name -And -Not $PSCmdlet.ParameterSetName -eq 'FeedEnabled') {
+            throw "Either Name or Enabled must be specified."
+        }     
         # Retrieve Juriba product version
         $versionUri = "{0}/apiv1/" -f $Instance
         $versionResult = Invoke-WebRequest -Uri $versionUri -Method GET -Headers $headers -ContentType "application/json"
@@ -66,20 +70,32 @@ function Remove-JuribaImportDepartmentFeed {
 
         # Check if the version is 5.13 or older
         if ($major -lt 5 -or ($major -eq 5 -and $minor -le 13)) {
-            $uri = "{0}/apiv2/imports/departments/{1}" -f $Instance, $ImportId
+            throw "This function is only supported on Juriba DPC 5.14 and later."
         } else {
             $uri = "{0}/apiv2/imports/{1}" -f $Instance, $ImportId
         }
         $headers = @{'x-api-key' = $APIKey}
     
+        $payload = @{}
+        if ($name) { $payload.Add("name", $Name) }
+        if ($PSCmdlet.ParameterSetName -eq 'FeedEnabled') { $payload.Add("enabled", $Enabled) }
+    
+        $jsonBody = $payload | ConvertTo-Json
+    
         try {
             if ($PSCmdlet.ShouldProcess($ImportId)) {
-                $result = Invoke-RestMethod -Uri $uri -Method DELETE -Headers $headers
+                $result = Invoke-RestMethod -Uri $uri -Method PATCH -Headers $headers -ContentType "application/json" -Body $jsonBody
                 return $result
             }
         }
         catch {
-            Write-Error $_
+            if ($_.Exception.Response.StatusCode.Value__ -eq 409)
+            {
+                Write-Error ("{0}" -f "Update conflicted with another feed. Check if another feed exists with the same name.")
+            }
+            else {
+                Write-Error $_
+            }
         }
 
     } else {

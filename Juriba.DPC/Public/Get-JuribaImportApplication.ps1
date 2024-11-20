@@ -7,7 +7,7 @@ function Get-JuribaImportApplication {
         .DESCRIPTION
         Gets a Dashworks application from the import API.
         Takes the ImportId and UniqueIdentifier as an input.
-        Optionally takes a UnqiueIdentifier as an input and will return a single application with that UniqueIdentifier.
+        Optionally takes a UniqueIdentifier as an input and will return a single application with that UniqueIdentifier.
         Optionally takes a Filter as an input and will return all applications matching that filter. See swagger documentation for examples of using filters.
         If specified, only one of UniqueIdentifier or Filter can be supplied. Omit all to return all devices for the import.
 
@@ -72,8 +72,26 @@ function Get-JuribaImportApplication {
 
     if ($APIKey -and $Instance) {
         $limit = 1000 # page size
-        $uri = "{0}/apiv2/imports/applications/{1}/items" -f $Instance, $ImportId
-    
+
+        # Retrieve Juriba product version
+        $versionUri = "{0}/apiv1/" -f $Instance
+        $versionResult = Invoke-WebRequest -Uri $versionUri -Method GET -Headers $headers -ContentType "application/json"
+        # Regular expression to match the version pattern
+        $regex = [regex]"\d+\.\d+\.\d+"
+
+        # Extract the version
+        $version = $regex.Match($versionResult).Value
+        $versionParts = $version -split '\.'
+        $major = [int]$versionParts[0]
+        $minor = [int]$versionParts[1]
+
+        # Check if the version is 5.13 or older
+        if ($major -lt 5 -or ($major -eq 5 -and $minor -le 13)) {
+            $uri = "{0}/apiv2/imports/applications/{1}/items" -f $Instance, $ImportId
+        } else {
+            $uri = "{0}/apiv2/imports/{1}/applications" -f $Instance, $ImportId
+        }
+           
         switch ($PSCmdlet.ParameterSetName) {
             "UniqueIdentifier" {
                 $uri += "/{0}" -f $UniqueIdentifier
