@@ -53,7 +53,7 @@ function New-JuribaImportDevice {
     if ($APIKey -and $Instance) {
         # Retrieve Juriba product version
         $versionUri = "{0}/apiv1/" -f $Instance
-        $versionResult = Invoke-WebRequest -Uri $versionUri -Method GET -Headers $headers -ContentType "application/json"
+        $versionResult = Invoke-WebRequest -Uri $versionUri -Method GET
         # Regular expression to match the version pattern
         $regex = [regex]"\d+\.\d+\.\d+"
 
