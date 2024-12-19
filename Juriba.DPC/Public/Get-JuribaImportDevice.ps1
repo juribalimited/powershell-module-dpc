@@ -147,14 +147,14 @@ function Get-JuribaImportDevice {
             }
             return $device
         }
-        catch {
-            Write-Error $_.Exception.Response
-            <#
+        catch {   
             if ($_.Exception.Response.StatusCode.Value__ -eq 404) {
                 # 404 means the device was not found, don't treat this as an error
                 # as we expect this function to be used to check if a device exists
                 Write-Verbose "device not found"
-            } #>
+            } else {
+                Write-Error $_
+            }
         }
 
     } else {
