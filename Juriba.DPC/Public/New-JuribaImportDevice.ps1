@@ -65,8 +65,8 @@ function New-JuribaImportDevice {
 
         # Check if the version is 5.13 or older
         if ($major -lt 5 -or ($major -eq 5 -and $minor -le 13)) {
-            $uri = "{0}/apiv2/imports/devices/{1}/items" -f $Instance, $ImportId
-            $bulkuri = "{0}/apiv2/imports/devices/{1}/items/`$bulk" -f $Instance, $ImportId
+            $uri = "{0}/apiv2/imports/{1}/devices" -f $Instance, $ImportId
+            $bulkuri = "{0}/apiv2/imports/{1}/devices/`$bulk" -f $Instance, $ImportId
         } else {
             $uri = "{0}/apiv2/imports/{1}/devices" -f $Instance, $ImportId
             $bulkuri = "{0}/apiv2/imports/{1}/devices/`$bulk" -f $Instance, $ImportId
