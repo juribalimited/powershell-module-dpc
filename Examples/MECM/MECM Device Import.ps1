@@ -29,7 +29,6 @@ param (
 
 #Requires -Version 7
 #Requires -Module SqlServer
-#Requires -Module Juriba.Dashworks
 
 $DashworksParams = @{
     Instance = $DwInstance
@@ -43,10 +42,10 @@ $MecmParams = @{
 }
 
 # Get DW feed
-$feed = Get-DwImportDeviceFeed @DashworksParams -Name $DwFeedName
+$feed = Get-JuribaImportDeviceFeed @DashworksParams -Name $DwFeedName
 # If it doesnt exist, create it
 if (-Not $feed) {
-    $feed = New-DwImportDeviceFeed @DashworksParams -Name $DwFeedName -Enabled $true
+    $feed = New-JuribaImportDeviceFeed @DashworksParams -Name $DwFeedName -Enabled $true
 }
 $importId = $feed.id
 
@@ -63,9 +62,22 @@ foreach ($row in $table){
     # convert table row to json, exclude attributes we dont need
     $jsonBody = $row | Select-Object * -ExcludeProperty ItemArray, Table, RowError, RowState, HasErrors, OwnerDomain, OwnerUsername | ConvertTo-Json
     $uniqueIdentifier = $row.uniqueIdentifier
+
+    $uniqueIdentifier = $row.uniqueIdentifier
+
+    # Generate a random 5-digit number
+    $newLastFiveDigits = Get-Random -Minimum 10000 -Maximum 99999;  
+    # Replace the last five digits with the new ones - otherwise we get 409 error
+    $uniqueIdentifier = $uniqueIdentifier.Substring(0, $uniqueIdentifier.Length - 5)+ $newLastFiveDigits;
+
+    ($jsonBody | ConvertFrom-Json).uniqueIdentifier  = $uniqueIdentifier;   
+    $jsonBody = ($jsonBody | ConvertFrom-Json)
+    $jsonBody.uniqueIdentifier = $uniqueIdentifier
+    $jsonBody = ($jsonBody | ConvertTo-Json)
+
     Write-Progress -Activity "Importing Devices to Dashworks" -Status ("Processing device: {0}" -f $uniqueIdentifier) -PercentComplete (($i/$table.Count*100))
 
-    $existingDevice = Get-DwImportDevice @DashworksParams -ImportId $importId -UniqueIdentifier $uniqueIdentifier
+    $existingDevice = Get-JuribaImportDevice @DashworksParams -ImportId $importId -UniqueIdentifier $uniqueIdentifier
     if ($existingDevice) {
         $result = Set-DwImportDevice @DashworksParams -ImportId $importId -UniqueIdentifier $uniqueIdentifier -JsonBody $jsonBody
         # check result, for an update we are expecting status code 204
