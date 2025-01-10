@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.DPC.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.1.0.2'
+    ModuleVersion     = '1.1.1.2'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -177,7 +177,7 @@
         'Remove-JuribaList',
         'Remove-JuribaTag',
         'Remove-JuribaTaskValueDate',
-		'Remove-JuribaTaskValueText',
+        'Remove-JuribaTaskValueText',
         'Remove-JuribaTeam',
         'Set-JuribaAutomation',
         'Set-JuribaAutomationAction',
