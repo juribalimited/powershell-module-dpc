@@ -2,11 +2,7 @@ name: Run Pester Tests
 
 on:
   workflow_dispatch:  # Manual trigger
-    inputs:
-      branch:
-        description: 'The branch to test'
-        required: true
-        default: 'main'  # Default branch to test, change as needed
+  
 jobs:
   test:
     runs-on: windows-latest
