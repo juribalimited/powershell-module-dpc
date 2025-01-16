@@ -3,7 +3,7 @@ name: Run Pester Tests
 on:
   push:
     paths: 
-    - "PlatformE2E/**"
+    - "powershell-module-dpc/**"
     - ".github/workflows/pester-tests.yml"
     branches:
       - user/gudrun/DAS-43180
