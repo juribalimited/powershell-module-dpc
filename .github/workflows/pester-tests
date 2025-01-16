@@ -1,0 +1,31 @@
+name: Run Pester Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up PowerShell
+        uses: actions/setup-powershell@v2
+
+      - name: Install Pester
+        run: |
+          Install-Module -Name Pester -Force -SkipPublisherCheck
+
+      # Run Pester tests
+      - name: Run Pester Tests
+        run: |
+          # Run all Pester tests in the repository where the tests are held
+          Invoke-Pester -Path ./Juriba.DPC/Public\PublicTests
+        shell: pwsh
