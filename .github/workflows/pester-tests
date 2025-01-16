@@ -7,8 +7,13 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:  # Allow manual triggering of the workflow
-
+      
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'The branch to test'
+        required: true
+        default: 'main'
 jobs:
   test:
     runs-on: windows-latest
