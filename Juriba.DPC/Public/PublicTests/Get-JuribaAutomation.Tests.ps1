@@ -4,7 +4,12 @@ Set-Location -Path $PSScriptRoot
 
 . $PSScriptRoot\BaseTest.ps1
 
-# Show the current directory
+
+
+Describe "Get-JuribaAutomation" {
+ 
+    Context "Acceptance test" {
+        # Show the current directory
 Write-Host "Current directory: $(Get-Location)"
 
 # List all files in the current directory for debugging
@@ -22,10 +27,6 @@ if (Test-Path $baseTestPath) {
 } else {
     Write-Host "BaseTest.ps1 NOT found at: $baseTestPath"
 }
-
-Describe "Get-JuribaAutomation" {
- 
-    Context "Acceptance test" {
        GetFunctionFile
 
        try {
