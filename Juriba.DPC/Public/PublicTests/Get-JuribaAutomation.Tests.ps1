@@ -5,9 +5,7 @@ Set-Location -Path $PSScriptRoot
 . $PSScriptRoot\BaseTest.ps1
 
 Describe "Get-JuribaAutomation" {
-    #BeforeAll {
-        #Setup-TestEnvironment
-    #}
+ 
     Context "Acceptance test" {
         GetFunctionFile
 
