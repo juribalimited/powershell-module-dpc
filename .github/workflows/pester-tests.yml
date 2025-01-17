@@ -18,8 +18,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Verify installed modules
-       
+      - name: List Installed Modules
+        run: |
+          # List all installed PowerShell modules
+          $modules = Get-InstalledModule
+          $modules | Format-Table Name, Version       
 
       - name: Install Pester
         run: |
