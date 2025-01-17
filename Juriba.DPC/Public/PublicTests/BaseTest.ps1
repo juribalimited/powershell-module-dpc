@@ -7,7 +7,7 @@ Contains all common testing infrastructure
 function GetFunctionFile {
    # Needed to make sure the directory paths are correct
    Set-Location -Path $PSScriptRoot
-   
+   Write-Host("I'M HERE")
    # Access the caller's invocation and get its script path
    $callerInvocation = $MyInvocation
    while ($callerInvocation.InvocationName -eq "MyFunction") {
