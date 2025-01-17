@@ -38,3 +38,7 @@ jobs:
           # Run all Pester tests in the repository where the tests are held
           Invoke-Pester -Path ./Juriba.DPC/Public/PublicTests -Verbose
         shell: pwsh
+
+      - name: Check current directory
+        run: |
+          pwd
