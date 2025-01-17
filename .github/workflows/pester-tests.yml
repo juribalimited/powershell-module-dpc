@@ -24,9 +24,14 @@ jobs:
         run: |
           Install-Module -Name Pester -Force -SkipPublisherCheck
 
+      - name: Check current directory
+        run: |
+          pwd
+          ls -la
+
       # Run Pester tests
       - name: Run Pester Tests
         run: |
           # Run all Pester tests in the repository where the tests are held
-          Invoke-Pester -Path ./Juriba.DPC/Public/PublicTests
+          Invoke-Pester -Path ./Juriba.DPC/Public/PublicTests -Verbose
         shell: pwsh
