@@ -4,10 +4,7 @@ Set-Location -Path $PSScriptRoot
 
 . $PSScriptRoot\BaseTest.ps1
 
-
-
-Describe "Get-JuribaAutomation" {
- 
+Describe "Get-JuribaAutomation" { 
     Context "Acceptance test" {
         # Show the current directory
         Write-Host "Current directory: $(Get-Location)"
@@ -29,6 +26,7 @@ Describe "Get-JuribaAutomation" {
         }
        GetFunctionFile
 
+       
        try {
 
         $output = Get-JuribaAutomation -Instance $instance -APIKey $apiKey
