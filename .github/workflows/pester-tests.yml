@@ -27,7 +27,6 @@ jobs:
       - name: Check current directory
         run: |
           pwd
-          ls -la
 
       # Run Pester tests
       - name: Run Pester Tests
