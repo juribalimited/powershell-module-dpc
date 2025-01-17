@@ -1,5 +1,7 @@
 # All Test files should import this
-#Import-Module 
+#Import-Module
+Set-Location -Path $PSScriptRoot
+
 . $PSScriptRoot\BaseTest.ps1
 
 Describe "Get-JuribaAutomation" {
