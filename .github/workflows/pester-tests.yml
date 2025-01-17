@@ -24,6 +24,14 @@ jobs:
           $modules = Get-InstalledModule
           $modules | Format-Table Name, Version       
 
+      - name: Check if BaseTest.ps1 exists
+        run: |
+          if (Test-Path "$PSScriptRoot\BaseTest.ps1") {
+              Write-Host "BaseTest.ps1 found!"
+          } else {
+              Write-Host "BaseTest.ps1 NOT found!"
+          }
+
       - name: Install Pester
         run: |
           Install-Module -Name Pester -Force -SkipPublisherCheck

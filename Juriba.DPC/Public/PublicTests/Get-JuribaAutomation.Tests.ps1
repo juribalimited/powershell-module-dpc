@@ -7,7 +7,7 @@ Set-Location -Path $PSScriptRoot
 Describe "Get-JuribaAutomation" {
  
     Context "Acceptance test" {
-        GetFunctionFile
+       GetFunctionFile
 
        try {
 
@@ -23,7 +23,7 @@ Describe "Get-JuribaAutomation" {
         }
 
         It 'The count is greater than 1' {
-            $output.Count | Should -BeGreaterThan 1
+            $output.Length | Should -BeGreaterThan 1
         }
     }
 }
