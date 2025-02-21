@@ -81,23 +81,12 @@ function Get-JuribaImportGroup {
 
     if ($APIKey -and $Instance) {
         $limit = 50 # page size
-        # Retrieve Juriba product version
-        $versionUri = "{0}/apiv1/" -f $Instance
-        $versionResult = Invoke-WebRequest -Uri $versionUri -Method GET
-        # Regular expression to match the version pattern
-        $regex = [regex]"\d+\.\d+\.\d+"
-
-        # Extract the version
-        $version = $regex.Match($versionResult).Value
-        $versionParts = $version -split '\.'
-        $major = [int]$versionParts[0]
-        $minor = [int]$versionParts[1]
-
-        # Check if the version is 5.13 or older
-        if ($major -lt 5 -or ($major -eq 5 -and $minor -le 13)) {
-            $uri = "{0}/apiv2/imports/groups/{1}/items" -f $Instance, $ImportId
-        } else {
+        #Check if version is 5.14 or newer
+        $ver = Get-JuribaDPCVersion -Instance $instance -MinimumVersion "5.14"
+        if ($ver) {
             $uri = "{0}/apiv2/imports/{1}/groups" -f $Instance, $ImportId
+        } else {
+            $uri = "{0}/apiv2/imports/groups/{1}/items" -f $Instance, $ImportId
         }
     
         switch ($PSCmdlet.ParameterSetName) {

@@ -56,23 +56,12 @@ function Set-JuribaImportFeed {
         if (-Not $Name -And -Not $PSCmdlet.ParameterSetName -eq 'FeedEnabled') {
             throw "Either Name or Enabled must be specified."
         }     
-        # Retrieve Juriba product version
-        $versionUri = "{0}/apiv1/" -f $Instance
-        $versionResult = Invoke-WebRequest -Uri $versionUri -Method GET
-        # Regular expression to match the version pattern
-        $regex = [regex]"\d+\.\d+\.\d+"
-
-        # Extract the version
-        $version = $regex.Match($versionResult).Value
-        $versionParts = $version -split '\.'
-        $major = [int]$versionParts[0]
-        $minor = [int]$versionParts[1]
-
-        # Check if the version is 5.13 or older
-        if ($major -lt 5 -or ($major -eq 5 -and $minor -le 13)) {
-            throw "This function is only supported on Juriba DPC 5.14 and later."
-        } else {
+        #Check if version is 5.14 or newer
+        $ver = Get-JuribaDPCVersion -Instance $instance -MinimumVersion "5.14"
+        if ($ver) {
             $uri = "{0}/apiv2/imports/{1}" -f $Instance, $ImportId
+        } else {
+            throw "This function is only supported on Juriba DPC 5.14 and later."
         }
         $headers = @{'x-api-key' = $APIKey}
     
