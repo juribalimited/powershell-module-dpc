@@ -42,9 +42,9 @@ function New-JuribaDashboardPieWidget {
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [string]$Instance,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [string]$APIKey,
         [Parameter(Mandatory = $true)]
         [int]$DashboardId,
@@ -60,52 +60,52 @@ function New-JuribaDashboardPieWidget {
         [string]$OrderByField = $null,
         [Parameter(Mandatory = $false)]
         [bool]$OrderByDescending = $false,
-        [Parameter(Mandatory=$false)]
-        [ValidateSet ("Users","Devices","Applications","Mailboxes")]
+        [Parameter(Mandatory = $false)]
+        [ValidateSet ("Users", "Devices", "Applications", "Mailboxes")]
         [string]$ObjectType = "Devices",
-        [Parameter(Mandatory=$false)]
-        [ValidateSet ("Count","Count Distinct","Max","Min","Sum","Average")]
+        [Parameter(Mandatory = $false)]
+        [ValidateSet ("Count", "Count Distinct", "Max", "Min", "Sum", "Average")]
         [string]$AggregateFunction = "Count",
         [parameter(Mandatory = $false)]
         [string]$AggregateBy = "",
-        [Parameter(Mandatory=$false)]
-        [ValidateRange(1,100) ]
+        [Parameter(Mandatory = $false)]
+        [ValidateRange(1, 100) ]
         [int]$MaximumValues = 10,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [boolean]$displayDataLabels = $false,
-        [Parameter(Mandatory=$false)]
-        [ValidateSet ("None","Right","Left","Top","Bottom")]
+        [Parameter(Mandatory = $false)]
+        [ValidateSet ("None", "Right", "Left", "Top", "Bottom")]
         [string]$Legend = "Bottom"
     )
 
-    switch ($ObjectType){
-        "Users" {$ObjectTypeID = 1}
-        "Devices" {$ObjectTypeID = 2}
-        "Applications" {$ObjectTypeID = 3}
-        "Mailboxes" {$ObjectTypeID = 4}
+    switch ($ObjectType) {
+        "Users" { $ObjectTypeID = 1 }
+        "Devices" { $ObjectTypeID = 2 }
+        "Applications" { $ObjectTypeID = 3 }
+        "Mailboxes" { $ObjectTypeID = 4 }
     }
-    switch ($AggregateFunction){
-        "Count" {$AggregateFunctionID = 1}
-        "Count Distinct" {$AggregateFunctionID = 2}
-        "Sum" {$AggregateFunctionID = 3}
-        "Min" {$AggregateFunctionID = 4}
-        "Max" {$AggregateFunctionID = 5}
-        "Average" {$AggregateFunctionID = 6}
+    switch ($AggregateFunction) {
+        "Count" { $AggregateFunctionID = 1 }
+        "Count Distinct" { $AggregateFunctionID = 2 }
+        "Sum" { $AggregateFunctionID = 3 }
+        "Min" { $AggregateFunctionID = 4 }
+        "Max" { $AggregateFunctionID = 5 }
+        "Average" { $AggregateFunctionID = 6 }
     }
-    switch ($Legend){
-        "None" {$LegendValue = 1}
-        "Right" {$LegendValue = 2}
-        "Left" {$LegendValue = 3}
-        "Top" {$LegendValue = 4}
-        "Bottom" {$LegendValue = 4}
+    switch ($Legend) {
+        "None" { $LegendValue = 1 }
+        "Right" { $LegendValue = 2 }
+        "Left" { $LegendValue = 3 }
+        "Top" { $LegendValue = 4 }
+        "Bottom" { $LegendValue = 5 }
     }
-    switch ($OrderByField){
-        "Split Value" {$OrderById = 1}
-        "Aggregate Value" {$OrderById = 2}
-        "Status" {$OrderById = 3}
-        "Severity" {$OrderById = 4}
-        "Chronological" {$OrderById = 5}
-        "Display Order" {$OrderById = 6}
+    switch ($OrderByField) {
+        "Split Value" { $OrderById = 1 }
+        "Aggregate Value" { $OrderById = 2 }
+        "Status" { $OrderById = 3 }
+        "Severity" { $OrderById = 4 }
+        "Chronological" { $OrderById = 5 }
+        "Display Order" { $OrderById = 6 }
     }
 
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
@@ -114,7 +114,7 @@ function New-JuribaDashboardPieWidget {
     }
 
     if ($APIKey -and $Instance) {
-        $body        = @{
+        $body = @{
             "widgetType"                = "Pie"
             "displayOrder"              = 0
             "title"                     = $Title
@@ -147,7 +147,7 @@ function New-JuribaDashboardPieWidget {
 
         $contentType = "application/json"
         $headers = @{ 'X-API-KEY' = $ApiKey }
-		$uri = "{0}/apiv1/dashboard/{1}/section/{2}/widget" -f $Instance, $DashboardId, $SectionId
+        $uri = "{0}/apiv1/dashboard/{1}/section/{2}/widget" -f $Instance, $DashboardId, $SectionId
 
         if ($PSCmdlet.ShouldProcess($Title)) {
             $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -Method POST -ContentType $contentType
