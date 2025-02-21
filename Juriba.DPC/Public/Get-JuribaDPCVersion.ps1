@@ -22,10 +22,9 @@ function Get-JuribaDPCVersion {
 
 #>
     [CmdletBinding()]
+    [OutputType([Boolean], [String])]
     Param (
-        [parameter(Mandatory = $True)]
         [string]$Instance,
-        [Parameter(Mandatory = $False)]
         [string]$MinimumVersion
     )
     try {
