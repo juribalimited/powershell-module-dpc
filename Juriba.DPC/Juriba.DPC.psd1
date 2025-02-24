@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.DPC.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.1.2.0'
+    ModuleVersion     = '1.1.3.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -84,6 +84,7 @@
         'Get-JuribaCapacityUnit',
         'Get-JuribaCustomField',
         'Get-JuribaDashboard',
+        'Get-JuribaDPCVersion',
         'Get-JuribaETLJob',
         'Get-JuribaEvergreenSelfService',
         'Get-JuribaEvergreenSelfServiceBaseURL',
