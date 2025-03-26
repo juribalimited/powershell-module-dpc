@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.DPC.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.1.3.0'
+    ModuleVersion     = '1.1.4.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -96,6 +96,9 @@
         'Get-JuribaImportDepartmentFeed',
         'Get-JuribaImportDevice',
         'Get-JuribaImportDeviceFeed',
+        'Get-JuribaEventLogRuns',
+        'Get-JuribaEventLogs',
+        'Get-JuribaEventLogServices',
         'Get-JuribaImportFeed',
         'Get-JuribaImportGroup',
         'Get-JuribaImportLocation',
