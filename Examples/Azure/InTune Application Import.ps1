@@ -170,7 +170,7 @@ Function Get-AzDataTable{
 
         $uri = $devices.'@odata.nextLink'
     }
-    while ($null -ne $users.'@odata.nextLink')
+    while ($null -ne $devices.'@odata.nextLink')
 
     return @(,($dtResults))
 }
