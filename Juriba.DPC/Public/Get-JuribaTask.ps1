@@ -37,8 +37,17 @@ function Get-JuribaTask {
             'x-api-key' = $ApiKey
         }
         try {
-            $result = Invoke-WebRequest -Uri $uri -Headers $headers -Method GET        
-            return ($result.Content | ConvertFrom-Json)
+            $result = Invoke-WebRequest -Uri $uri -Headers $headers -Method GET
+            $tasks = ($result.Content | ConvertFrom-Json)
+            if ($result.Headers.ContainsKey("X-Pagination")) {
+                $totalPages = ($result.Headers."X-Pagination" | ConvertFrom-Json).totalPages
+                for ($page = 2; $page -le $totalPages; $page++) {
+                    $pagedUri = $uri + "?page={0}" -f $page
+                    $pagedResult = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $headers -ContentType "application/json"
+                    $tasks += ($pagedResult.Content | ConvertFrom-Json)
+                }
+            }
+            return $tasks
         }
         catch {
             Write-Error $_
