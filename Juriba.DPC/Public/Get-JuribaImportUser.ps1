@@ -72,7 +72,7 @@ function Get-JuribaImportUser {
     }
 
     if ($APIKey -and $Instance) {
-        $limit = 50 # page size
+        $limit = 200 # page size
         #Check if version is 5.14 or newer
         $ver = Get-JuribaDPCVersion -Instance $instance -MinimumVersion "5.14"
         if ($ver) {
