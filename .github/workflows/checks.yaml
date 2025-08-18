@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     name: 'PowerShell Script Analyzer'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: 'Install PSScriptAnalyzer PowerShell module'
         run: Install-Module PSScriptAnalyzer -Force
         shell: pwsh

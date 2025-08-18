@@ -14,6 +14,6 @@ jobs:
     env:
       NUGET_API_KEY: ${{ secrets.NUGETAPIKEY }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - shell: pwsh
         run: Publish-Module -Path .\Juriba.DPC -NuGetApiKey $env:NUGET_API_KEY -Verbose
