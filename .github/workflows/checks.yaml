@@ -20,4 +20,4 @@ jobs:
           recurse: true
           includeDefaultRules: true
           enableExit: true
-          excludeRule: PSAvoidTrailingWhitespace
+          excludeRule: '"PSAvoidTrailingWhitespace"'
