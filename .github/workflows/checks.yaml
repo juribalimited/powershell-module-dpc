@@ -13,9 +13,11 @@ jobs:
     name: 'PowerShell Script Analyzer'
     steps:
       - uses: actions/checkout@v5
-      - name: 'Install PSScriptAnalyzer PowerShell module'
-        run: Install-Module PSScriptAnalyzer -Force
-        shell: pwsh
-      - name: 'Run PSScriptAnalyzer'
-        run: Invoke-ScriptAnalyzer -Path .\Juriba.DPC -Recurse -EnableExit -ExcludeRule PSAvoidTrailingWhitespace | Format-List -Property ScriptName, RuleName, Severity, Line, Column, Message
-        shell: pwsh
+      - name: Run PSScriptAnalyzer
+        uses: microsoft/psscriptanalyzer-action@v1.1
+        with:
+          path: Juriba.DPC
+          recurse: true
+          includeDefaultRules: true
+          enableExit: true
+          excludeRules: PSAvoidTrailingWhitespace
