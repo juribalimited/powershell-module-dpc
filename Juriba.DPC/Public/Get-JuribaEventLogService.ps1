@@ -1,5 +1,6 @@
 #requires -Version 7
-function Get-JuribaEventLogServices {
+function Get-JuribaEventLogService {
+    [Alias("Get-JuribaEventLogServices")]
     <#
         .SYNOPSIS
         Retrieves service information from the Juriba API.
