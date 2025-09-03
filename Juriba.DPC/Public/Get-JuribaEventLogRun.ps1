@@ -1,4 +1,5 @@
-function Get-JuribaEventLogRuns {
+function Get-JuribaEventLogRun {
+    [Alias("Get-JuribaEventLogRuns")]
     <#
         .SYNOPSIS
         Retrieves recent runs for a specified service from the Juriba API.

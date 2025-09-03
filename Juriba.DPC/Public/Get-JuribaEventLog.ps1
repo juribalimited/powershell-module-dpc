@@ -1,4 +1,6 @@
-function Get-JuribaEventLogs {
+function Get-JuribaEventLog {
+    [Alias("Get-JuribaEventLogs")]
+    [OutputType([System.Object[]])]
     <#
         .SYNOPSIS
         Retrieves event logs for a specific service run.
