@@ -79,7 +79,9 @@ function Get-JuribaImportDevice {
         [ValidateSet("Basic", "Full")]
         [string]$InfoLevel = "Basic",
         [Parameter(Mandatory=$false ,ParameterSetName="fields")]
-        [string[]]$Fields
+        [string[]]$Fields,
+        [Parameter(Mandatory=$false)]
+        [int]$PageSize = 200
     )
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
         $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
@@ -87,8 +89,6 @@ function Get-JuribaImportDevice {
     }
 
     if ($APIKey -and $Instance) {
-        $limit = 200 # page size
-
         #Check if version is 5.14 or newer
         $ver = Get-JuribaDPCVersion -Instance $Instance -MinimumVersion "5.14"
         if ($ver) {
@@ -102,7 +102,7 @@ function Get-JuribaImportDevice {
 
         # add limit to query if not getting by UniqueIdentifier
         if ($PSCmdlet.ParameterSetName -ne "UniqueIdentifier") {
-            $query += "limit=$limit"
+            $query += "limit=$PageSize"
         }
         
         # add parameters to query based on parameter set
