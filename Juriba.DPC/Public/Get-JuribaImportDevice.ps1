@@ -1,10 +1,10 @@
 function Get-JuribaImportDevice {
     <#
         .SYNOPSIS
-        Gets one or more Dashworks devices from the import API.
+        Gets one or more imported devices.
 
         .DESCRIPTION
-        Gets a Dashworks device from the import API.
+        Gets devices from the import API.
         Takes the ImportId as an input.
         Optionally takes a UnqiueIdentifier as an input and will return a single device with that UniqueIdentifier.
         Optionally takes a Hostname as an input and will return all devices matching that hostname.
@@ -13,7 +13,7 @@ function Get-JuribaImportDevice {
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.platform.juriba.app:8443
 
         .PARAMETER APIKey
 
@@ -43,16 +43,16 @@ function Get-JuribaImportDevice {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-JuribaImportDevice -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+        PS> Get-JuribaImportDevice -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
         .EXAMPLE
-        PS> Get-JuribaImportDevice -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
+        PS> Get-JuribaImportDevice -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
 
         .EXAMPLE
-        PS> Get-JuribaImportDevice -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
+        PS> Get-JuribaImportDevice -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
 
         .EXAMPLE
-        PS> Get-JuribaImportDevice -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
+        PS> Get-JuribaImportDevice -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
 
     #>
     [alias("Get-DwImportDevice")]
@@ -84,7 +84,7 @@ function Get-JuribaImportDevice {
         $limit = 200 # page size
 
         #Check if version is 5.14 or newer
-        $ver = Get-JuribaDPCVersion -Instance $instance -MinimumVersion "5.14"
+        $ver = Get-JuribaDPCVersion -Instance $Instance -MinimumVersion "5.14"
         if ($ver) {
             $uri = "{0}/apiv2/imports/{1}/devices" -f $Instance, $ImportId
         } else {

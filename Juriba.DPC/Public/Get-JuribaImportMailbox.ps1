@@ -2,10 +2,10 @@ function Get-JuribaImportMailbox {
     [alias("Get-DwImportMailbox")]
     <#
         .SYNOPSIS
-        Gets one or more Dashworks mailboxes from the import API.
+        Gets mailboxes from the import API.
 
         .DESCRIPTION
-        Gets one or more Dashworks mailboxes from the import API.
+        Gets mailboxes from the import API.
         Takes the ImportId as an input.
         Optionally takes a UniqueIdentifier as an input and will return a single mailbox with that UniqueIdentifier.
         Optionally takes a Filter as an input and will return all mailboxes matching that filter. See swagger documentation for examples of using filters.
@@ -13,7 +13,7 @@ function Get-JuribaImportMailbox {
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.platform.juriba.app:8443
 
         .PARAMETER APIKey
 
@@ -39,16 +39,16 @@ function Get-JuribaImportMailbox {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-JuribaImportMailbox -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+        PS> Get-JuribaImportMailbox -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
         .EXAMPLE
-        PS> Get-JuribaImportMailbox -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
+        PS> Get-JuribaImportMailbox -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
 
         .EXAMPLE
-        PS> Get-JuribaImportMailbox -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
+        PS> Get-JuribaImportMailbox -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
 
         .EXAMPLE
-        PS> Get-JuribaImportMailbox -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
+        PS> Get-JuribaImportMailbox -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
 
          #>
 
@@ -76,7 +76,7 @@ function Get-JuribaImportMailbox {
     if ($APIKey -and $Instance) {
         $limit = 50 # page size
         #Check if version is 5.14 or newer
-        $ver = Get-JuribaDPCVersion -Instance $instance -MinimumVersion "5.14"
+        $ver = Get-JuribaDPCVersion -Instance $Instance -MinimumVersion "5.14"
         if ($ver) {
             $uri = "{0}/apiv2/imports/{1}/mailboxes" -f $Instance, $ImportId
         } else {

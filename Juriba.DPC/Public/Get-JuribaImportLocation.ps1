@@ -2,19 +2,19 @@ function Get-JuribaImportLocation {
     [alias("Get-DwImportLocation")]
     <#
         .SYNOPSIS
-        Gets one or more Dashworks devices from the import API.
+        Gets locations from the import API.
 
         .DESCRIPTION
-        Gets a Dashworks Location from the import API.
+        Gets locations from the import API.
         Takes the ImportId as an input.
-        Optionally takes a UnqiueIdentifier as an input and will return a single location with that UniqueIdentifier.
-        Optionally takes a Hostname as an input and will return all location matching that hostname.
-        Optionally takes a Filter as an input and will return all location matching that filter. See swagger documentation for examples of using filters.
-        If specified, only one of UniqueIdentifier, Hostname or Filter can be supplied. Omit all to return all locations for the import.
+        Optionally takes a UniqueIdentifier as an input and will return a single location with that UniqueIdentifier.
+        Optionally takes a LocationName as an input and will return all locations matching that hostname.
+        Optionally takes a Filter as an input and will return all locations matching that filter. See swagger documentation for examples of using filters.
+        If specified, only one of UniqueIdentifier, LocationName can be supplied. Omit all to return all locations for the import.
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.platform.juriba.app:8443
 
         .PARAMETER APIKey
 
@@ -44,7 +44,7 @@ function Get-JuribaImportLocation {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-JuribaImportLocation -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Region, 'EU')"
+        PS> Get-JuribaImportLocation -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Region, 'EU')"
 
          #>
 
@@ -75,7 +75,7 @@ function Get-JuribaImportLocation {
     if ($APIKey -and $Instance) {
         $limit = 1000 # page size
         #Check if version is 5.14 or newer
-        $ver = Get-JuribaDPCVersion -Instance $instance -MinimumVersion "5.14"
+        $ver = Get-JuribaDPCVersion -Instance $Instance -MinimumVersion "5.14"
         if ($ver) {
             $uri = "{0}/apiv2/imports/{1}/locations" -f $Instance, $ImportId
         } else {

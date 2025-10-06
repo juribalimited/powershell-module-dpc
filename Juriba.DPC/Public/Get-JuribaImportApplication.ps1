@@ -2,10 +2,10 @@ function Get-JuribaImportApplication {
     [alias("Get-DwImportApplication")]
     <#
         .SYNOPSIS
-        Gets a Dashworks application from the import API.
+        Gets applications from the import API.
 
         .DESCRIPTION
-        Gets a Dashworks application from the import API.
+        Gets applications from the import API.
         Takes the ImportId and UniqueIdentifier as an input.
         Optionally takes a UniqueIdentifier as an input and will return a single application with that UniqueIdentifier.
         Optionally takes a Filter as an input and will return all applications matching that filter. See swagger documentation for examples of using filters.
@@ -13,7 +13,7 @@ function Get-JuribaImportApplication {
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.platform.juriba.app:8443
 
         .PARAMETER APIKey
 
@@ -39,13 +39,13 @@ function Get-JuribaImportApplication {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-JuribaImportApplication -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+        PS> Get-JuribaImportApplication -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
         .EXAMPLE
-        PS> Get-JuribaImportApplication -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
+        PS> Get-JuribaImportApplication -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
 
         .EXAMPLE
-        PS> Get-JuribaImportApplication -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Manufacturer, 'zxy123456')"
+        PS> Get-JuribaImportApplication -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Manufacturer, 'zxy123456')"
 
     #>
     [OutputType([string])]
@@ -74,7 +74,7 @@ function Get-JuribaImportApplication {
         $limit = 200 # page size
 
         #Check if version is 5.14 or newer
-        $ver = Get-JuribaDPCVersion -Instance $instance -MinimumVersion "5.14"
+        $ver = Get-JuribaDPCVersion -Instance $Instance -MinimumVersion "5.14"
         if ($ver) {
             $uri = "{0}/apiv2/imports/{1}/applications" -f $Instance, $ImportId
         } else {
