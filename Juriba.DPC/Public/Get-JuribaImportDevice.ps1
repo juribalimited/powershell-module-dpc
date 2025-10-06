@@ -35,6 +35,10 @@ function Get-JuribaImportDevice {
 
         Filter for device search. Cannot be used with Hostname or UniqueIdentifier.
 
+        .PARAMETER Fields
+
+        Array of fields to return. If specified, only these fields will be returned. This parameter is mutually exclusive with UniqueIdentifier and Filter.
+
         .PARAMETER InfoLevel
 
         Optional. Sets the level of information that this function returns. Accepts Basic or Full.
@@ -63,17 +67,19 @@ function Get-JuribaImportDevice {
         [string]$Instance,
         [Parameter(Mandatory=$false)]
         [string]$APIKey,
-        [parameter(Mandatory=$false, ParameterSetName="UniqueIdentifier")]
+        [Parameter(Mandatory=$false, ParameterSetName="UniqueIdentifier")]
         [string]$UniqueIdentifier,
-        [parameter(Mandatory=$false, ParameterSetName="Hostname")]
+        [Parameter(Mandatory=$false, ParameterSetName="Hostname")]
         [string]$Hostname,
-        [parameter(Mandatory=$false, ParameterSetName="Filter")]
+        [Parameter(Mandatory=$false, ParameterSetName="Filter")]
         [string]$Filter,
-        [parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true)]
         [int]$ImportId,
-        [parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false)]
         [ValidateSet("Basic", "Full")]
-        [string]$InfoLevel = "Basic"
+        [string]$InfoLevel = "Basic",
+        [Parameter(Mandatory=$false ,ParameterSetName="fields")]
+        [string[]]$Fields
     )
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
         $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
@@ -90,24 +96,36 @@ function Get-JuribaImportDevice {
         } else {
             $uri = "{0}/apiv2/imports/devices/{1}/items" -f $Instance, $ImportId
         }
-    
+
+        #build query string
+        $query = @()
+
+        # add limit to query if not getting by UniqueIdentifier
+        if ($PSCmdlet.ParameterSetName -ne "UniqueIdentifier") {
+            $query += "limit=$limit"
+        }
+        
+        # add parameters to query based on parameter set
         switch ($PSCmdlet.ParameterSetName) {
             "UniqueIdentifier" {
                 $uri += "/{0}" -f $UniqueIdentifier
             }
             "Hostname" {
-                $uri += "?filter="
-                $uri += [System.Web.HttpUtility]::UrlEncode("eq(hostname,'{0}')" -f $Hostname)
-                $uri += "&limit={0}" -f $limit
+                $query += "filter={0}" -f [System.Web.HttpUtility]::UrlEncode("eq(hostname,'{0}')" -f $Hostname)
             }
-            "Filter" {
-                $uri += "?filter="
-                $uri += [System.Web.HttpUtility]::UrlEncode("{0}" -f $Filter)
-                $uri += "&limit={0}" -f $limit
+             "Filter" {
+                $query += "filter={0}" -f [System.Web.HttpUtility]::UrlEncode($Filter)
             }
-            Default {
-                $uri += "?limit={0}" -f $limit
+            "Fields" {
+                $query += "fields={0}" -f [System.Web.HttpUtility]::UrlEncode($Fields -join ',')
+                $InfoLevel = "Full"
             }
+            Default { }
+        }
+
+        # build final uri
+        if ($query.Count -gt 0) {
+            $uri += $query | Join-String -Property $_ -Separator "&" -OutputPrefix "?"
         }
     
         $headers = @{
@@ -127,7 +145,11 @@ function Get-JuribaImportDevice {
             if ($result.Headers.ContainsKey("X-Pagination")) {
                 $totalPages = ($result.Headers."X-Pagination" | ConvertFrom-Json).totalPages
                 for ($page = 2; $page -le $totalPages; $page++) {
-                    $pagedUri = $uri + "&page={0}" -f $page
+                    if ($uri -match '\?') {
+                        $pagedUri = $uri + "&page={0}" -f $page
+                    } else {
+                        $pagedUri = $uri + "?page={0}" -f $page
+                    }
                     $pagedResult = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $headers -ContentType "application/json"
                     $device += switch($InfoLevel) {
                         "Basic" { ($pagedResult.Content | ConvertFrom-Json).UniqueIdentifier }

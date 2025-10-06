@@ -31,6 +31,10 @@ function Get-JuribaImportUser {
 
         Filter for user search. Cannot be used with Username.
 
+        .PARAMETER Fields
+
+        Array of fields to return. If specified, only these fields will be returned. This parameter is mutually exclusive with UniqueIdentifier and Filter.
+
         .PARAMETER InfoLevel
 
         Optional. Sets the level of information that this function returns. Accepts Basic or Full.
@@ -55,15 +59,17 @@ function Get-JuribaImportUser {
         [string]$Instance,
         [Parameter(Mandatory=$false)]
         [string]$APIKey,
-        [parameter(Mandatory=$false, ParameterSetName="Username")]
+        [Parameter(Mandatory=$false, ParameterSetName="Username")]
         [string]$Username,
-        [parameter(Mandatory=$false, ParameterSetName="Filter")]
+        [Parameter(Mandatory=$false, ParameterSetName="Filter")]
         [string]$Filter,
-        [parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true)]
         [int]$ImportId,
-        [parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false)]
         [ValidateSet("Basic", "Full")]
-        [string]$InfoLevel = "Basic"
+        [string]$InfoLevel = "Basic",
+        [Parameter(Mandatory=$false ,ParameterSetName="fields")]
+        [string[]]$Fields
     )
 
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
@@ -81,19 +87,32 @@ function Get-JuribaImportUser {
             $uri = "{0}/apiv2/imports/users/{1}/items" -f $Instance, $ImportId
         }
     
+        #build query string
+        $query = @()
+
+        # add limit to query if not getting by UniqueIdentifier
+        if ($PSCmdlet.ParameterSetName -ne "UniqueIdentifier") {
+            $query += "limit=$limit"
+        }
+        
+        # add parameters to query based on parameter set
         switch ($PSCmdlet.ParameterSetName) {
             "Username" {
-                $uri += "?filter="
-                $uri += [System.Web.HttpUtility]::UrlEncode("eq(Username,'{0}')" -f $Username)
+                $query += "filter={0}" -f [System.Web.HttpUtility]::UrlEncode("eq(username,'{0}')" -f $Username)
             }
             "Filter" {
-                $uri += "?filter="
-                $uri += [System.Web.HttpUtility]::UrlEncode("{0}" -f $Filter)
-                $uri += "&limit={0}" -f $limit
+                $query += "filter={0}" -f [System.Web.HttpUtility]::UrlEncode($Filter)
             }
-            Default {
-                $uri += "?limit={0}" -f $limit
+            "Fields" {
+                $query += "fields={0}" -f [System.Web.HttpUtility]::UrlEncode($Fields -join ',')
+                $InfoLevel = "Full"
             }
+            Default { }
+        }
+
+        # build final uri
+        if ($query.Count -gt 0) {
+            $uri += $query | Join-String -Property $_ -Separator "&" -OutputPrefix "?"
         }
     
         $headers = @{'x-api-key' = $APIKey}
@@ -109,7 +128,11 @@ function Get-JuribaImportUser {
             if ($result.Headers.ContainsKey("X-Pagination")) {
                 $totalPages = ($result.Headers."X-Pagination" | ConvertFrom-Json).totalPages
                 for ($page = 2; $page -le $totalPages; $page++) {
-                    $pagedUri = $uri + "&page={0}" -f $page
+                    if ($uri -match '\?') {
+                        $pagedUri = $uri + "&page={0}" -f $page
+                    } else {
+                        $pagedUri = $uri + "?page={0}" -f $page
+                    }
                     $pagedResult = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $headers -ContentType "application/json"
                     $user += switch($InfoLevel) {
                         "Basic" { ($pagedResult.Content | ConvertFrom-Json).Username }
