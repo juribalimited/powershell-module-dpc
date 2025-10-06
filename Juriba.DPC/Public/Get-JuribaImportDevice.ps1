@@ -6,7 +6,7 @@ function Get-JuribaImportDevice {
         .DESCRIPTION
         Gets devices from the import API.
         Takes the ImportId as an input.
-        Optionally takes a UnqiueIdentifier as an input and will return a single device with that UniqueIdentifier.
+        Optionally takes a UniqueIdentifier as an input and will return a single device with that UniqueIdentifier.
         Optionally takes a Hostname as an input and will return all devices matching that hostname.
         Optionally takes a Filter as an input and will return all devices matching that filter. See swagger documentation for examples of using filters.
         If specified, only one of UniqueIdentifier, Hostname or Filter can be supplied. Omit all to return all devices for the import.
