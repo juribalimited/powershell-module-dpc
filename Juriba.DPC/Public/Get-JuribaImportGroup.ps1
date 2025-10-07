@@ -1,10 +1,10 @@
 function Get-JuribaImportGroup {
     <#
         .SYNOPSIS
-        Gets one or more Juriba Platform group(s) from the import API.
+        Gets groups from the import API.
 
         .DESCRIPTION
-        Gets a Juriba Platform group from the import API.
+        Gets groups from the import API.
         Takes the User import ImportId as an input.
         Optionally takes a UniqueIdentifier as an input and will return a single group with that UniqueIdentifier.
         Optionally takes a Name as an input and will return all groups matching the provided group name.
@@ -13,7 +13,7 @@ function Get-JuribaImportGroup {
 
         .PARAMETER Instance
 
-        Optional. Juriba Platform instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.platform.juriba.app:8443
 
         .PARAMETER APIKey
 
@@ -43,16 +43,16 @@ function Get-JuribaImportGroup {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-JuribaImportGroup -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+        PS> Get-JuribaImportGroup -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
         .EXAMPLE
-        PS> Get-JuribaImportGroup -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
+        PS> Get-JuribaImportGroup -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
 
         .EXAMPLE
-        PS> Get-JuribaImportGroup -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Name "wabc123"
+        PS> Get-JuribaImportGroup -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Name "wabc123"
 
         .EXAMPLE
-        PS> Get-JuribaImportGroup -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(domain, 'zxy123456')"
+        PS> Get-JuribaImportGroup -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(domain, 'zxy123456')"
 
          #>
 
@@ -82,7 +82,7 @@ function Get-JuribaImportGroup {
     if ($APIKey -and $Instance) {
         $limit = 50 # page size
         #Check if version is 5.14 or newer
-        $ver = Get-JuribaDPCVersion -Instance $instance -MinimumVersion "5.14"
+        $ver = Get-JuribaDPCVersion -Instance $Instance -MinimumVersion "5.14"
         if ($ver) {
             $uri = "{0}/apiv2/imports/{1}/groups" -f $Instance, $ImportId
         } else {

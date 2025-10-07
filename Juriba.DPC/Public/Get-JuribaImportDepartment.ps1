@@ -2,10 +2,10 @@ function Get-JuribaImportDepartment {
     [alias("Get-DwImportDepartment")]
     <#
         .SYNOPSIS
-        Gets one or more Dashworks departments from the import API.
+        Gets one or more departments from the import API.
 
         .DESCRIPTION
-        Gets a Dashworks departments from the import API.
+        Gets departments from the import API.
         Takes the ImportId as an input.
         Optionally takes a name as an input and will return a single department with that name.
         Optionally takes a Filter as an input and will return all departments matching that filter. See swagger documentation for examples of using filters.
@@ -13,7 +13,7 @@ function Get-JuribaImportDepartment {
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.platform.juriba.app:8443
 
         .PARAMETER APIKey
 
@@ -39,13 +39,13 @@ function Get-JuribaImportDepartment {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-JuribaImportDepartment -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+        PS> Get-JuribaImportDepartment -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
         .EXAMPLE
-        PS> Get-JuribaImportDepartment -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Name "Sales" -InfoLevel "Basic"
+        PS> Get-JuribaImportDepartment -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Name "Sales" -InfoLevel "Basic"
 
         .EXAMPLE
-        PS> Get-JuribaImportDepartment -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Name, 'zxy123456@x.com')"
+        PS> Get-JuribaImportDepartment -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Name, 'zxy123456@x.com')"
 
          #>
 
@@ -75,7 +75,7 @@ function Get-JuribaImportDepartment {
         $limit = 50 # page size
 
         #Check if version is 5.14 or newer
-        $ver = Get-JuribaDPCVersion -Instance $instance -MinimumVersion "5.14"
+        $ver = Get-JuribaDPCVersion -Instance $Instance -MinimumVersion "5.14"
         if ($ver) {
             $uri = "{0}/apiv2/imports/{1}/departments" -f $Instance, $ImportId
         } else {

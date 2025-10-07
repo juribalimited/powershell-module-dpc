@@ -2,10 +2,10 @@ function Get-JuribaImportApplication {
     [alias("Get-DwImportApplication")]
     <#
         .SYNOPSIS
-        Gets a Dashworks application from the import API.
+        Gets applications from the import API.
 
         .DESCRIPTION
-        Gets a Dashworks application from the import API.
+        Gets applications from the import API.
         Takes the ImportId and UniqueIdentifier as an input.
         Optionally takes a UniqueIdentifier as an input and will return a single application with that UniqueIdentifier.
         Optionally takes a Filter as an input and will return all applications matching that filter. See swagger documentation for examples of using filters.
@@ -13,7 +13,7 @@ function Get-JuribaImportApplication {
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.platform.juriba.app:8443
 
         .PARAMETER APIKey
 
@@ -31,6 +31,10 @@ function Get-JuribaImportApplication {
 
         Filter for application search.
 
+        .PARAMETER Fields
+
+        Array of fields to return. If specified, only these fields will be returned. This parameter is mutually exclusive with UniqueIdentifier and Filter.
+
         .PARAMETER InfoLevel
 
         Optional. Sets the level of information that this function returns. Accepts Basic or Full.
@@ -39,13 +43,13 @@ function Get-JuribaImportApplication {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-JuribaImportApplication -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+        PS> Get-JuribaImportApplication -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
         .EXAMPLE
-        PS> Get-JuribaImportApplication -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
+        PS> Get-JuribaImportApplication -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
 
         .EXAMPLE
-        PS> Get-JuribaImportApplication -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Manufacturer, 'zxy123456')"
+        PS> Get-JuribaImportApplication -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Manufacturer, 'zxy123456')"
 
     #>
     [OutputType([string])]
@@ -55,15 +59,19 @@ function Get-JuribaImportApplication {
         [string]$Instance,
         [Parameter(Mandatory=$true)]
         [string]$APIKey,
-        [parameter(Mandatory=$false, ParameterSetName="UniqueIdentifier")]
+        [Parameter(Mandatory=$false, ParameterSetName="UniqueIdentifier")]
         [string]$UniqueIdentifier,
-        [parameter(Mandatory=$false, ParameterSetName="Filter")]
+        [Parameter(Mandatory=$false, ParameterSetName="Filter")]
         [string]$Filter,
-        [parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true)]
         [int]$ImportId,
-        [parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false)]
         [ValidateSet("Basic", "Full")]
-        [string]$InfoLevel = "Basic"
+        [string]$InfoLevel = "Basic",
+        [Parameter(Mandatory=$false ,ParameterSetName="fields")]
+        [string[]]$Fields,
+        [Parameter(Mandatory=$false)]
+        [int]$PageSize = 200
     )
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
         $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
@@ -71,29 +79,42 @@ function Get-JuribaImportApplication {
     }
 
     if ($APIKey -and $Instance) {
-        $limit = 200 # page size
-
         #Check if version is 5.14 or newer
-        $ver = Get-JuribaDPCVersion -Instance $instance -MinimumVersion "5.14"
+        $ver = Get-JuribaDPCVersion -Instance $Instance -MinimumVersion "5.14"
         if ($ver) {
             $uri = "{0}/apiv2/imports/{1}/applications" -f $Instance, $ImportId
         } else {
             $uri = "{0}/apiv2/imports/applications/{1}/items" -f $Instance, $ImportId
         }
-           
+
+        #build query string
+        $query = @()
+
+        # add limit to query if not getting by UniqueIdentifier
+        if ($PSCmdlet.ParameterSetName -ne "UniqueIdentifier") {
+            $query += "limit=$PageSize"
+        }
+        
+        # add parameters to query based on parameter set
         switch ($PSCmdlet.ParameterSetName) {
             "UniqueIdentifier" {
                 $uri += "/{0}" -f $UniqueIdentifier
             }
             "Filter" {
-                $uri += "?filter="
-                $uri += [System.Web.HttpUtility]::UrlEncode("{0}" -f $Filter)
-                $uri += "&limit={0}" -f $limit
+                $query += "filter={0}" -f [System.Web.HttpUtility]::UrlEncode($Filter)
             }
-            Default {
-                $uri += "?limit={0}" -f $limit
+            "Fields" {
+                $query += "fields={0}" -f [System.Web.HttpUtility]::UrlEncode($Fields -join ',')
+                $InfoLevel = "Full"
             }
+            Default { }
         }
+
+        # build final uri
+        if ($query.Count -gt 0) {
+            $uri += $query | Join-String -Property $_ -Separator "&" -OutputPrefix "?"
+        }
+
         $headers = @{'x-api-key' = $APIKey}
     
         $application = ""
@@ -107,7 +128,11 @@ function Get-JuribaImportApplication {
             if ($result.Headers.ContainsKey("X-Pagination")) {
                 $totalPages = ($result.Headers."X-Pagination" | ConvertFrom-Json).totalPages
                 for ($page = 2; $page -le $totalPages; $page++) {
-                    $pagedUri = $uri + "&page={0}" -f $page
+                    if ($uri -match '\?') {
+                        $pagedUri = $uri + "&page={0}" -f $page
+                    } else {
+                        $pagedUri = $uri + "?page={0}" -f $page
+                    }
                     $pagedResult = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $headers -ContentType "application/json"
                     $application += switch($InfoLevel) {
                         "Basic" { ($pagedResult.Content | ConvertFrom-Json).UniqueIdentifier }
