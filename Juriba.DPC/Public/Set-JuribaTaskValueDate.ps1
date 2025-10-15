@@ -12,6 +12,8 @@ function Set-JuribaTaskValueDate {
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER TaskId
         TaskId of the task to be updated.
+        .PARAMETER TaskName
+        TaskName of the task to be updated.
         .PARAMETER ProjectId
         The projectId of the task being updated.
         .PARAMETER ObjectKey
@@ -27,15 +29,20 @@ function Set-JuribaTaskValueDate {
         PS> Set-JuribaTaskValueDate -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85 -Value '2022-01-01' -SlotId 34
     #>
 
-    [CmdletBinding(SupportsShouldProcess)]
+    [CmdletBinding(DefaultParameterSetName = "ByTaskID", SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,
         [Parameter(Mandatory=$false)]
         [string]$APIKey,
-        [Parameter(Mandatory = $true)]
+        # Require TaskID if this parameter set is chosen
+        [Parameter(Mandatory = $true, ParameterSetName = 'ByTaskID')]
         [ValidateNotNullOrEmpty()]
         [int]$TaskId,
+        # Require TaskName if this parameter set is chosen
+        [Parameter(Mandatory = $true, ParameterSetName = 'ByTaskName')]
+        [ValidateNotNullOrEmpty()]
+        [string]$TaskName,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [int]$ProjectId,
@@ -69,7 +76,11 @@ function Set-JuribaTaskValueDate {
             'x-api-key' = $APIKey
             'content-type' = 'application/Json'
             }
-    
+
+        # Get the task ID if the task name has been specified
+        if ($PSCmdlet.ParameterSetName -eq 'ByTaskName') {
+            $TaskID = Get-JuribaTask -ProjectID $ProjectID | Where-Object -Property name -EQ $TaskName | Select-Object -ExpandProperty id
+        }    
     
         $params = @{
             'date'=$Value
