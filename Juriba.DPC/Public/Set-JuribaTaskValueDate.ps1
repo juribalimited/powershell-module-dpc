@@ -5,21 +5,23 @@ function Set-JuribaTaskValueDate {
         Updates a project date task.
         .DESCRIPTION
         Updates a project task. This cannot be used to clear the date value.
-        Takes TaskId, ProjectID, ObjectKey, Value and SlotId (optional) as inputs.
+        Takes TaskId, ProjectId, ObjectKey, Value and SlotId (optional) as inputs.
         .PARAMETER Instance
         Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER TaskId
         TaskId of the task to be updated.
+        .PARAMETER TaskName
+        TaskName of the task to be updated.
         .PARAMETER ProjectId
         The projectId of the task being updated.
         .PARAMETER ObjectKey
         The projectId of the task being updated.
         .PARAMETER Value
-        An ISO 8601 formatted date string to set the task to. EG ('2022-01-01')
+        An ISO 8601 formatted date string to set the task to. e.g. ('2022-01-01')
         .PARAMETER SlotId
-        Optional: The slot to set the task to. The slotId is not validated.
+        Optional: The slot to set the task to. The SlotId is not validated.
         .PARAMETER ObjectType
         The type of object being updated.
 
@@ -27,15 +29,20 @@ function Set-JuribaTaskValueDate {
         PS> Set-JuribaTaskValueDate -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85 -Value '2022-01-01' -SlotId 34
     #>
 
-    [CmdletBinding(SupportsShouldProcess)]
+    [CmdletBinding(DefaultParameterSetName = "ByTaskId", SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,
         [Parameter(Mandatory=$false)]
         [string]$APIKey,
-        [Parameter(Mandatory = $true)]
+        # Require TaskId if this parameter set is chosen
+        [Parameter(Mandatory = $true, ParameterSetName = 'ByTaskId')]
         [ValidateNotNullOrEmpty()]
         [int]$TaskId,
+        # Require TaskName if this parameter set is chosen
+        [Parameter(Mandatory = $true, ParameterSetName = 'ByTaskName')]
+        [ValidateNotNullOrEmpty()]
+        [string]$TaskName,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [int]$ProjectId,
@@ -69,17 +76,21 @@ function Set-JuribaTaskValueDate {
             'x-api-key' = $APIKey
             'content-type' = 'application/Json'
             }
-    
+
+        # Get the taskId if the task name has been specified
+        if ($PSCmdlet.ParameterSetName -eq 'ByTaskName') {
+            $TaskId = Get-JuribaTask -ProjectId $ProjectId | Where-Object -Property name -EQ $TaskName | Select-Object -ExpandProperty id
+        }    
     
         $params = @{
             'date'=$Value
-            'projectid'=$ProjectID
-            'taskid'=$TaskID
+            'projectid'=$ProjectId
+            'taskid'=$TaskId
             }
     
         if ($SlotId)
         {
-            $params.add("slotid",$SlotID)
+            $params.add("slotid",$SlotId)
         }
     
         $body = $params | ConvertTo-Json
