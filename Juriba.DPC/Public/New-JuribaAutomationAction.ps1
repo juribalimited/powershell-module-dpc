@@ -25,7 +25,7 @@ function New-JuribaAutomationAction {
         It gets the structure and information of the type from the set structure
         .PARAMETER Type
         Choose from TextCustomFieldUpdate, TextCustomFieldRemove, MVTextCustomFieldAdd, Resync, UpdateProjectCapacityUnit, UpdateProjectPath, UpdateRadioButtonTask, UpdateDateTaskRelativeAnotherTask, UpdateDateTaskRelativeCurrentValue, 
-            UpdateDateTaskRelativeNow, UpdateDateTask, RemoveDateTask
+            UpdateDateTaskRelativeNow, UpdateDateTask, RemoveDateTask, UpdateProjectBucket
         .PARAMETER CustomFieldId
         Custom Field Id to be assigned for action
         .PARAMETER CustomFieldValue
@@ -85,7 +85,7 @@ function New-JuribaAutomationAction {
         [Object]$Parameters,
         [Parameter(Mandatory = $false)]
         [ValidateSet("TextCustomFieldUpdate", "TextCustomFieldRemove", "MVTextCustomFieldAdd", "Resync", "UpdateProjectCapacityUnit","UpdateProjectPath","UpdateRadioButtonTask"
-                    ,"UpdateDateTaskRelativeAnotherTask","UpdateDateTaskRelativeCurrentValue","UpdateDateTaskRelativeNow","UpdateDateTask","RemoveDateTask")]
+                    ,"UpdateDateTaskRelativeAnotherTask","UpdateDateTaskRelativeCurrentValue","UpdateDateTaskRelativeNow","UpdateDateTask","RemoveDateTask","UpdateProjectBucket","UpdateTextTask")]
         [string]$Type,
         [Parameter(Mandatory = $false, ParameterSetName = "ByType")]
         [int]$CustomFieldId,
@@ -490,6 +490,55 @@ function New-JuribaAutomationAction {
                     $payload.Add("parameters", $params)
                     $payload.Add("isEvergreen", $false)
                 }
+				"UpdateProjectBucket" {
+					
+					switch ($AlsoMoveUsers) {
+                        "None" {$moveFirstObjectActionId = 3}
+                        "Owners only" {$moveFirstObjectActionId = 4}
+                        "All linked users" {$moveFirstObjectActionId = 5}
+                    }
+					              
+                    $payload.Add("typeId", 5)
+                    $payload.Add("projectId", $ProjectID)
+                    $params = @(
+                        @{
+                            "Property" = "bucketid";
+                            "Value"    = $BucketId;
+                            "meta"     = "bucket"
+                        },
+						@{
+                            "Property" = "moveFirstObjectActionId";
+                            "Value"    = $moveFirstObjectActionId;
+                            "meta"     = "bucket"
+                        }
+                    )
+                    $payload.Add("parameters", $params)
+                    $payload.Add("isEvergreen", $false)
+                }
+				"UpdateTextTask"	{
+
+                    $payload.Add("typeId", 2)
+                    $payload.Add("projectId", $ProjectID)
+                    $params = @(
+                        @{
+                            "Property" = "taskId";
+                            "Value"    = $TaskId;
+                            "meta"     = "task"
+                        },
+                        @{
+                            "Property" = "valueActionType";
+                            "Value"    = 1; #Update
+                            "meta"     = "Text"
+                        },
+                        @{
+                            "Property" = "value";
+                            "Value"    = $TextTaskValue;
+                            "meta"     = "Text"
+                        }
+                    )
+                    $payload.Add("parameters", $params)
+                    $payload.Add("isEvergreen", $false)	
+				}
             }
         
             $jsonbody = $payload | ConvertTo-Json -Depth 6
