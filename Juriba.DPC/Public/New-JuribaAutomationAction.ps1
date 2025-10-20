@@ -25,7 +25,7 @@ function New-JuribaAutomationAction {
         It gets the structure and information of the type from the set structure
         .PARAMETER Type
         Choose from TextCustomFieldUpdate, TextCustomFieldRemove, MVTextCustomFieldAdd, Resync, UpdateProjectCapacityUnit, UpdateProjectPath, UpdateRadioButtonTask, UpdateDateTaskRelativeAnotherTask, UpdateDateTaskRelativeCurrentValue, 
-            UpdateDateTaskRelativeNow, UpdateDateTask, RemoveDateTask, UpdateProjectBucket
+            UpdateDateTaskRelativeNow, UpdateDateTask, RemoveDateTask, UpdateProjectBucket, UpdateTextTask
         .PARAMETER CustomFieldId
         Custom Field Id to be assigned for action
         .PARAMETER CustomFieldValue
