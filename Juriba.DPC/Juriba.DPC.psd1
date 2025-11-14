@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.DPC.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.1.10.0'
+    ModuleVersion     = '1.1.11.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
