@@ -38,9 +38,9 @@ function Add-JuribaCustomFieldValue {
         [int]$fieldIndex = 0,
         [Parameter(Mandatory = $true)]
         [int]$ObjectKey,
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [ValidateSet("Device", "User", "Application", "Mailbox")]
-        [string]$ObjectType
+        [string]$ObjectType = "Device"
     )
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
         $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
@@ -48,6 +48,7 @@ function Add-JuribaCustomFieldValue {
     }
 
     if ($APIKey -and $Instance) {
+        
         $path = switch($ObjectType) {
             "Device"        {"device"}
             "User"          {"user"}
@@ -55,27 +56,29 @@ function Add-JuribaCustomFieldValue {
             "Mailbox"       {"mailbox"}
         }
 
-    $payload = @{
-        "fieldName" = $CSVColumnHeader
-        "value" = $Value
-        "fieldIndex" = $fieldIndex
-    }
+        $payload = @{
+            "fieldName" = $CSVColumnHeader
+            "value" = $Value
+            "fieldIndex" = $fieldIndex
+        }
     
-    $jsonbody = $payload | ConvertTo-Json
+        $jsonbody = $payload | ConvertTo-Json
 
-    $uri = "{0}/apiv1//{1}/{2}/addCustomField" -f $Instance, $path, $ObjectKey
-    $headers = @{'x-api-key' = $APIKey }
+        $uri = "{0}/apiv1//{1}/{2}/addCustomField" -f $Instance, $path, $ObjectKey
+        $headers = @{'x-api-key' = $APIKey }
+        
+        try {
+            if ($PSCmdlet.ShouldProcess($ObjectKey)) {
+                $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType 'application/json'
+                return ($result.Content).Trim('"')
+            }
+        }
+        catch {
+            Write-Error $_
+            }
+        } 
     
-    try {
-        if ($PSCmdlet.ShouldProcess($ObjectKey)) {
-            $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType 'application/json'
-            return ($result.Content).Trim('"')
-        }
-	}
-    catch {
-        Write-Error $_
-        }
-    } else {
+    else {
         Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
-    }
+        }
 }
