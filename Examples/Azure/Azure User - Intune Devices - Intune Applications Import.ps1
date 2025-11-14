@@ -675,7 +675,7 @@ $DWImportDeviceTable | ForEach-Object -Parallel {
     $DeviceAppsTable.Columns.Add("entitled", [bool]) | Out-Null
 
     #Get Detected Device Applications
-    $GraphEndpoint ='https://graph.microsoft.com/v1.0/deviceManagement/manageddevices(''' + $Device.uniqueIdentifier + ''')?$expand=detectedApps'
+    $GraphEndpoint ='https://graph.microsoft.com/beta/deviceManagement/manageddevices(''' + $Device.uniqueIdentifier + ''')/detectedApps'
     try{
         $GraphData = Invoke-RestMethod -Headers @{Authorization = "Bearer $($AZToken)" } -Uri $GraphEndpoint -Method Get
     }
