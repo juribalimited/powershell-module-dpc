@@ -1,5 +1,3 @@
-
-
 function Add-JuribaCustomFieldValue {
     [alias("Add-DWCustomFieldValue")]
     <#
@@ -19,10 +17,12 @@ function Add-JuribaCustomFieldValue {
         Only applies to multi value text type, otherwise defaults to 0
         .PARAMETER ObjectKey
         Identity of the object to add the value to
+        .PARAMETER ObjectType
+        The type of object being updated.
         .OUTPUTS
         New custom field value added successfully
 		.EXAMPLE
-		PS> Add-JuribaCustomFieldValue @dwparams -CustomField "W11 Path" -Value "W11 Device Upgrade" -ObjectKey 100
+		PS> Add-JuribaCustomFieldValue @dwparams -CustomField "W11 Path" -Value "W11 Device Upgrade" -ObjectKey 100 -ObjectType Device
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
@@ -37,27 +37,48 @@ function Add-JuribaCustomFieldValue {
         [Parameter(Mandatory = $false)]
         [int]$fieldIndex = 0,
         [Parameter(Mandatory = $true)]
-        [int]$ObjectKey
+        [int]$ObjectKey,
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("Device", "User", "Application", "Mailbox")]
+        [string]$ObjectType = "Device"
     )
-
-    $payload = @{
-        "fieldName" = $CSVColumnHeader
-        "value" = $Value
-        "fieldIndex" = $fieldIndex
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
     }
-    
-    $jsonbody = $payload | ConvertTo-Json
 
-    $uri = "{0}/apiv1//device/{1}/addCustomField" -f $Instance, $ObjectKey
-    $headers = @{'x-api-key' = $APIKey }
-    
-    try {
-        if ($PSCmdlet.ShouldProcess($ObjectKey)) {
-            $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType 'application/json'
-            return ($result.Content).Trim('"')
+    if ($APIKey -and $Instance) {
+        
+        $path = switch($ObjectType) {
+            "Device"        {"device"}
+            "User"          {"user"}
+            "Application"   {"application"}
+            "Mailbox"       {"mailbox"}
         }
-	}
-    catch {
-        Write-Error $_
-    }
+
+        $payload = @{
+            "fieldName" = $CSVColumnHeader
+            "value" = $Value
+            "fieldIndex" = $fieldIndex
+        }
+    
+        $jsonbody = $payload | ConvertTo-Json
+
+        $uri = "{0}/apiv1//{1}/{2}/addCustomField" -f $Instance, $path, $ObjectKey
+        $headers = @{'x-api-key' = $APIKey }
+        
+        try {
+            if ($PSCmdlet.ShouldProcess($ObjectKey)) {
+                $result = Invoke-WebRequest -Uri $uri -Method POST -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($jsonbody)) -ContentType 'application/json'
+                return ($result.Content).Trim('"')
+            }
+        }
+        catch {
+            Write-Error $_
+            }
+        } 
+    
+    else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
+        }
 }
