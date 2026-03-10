@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.DPC.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.1.12.0'
+    ModuleVersion     = '1.1.13.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -208,6 +208,7 @@
         'Set-JuribaImportMailboxFeed',
         'Set-JuribaImportUser',
         'Set-JuribaImportVulnerability',
+		'Set-JuribaListTeamUserAccess',
         'Set-JuribaProjectCapacityDetail',
         'Set-JuribaTaskValueDate',
         'Set-JuribaTaskValueSelect',
