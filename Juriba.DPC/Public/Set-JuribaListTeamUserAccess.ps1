@@ -8,7 +8,7 @@ Function Set-JuribaListTeamUserAccess {
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.juriba.app:8443
 
         .PARAMETER APIKey
 
@@ -36,8 +36,8 @@ Function Set-JuribaListTeamUserAccess {
 
         .EXAMPLE
 
-        PS> New-JuribaList
-            -Instance "https://myinstance.dashworks.app:8443"
+        PS> Set-JuribaListTeamUserAccess 
+            -Instance "https://myinstance.juriba.app:8443"
             -APIKey "xxxxx"
             -ObjectType "Device"
             -AccessType "Admin"
