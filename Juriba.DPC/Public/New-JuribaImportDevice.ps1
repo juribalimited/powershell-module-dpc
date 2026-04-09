@@ -89,8 +89,8 @@ function New-JuribaImportDevice {
                 <# Bulk operation request #>
                 if ($Async) {
                     $response = Invoke-WebRequest -Uri $bulkuri -Method POST -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($JsonBody))
-                    if ($response.Headers.Location.Length -gt 0) {
-                        return $response.Headers.Location
+                    if ($response.Headers['Location']) {
+                        return [string]$response.Headers['Location'][0]
                     } else {
                         throw "No job location returned in async response headers."
                     }
