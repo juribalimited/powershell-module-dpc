@@ -20,9 +20,10 @@ Examples/            - Example scripts organized by integration type
 
 ## CI/CD
 
-- **PR checks**: PSScriptAnalyzer runs on PRs touching `Juriba.DPC/**`. Excluded rule: `PSAvoidTrailingWhitespace`. All other rules must pass.
+- **PR checks**: PSScriptAnalyzer runs on PRs touching `Juriba.DPC/**` with `-EnableExit`. This means **all** findings fail the build, including Information-level (not just warnings/errors). Excluded rule: `PSAvoidTrailingWhitespace`.
 - **Publishing**: On push to `main` with changes in `Juriba.DPC/**`, the module is published to the PowerShell Gallery via `Publish-Module`.
-- Run PSScriptAnalyzer locally before committing: `Invoke-ScriptAnalyzer -Path .\Juriba.DPC -Recurse -ExcludeRule PSAvoidTrailingWhitespace`
+- Run PSScriptAnalyzer locally before committing: `Invoke-ScriptAnalyzer -Path .\Juriba.DPC -Recurse -EnableExit -ExcludeRule PSAvoidTrailingWhitespace`
+- Common pitfall: if a function returns different types depending on code path (e.g., a string in one branch, a PSObject in another), add `[OutputType([String])]` or the appropriate types to avoid `PSUseOutputTypeCorrectly` findings.
 
 ## Adding a New Function
 
