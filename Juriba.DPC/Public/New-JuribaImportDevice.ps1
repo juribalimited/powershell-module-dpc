@@ -25,8 +25,15 @@ function New-JuribaImportDevice {
 
         Json payload with updated device details.
 
+        .PARAMETER Async
+
+        Optional. Send bulk requests asynchronously. Returns the job URI for polling with Wait-JuribaImportJob. Requires DPC 5.17 or later. Only applies to bulk requests.
+
         .EXAMPLE
         PS> New-JuribaImportDevice -ImportId 1 -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+
+        .EXAMPLE
+        PS> New-JuribaImportDevice -ImportId 1 -JsonBody $jsonBody -Async -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
 
     [CmdletBinding(SupportsShouldProcess)]
@@ -43,7 +50,9 @@ function New-JuribaImportDevice {
         ErrorMessage = "JsonBody is not valid json or does not contain a uniqueIdentifier"
         )]
         [parameter(Mandatory=$true)]
-        [string]$JsonBody
+        [string]$JsonBody,
+        [parameter(Mandatory=$false)]
+        [switch]$Async
     )
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
         $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
@@ -60,8 +69,17 @@ function New-JuribaImportDevice {
             $uri = "{0}/apiv2/imports/{1}/devices" -f $Instance, $ImportId
             $bulkuri = "{0}/apiv2/imports/{1}/devices/`$bulk" -f $Instance, $ImportId
         }
+
+        if ($Async) {
+            $asyncVer = Get-JuribaDPCVersion -Instance $Instance -MinimumVersion "5.17"
+            if (-not $asyncVer) {
+                throw "The -Async switch requires DPC version 5.17 or later."
+            }
+            $bulkuri += "?async"
+        }
+
         $headers = @{'x-api-key' = $APIKey}
-    
+
         try {
             if (($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueIdentifier)) -and (($JsonBody | ConvertFrom-Json).Length -eq 1)) {
                 $result = Invoke-RestMethod -Uri $uri -Method POST -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($JsonBody))
@@ -69,15 +87,24 @@ function New-JuribaImportDevice {
             }
             elseif (($PSCmdlet.ShouldProcess(($JsonBody | ConvertFrom-Json).uniqueIdentifier)) -and (($JsonBody | ConvertFrom-Json).Length -gt 1)) {
                 <# Bulk operation request #>
-                $result = Invoke-RestMethod -Uri $bulkuri -Method POST -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($JsonBody))
-                return $result
+                if ($Async) {
+                    $response = Invoke-WebRequest -Uri $bulkuri -Method POST -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($JsonBody))
+                    if ($response.Headers.Location.Length -gt 0) {
+                        return $response.Headers.Location
+                    } else {
+                        throw "No job location returned in async response headers."
+                    }
+                } else {
+                    $result = Invoke-RestMethod -Uri $bulkuri -Method POST -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($JsonBody))
+                    return $result
+                }
             }
         }
         catch {
             Write-Error $_
         }
 
-    } 
+    }
     else {
         Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
