@@ -37,6 +37,7 @@ function New-JuribaImportDevice {
     #>
 
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([String])]
     param (
         [Parameter(Mandatory=$false)]
         [string]$Instance,

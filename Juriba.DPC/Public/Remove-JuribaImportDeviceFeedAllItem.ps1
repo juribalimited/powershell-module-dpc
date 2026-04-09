@@ -42,6 +42,7 @@ function Remove-JuribaImportDeviceFeedAllItem {
         SupportsShouldProcess,
         ConfirmImpact = 'High'
     )]
+    [OutputType([String])]
     param (
         [Parameter(Mandatory=$false)]
         [string]$Instance,
