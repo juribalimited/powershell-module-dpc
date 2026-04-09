@@ -58,7 +58,7 @@ function Wait-JuribaImportJob {
 
         try {
             $jobDetails = Invoke-RestMethod -Uri $JobUri -Method GET -Headers $headers
-            while ($jobDetails.status -eq "InProgress") {
+            while ($jobDetails.status -notin @("Completed", "Failed")) {
                 Start-Sleep -Milliseconds $PollIntervalMs
                 $jobDetails = Invoke-RestMethod -Uri $JobUri -Method GET -Headers $headers
             }
