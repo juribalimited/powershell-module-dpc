@@ -52,7 +52,7 @@ function Verb-JuribaEntity {
         Longer description including which API version is used.
 
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
@@ -64,7 +64,7 @@ function Verb-JuribaEntity {
         Description of what is returned.
 
         .EXAMPLE
-        PS> Verb-JuribaEntity @DwParams -ExampleParam "value"
+        PS> Verb-JuribaEntity -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxx" -ExampleParam "value"
     #>
     [CmdletBinding(SupportsShouldProcess)]  # Include SupportsShouldProcess for New/Set/Remove functions
     param(
