@@ -40,7 +40,7 @@ function Set-JuribaImportApplication {
         [string]$Instance,
         [Parameter(Mandatory=$false)]
         [string]$APIKey,
-        [parameter(Mandatory=$true)]
+        [parameter(Mandatory=$false)]
         [string]$UniqueIdentifier,
         [parameter(Mandatory=$true)]
         [int]$ImportId,

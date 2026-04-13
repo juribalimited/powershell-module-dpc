@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.DPC.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.1.13.0'
+    ModuleVersion     = '1.1.14.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -217,7 +217,8 @@
         'Start-JuribaETLJob',
         'Stop-JuribaETLJob',
         'Update-ApplicationOwner',
-        'Set-JuribaCustomFieldValue'
+        'Set-JuribaCustomFieldValue',
+        'Wait-JuribaImportJob'
     )
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.

@@ -21,6 +21,10 @@ function Remove-JuribaImportDeviceFeedAllItem {
 
         The Id of the device feed to be deleted.
 
+        .PARAMETER Async
+
+        Optional. Send the request asynchronously. Returns the job URI for polling with Wait-JuribaImportJob. Requires DPC 5.17 or later.
+
         .EXAMPLE
 
         PS> Remove-JuribaImportDeviceFeedAllItem -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
@@ -29,18 +33,25 @@ function Remove-JuribaImportDeviceFeedAllItem {
 
         PS> Remove-JuribaImportDeviceFeedAllItem -Confirm:$false -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
+        .EXAMPLE
+
+        PS> Remove-JuribaImportDeviceFeedAllItem -ImportId 1 -Async -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+
     #>
     [CmdletBinding(
         SupportsShouldProcess,
         ConfirmImpact = 'High'
     )]
+    [OutputType([String])]
     param (
         [Parameter(Mandatory=$false)]
         [string]$Instance,
         [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [parameter(Mandatory=$true)]
-        [int]$ImportId
+        [int]$ImportId,
+        [parameter(Mandatory=$false)]
+        [switch]$Async
     )
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
         $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
@@ -55,12 +66,29 @@ function Remove-JuribaImportDeviceFeedAllItem {
         } else {
             $uri = "{0}/apiv2/imports/devices/{1}/items" -f $Instance, $ImportId
         }
+        if ($Async) {
+            $asyncVer = Get-JuribaDPCVersion -Instance $Instance -MinimumVersion "5.17"
+            if (-not $asyncVer) {
+                throw "The -Async switch requires DPC version 5.17 or later."
+            }
+            $uri += "?async"
+        }
+
         $headers = @{'x-api-key' = $APIKey}
-    
+
         try {
             if ($PSCmdlet.ShouldProcess($ImportId)) {
-                $result = Invoke-RestMethod -Uri $uri -Method DELETE -Headers $headers
-                return $result
+                if ($Async) {
+                    $response = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $headers
+                    if ($response.Headers['Location']) {
+                        return [string]$response.Headers['Location'][0]
+                    } else {
+                        throw "No job location returned in async response headers."
+                    }
+                } else {
+                    $result = Invoke-RestMethod -Uri $uri -Method DELETE -Headers $headers
+                    return $result
+                }
             }
         }
         catch {
