@@ -215,18 +215,20 @@ function Invoke-JuribaAPIBulkImportGroupFeedDataTableDiff{
                     $members += @{"uniqueIdentifier"=$member.memberUniqueIdentifier;"importId"=$ImportId;"objectType"=$member.objectType;"isPrimary"=$member.isPrimary}
                 }
             }
-            $Body.members = $members            
+            $Body.members = $members
 
-            $PropertyEntries = foreach ($Property in $Properties) {
-                if ($Row.Table.Columns.Contains($Property) -and
-                    $Row[$Property] -ne [dbnull]::Value)
-                {
-                    @{
-                        name  = $Property
-                        value = @($Row[$Property])
+            $PropertyEntries = @(
+                foreach ($Property in $Properties) {
+                    if ($Row.Table.Columns.Contains($Property) -and
+                        $Row[$Property] -ne [dbnull]::Value)
+                    {
+                        @{
+                            name  = $Property
+                            value = @($Row[$Property])
+                        }
                     }
                 }
-            }
+            )
             $Body.Properties = $PropertyEntries
 
             $BulkUploadObject += $Body

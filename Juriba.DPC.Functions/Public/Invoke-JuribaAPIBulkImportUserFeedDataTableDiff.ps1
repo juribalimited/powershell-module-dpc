@@ -220,28 +220,32 @@ function Invoke-JuribaAPIBulkImportUserFeedDataTableDiff{
             }
             $Body.applications = $applications
             
-            $CustomFieldValues = foreach ($CustomFieldName in $CustomFields) {
-                if ($Row.Table.Columns.Contains($CustomFieldName) -and
-                    $Row[$CustomFieldName] -ne [dbnull]::Value)
-                {
-                    @{
-                        name  = $CustomFieldName
-                        value = $Row[$CustomFieldName]
+            $CustomFieldValues = @(
+                foreach ($CustomFieldName in $CustomFields) {
+                    if ($Row.Table.Columns.Contains($CustomFieldName) -and
+                        $Row[$CustomFieldName] -ne [dbnull]::Value)
+                    {
+                        @{
+                            name  = $CustomFieldName
+                            value = $Row[$CustomFieldName]
+                        }
                     }
                 }
-            }
+            )
             $Body.CustomFieldValues = $CustomFieldValues
 
-            $PropertyEntries = foreach ($Property in $Properties) {
-                if ($Row.Table.Columns.Contains($Property) -and
-                    $Row[$Property] -ne [dbnull]::Value)
-                {
-                    @{
-                        name  = $Property
-                        value = @($Row[$Property])
+            $PropertyEntries = @(
+                foreach ($Property in $Properties) {
+                    if ($Row.Table.Columns.Contains($Property) -and
+                        $Row[$Property] -ne [dbnull]::Value)
+                    {
+                        @{
+                            name  = $Property
+                            value = @($Row[$Property])
+                        }
                     }
                 }
-            }
+            )
             $Body.Properties = $PropertyEntries
 
             $BulkUploadObject += $Body
