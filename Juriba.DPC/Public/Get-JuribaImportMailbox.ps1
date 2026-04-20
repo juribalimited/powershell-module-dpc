@@ -113,13 +113,13 @@ function Get-JuribaImportMailbox {
             Default { }
         }
 
+        # Fix for JRB-3457 / DAS-44911 for pre-Umbreon releases
+        $query += "order=uniqueIdentifier"
+
         # build final uri
         if ($query.Count -gt 0) {
             $uri += $query | Join-String -Property $_ -Separator "&" -OutputPrefix "?"
         }
-
-        # Fix for JRB-3457 / DAS-44911 for pre-Umbreon releases
-        $query += "order=uniqueIdentifier"
     
         $headers = @{
             'x-api-key' = $APIKey
