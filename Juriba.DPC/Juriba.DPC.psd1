@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.DPC.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.1.15.0'
+    ModuleVersion     = '1.1.16.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -116,6 +116,7 @@
         'Get-JuribaSessionUser',
         'Get-JuribaTag',
         'Get-JuribaTask',
+        'Get-JuribaTaskBulkUpdateLog',
         'Get-JuribaTeam',
         'Invoke-JuribaAutomation',
         'New-JuribaAutomation',
@@ -210,6 +211,7 @@
         'Set-JuribaImportVulnerability',
 		'Set-JuribaListTeamUserAccess',
         'Set-JuribaProjectCapacityDetail',
+        'Set-JuribaTaskValueBulk',
         'Set-JuribaTaskValueDate',
         'Set-JuribaTaskValueSelect',
         'Set-JuribaTaskValueText',
