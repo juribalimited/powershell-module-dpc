@@ -39,15 +39,15 @@ Function New-JuribaList {
 
         .PARAMETER SharedViewAccessType
 
-        Sets the View Access permissions for the list. Accepts one of: "Owner", "Eveyone". Optional, if ommited "Owner" is used.
+        Sets the View Access permissions for the list. Accepts one of: "Owner", "Eveyone", "SpecificUserTeam". Optional, if ommited "Owner" is used.
 
         .PARAMETER SharedEditAccessType
 
-        Sets the Edit Access permissions for the list. Accepts one of: "Owner", "Eveyone". Optional, if ommited "Owner" is used.
+        Sets the Edit Access permissions for the list. Accepts one of: "Owner", "Eveyone", "SpecificUserTeam". Optional, if ommited "Owner" is used.
 
         .PARAMETER SharedAdminAccessType
 
-        Sets the Admin Access permissions for the list. Accepts one of: "Owner", "Eveyone". Optional, if ommited "Owner" is used.
+        Sets the Admin Access permissions for the list. Accepts one of: "Owner", "Eveyone", "SpecificUserTeam". Optional, if ommited "Owner" is used.
 
         .EXAMPLE
 
@@ -84,13 +84,13 @@ Function New-JuribaList {
         [ValidateSet("Device", "User", "Application", "Mailbox", "ApplicationUser", "ApplciationDevice")]
         [string]$ObjectType,
         [Parameter(Mandatory = $false)]
-        [ValidateSet("Owner", "Everyone")]
+        [ValidateSet("Owner", "Everyone", "SpecificUserTeam")]
         [string]$SharedViewAccessType = "Owner",
         [Parameter(Mandatory = $false)]
-        [ValidateSet("Owner", "Everyone")]
+        [ValidateSet("Owner", "Everyone", "SpecificUserTeam")]
         [string]$SharedEditAccessType = "Owner",
         [Parameter(Mandatory = $false)]
-        [ValidateSet("Owner", "Everyone")]
+        [ValidateSet("Owner", "Everyone", "SpecificUserTeam")]
         [string]$SharedAdminAccessType = "Owner"
     )
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {

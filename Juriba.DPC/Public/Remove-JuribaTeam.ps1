@@ -35,6 +35,7 @@ function Remove-JuribaTeam {
         $Instance = $dwConnection.instance
     }
 
+	$contentType = 'application/json'
     $headers = @{ 'X-API-KEY' = $ApiKey }
     $uri = "{0}/apiv1/admin/team/deleteTeams" -f $Instance
 
