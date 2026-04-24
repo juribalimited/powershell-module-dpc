@@ -90,7 +90,7 @@ dynamic properties.
             # Skip identity fields promoted to top level
             if ($col -in @(
                 "uniqueIdentifier","username","displayName","objectSid",
-                "surname","givenName","emailAddress","userPrincipalName"
+                "disabled","surname","givenName","emailAddress","userPrincipalName"
             )) { continue }
 
             $value = $row.$col
@@ -141,6 +141,7 @@ dynamic properties.
         username = [string]
         displayName = [string]
         objectSid = [string]
+        disabled = [bool]
         surname = [string]
         givenName = [string]
         emailAddress = [string]
@@ -170,6 +171,7 @@ dynamic properties.
         $newRowValues[$index++] = $row.mailNickname
         $newRowValues[$index++] = $row.displayName
         $newRowValues[$index++] = $row.securityIdentifier
+        $newRowValues[$index++] = if (-not [bool]::Parse($row.accountEnabled)) { 1 } else { 0 }
         $newRowValues[$index++] = $row.surname
         $newRowValues[$index++] = $row.givenName
         $newRowValues[$index++] = $row.mail

@@ -1,381 +1,498 @@
-function Invoke-JuribaAPIBulkImportDeviceFeedDataTableDiff{
-    <#
-    .Synopsis
-    Loops a correctly formatted data table inserting all of the rows it contains.
+function Invoke-JuribaAPIBulkImportDeviceFeedDataTableDiff {
 
-    .Description
-    Takes a System.Data.Datatable object with the columns required for the DwAPI Device. Inserts these Devices one at a time.
-
-    .Parameter Instance
-    The URI to the Dashworks instance being examined.
-
-    .Parameter APIKey
-    The APIKey for a Device with access to the required resources.
-
-    .Parameter FeedName
-    The name of the feed to be searched for and used.
-
-    .Parameter ImportId
-    The id of the Device feed to be used.
-
-    .Parameter DWDataTable
-    [System.Data.DataTable] Data table containing the fields required to insert data into the DW Device API.
-
-    .Parameter DPCDeviceAppDataTable
-    [System.Data.DataTable] Data table containing the columns DeviceUniqueIdentifier, appUniqueIdentifier & appDistHierId
-    
-    .Outputs
-    Output type [string]
-    Text confirming the number of rows to be inserted.
-
-    .Example
-    # Get the Device feed id for the named feed.
-    Write-DeviceFeedData -Instance $Instance -DWDataTable $dtDashworksInput -ImportId $DeviceImportID -APIKey $APIKey
-    #>
-
+    [CmdletBinding()]
     [OutputType([string])]
-    Param (
-        [parameter(Mandatory=$True)]
+    param (
+        [Parameter(Mandatory)]
         [string]$Instance,
-        [Parameter(Mandatory=$True)]
+
+        [Parameter(Mandatory)]
         [System.Data.DataTable]$DPCDeviceDataTable,
-        [Parameter(Mandatory=$false)]
+
+        [Parameter()]
         [System.Data.DataTable]$DPCUserDataTable,
-        [Parameter(Mandatory=$false)]
+
+        [Parameter()]
         [System.Data.DataTable]$DPCDeviceAppDataTable,
-        [Parameter(Mandatory=$True)]
+
+        [Parameter(Mandatory)]
         [string]$APIKey,
-        [parameter(Mandatory=$False)]
-        [string]$FeedName = $null,
-        [parameter(Mandatory=$False)]
-        [string]$ImportId = $null,
-        [parameter(Mandatory=$False)]
-        [array]$CustomFields = @(),
-        [parameter(Mandatory=$False)]
-        [array]$Properties = @(),
-        [parameter(Mandatory=$False)]
+
+        [Parameter()]
+        [string]$FeedName,
+
+        [Parameter()]
+        [string]$ImportId,
+
+        [Parameter()]
+        [string[]]$CustomFields = @(),
+
+        [Parameter()]
+        [string[]]$Properties = @(),
+
+        [Parameter()]
         [int]$BatchSize = 500,
-        [parameter(Mandatory=$False)]
-        [boolean]$Async = $False
+
+        [Parameter()]
+        [bool]$Async = $false
     )
 
-    if (-not $ImportId)
-    {
-        if (-not $FeedName)
-        {
-            return 'Device feed not found by name or ID'
+    # ------------------------
+    # Local helpers
+    # ------------------------
+    function Escape-DataTableFilterValue([string]$Value) {
+        if ($null -eq $Value) { return "" }
+        return $Value.Replace("'", "''")
+    }
+
+    function Get-WebResponseContentString {
+        param([Parameter(Mandatory)]$Response)
+
+        # PS7 usually gives string; WinPS often gives byte[]
+        if ($Response.Content -is [byte[]]) {
+            return [System.Text.Encoding]::UTF8.GetString($Response.Content)
         }
-        try{
-            $ImportId = (Get-JuribaImportDeviceFeed -Instance $Instance -ApiKey $APIKey -Name $FeedName).id
+        return [string]$Response.Content
+    }
+
+    function ConvertFrom-JsonSafeDataArray {
+        param([Parameter(Mandatory)][string]$JsonText)
+
+        # Supports either { data: [...] } or a plain [...]
+        try {
+            $obj = $JsonText | ConvertFrom-Json
+            if ($null -eq $obj) { return @() }
+
+            if ($obj.PSObject.Properties.Name -contains 'data') {
+                return @($obj.data)
+            }
+
+            if ($obj -is [System.Collections.IEnumerable]) {
+                return @($obj)
+            }
+
+            return @()
         }
         catch {
-            write-error "Device feed lookup returned no results: $_"
-            exit 1
+            return @()
         }
     }
 
-    try{
-        [version]$juribaVersion = (Invoke-WebRequest -Uri "$Instance/apiv1").Content.Replace('Hello World - ','')
-        if($juribaVersion.Major -le 5 -and $juribaVersion.Minor -le 13){$APIVersion = 1}else{$APIVersion = 2}
-        write-debug "$(get-date -format 'o') ProductVersion: $($juribaVersion.Major).$($juribaVersion.Minor) - API Version: $APIVersion"
-    }catch{
-        write-error "API Version Check returned: $_"
+    function Invoke-BulkRequest {
+        param(
+            [Parameter(Mandatory)][string]$Uri,
+            [Parameter(Mandatory)][ValidateSet("POST","PATCH","DELETE")][string]$Method,
+            [Parameter(Mandatory)][hashtable]$Headers,
+            [Parameter(Mandatory)][object]$Payload,
+            [int]$Depth = 10
+        )
+
+        $json  = ConvertTo-Json -Depth $Depth -InputObject $Payload
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes($json)
+
+        Invoke-RestMethod `
+            -Uri $Uri `
+            -Method $Method `
+            -Headers $Headers `
+            -ContentType "application/json" `
+            -Body $bytes `
+            -MaximumRetryCount 3 `
+            -RetryIntervalSec 20
     }
 
-    write-debug "$(get-date -format 'o') Existing uniqueIdentifiers - Get Page 1"
+    function Build-DeviceBodyFromRow {
+        param(
+            [Parameter(Mandatory)][System.Data.DataRow]$Row,
+            [Parameter()][System.Data.DataTable]$AppTable,
+            [Parameter()][System.Data.DataTable]$UserTable,
+            [Parameter(Mandatory)][int]$APIVersion,
+            [string[]]$CustomFields,
+            [string[]]$Properties
+        )
 
-    if ($APIVersion -eq 1)
-    {
-        $uri = '{0}/apiv2/imports/devices/{1}/items?fields=uniqueIdentifier,lastUpdated&order=uniqueIdentifier&limit=1000' -f $Instance,$ImportId
-    }
-    else{
-        $uri = '{0}/apiv2/imports/{1}/devices?fields=uniqueIdentifier,lastUpdated&order=uniqueIdentifier&limit=1000' -f $Instance,$ImportId
-    }
+        # Build lookup sets for fast exclusion
+        $customFieldSet = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+        foreach ($cf in $CustomFields) { [void]$customFieldSet.Add($cf) }
 
-    $UIDheaders = @{'x-api-key' = $APIKey;'Accept'='application/vnd.juriba.dashworks+json'}
+        $propertySet = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+        foreach ($p in $Properties) { [void]$propertySet.Add($p) }
 
-    $response = Invoke-WebRequest -uri $uri -Headers $UIDheaders -Method GET
+        $body = @{}
 
-    $threadSafeDictionary = [System.Collections.Concurrent.ConcurrentDictionary[string,object]]::new()
+        # ------------------------------------------------------------------
+        # Core device fields ONLY (exclude CustomFields / Properties)
+        # ------------------------------------------------------------------
+        foreach ($col in $Row.Table.Columns) {
+            $name = $col.ColumnName
 
-    if([System.Text.Encoding]::UTF8.GetString($response.Content) -ne '[]')
-    {
-        write-debug "$(get-date -format 'o') Existing uniqueIdentifiers - Adding Page 1 to dictionary"
-        Foreach($entry in ([System.Text.Encoding]::UTF8.GetString($response.Content) | ConvertFrom-Json).data)
-        {
-            $threadSafeDictionary.TryAdd($entry.uniqueIdentifier,$entry.lastUpdated) | Out-Null
-        }
+            if ($customFieldSet.Contains($name)) { continue }
+            if ($propertySet.Contains($name))    { continue }
 
-        if ($response.Headers.ContainsKey("X-Pagination")) {
-            $totalPages = ($response.Headers."X-Pagination" | ConvertFrom-Json).totalPages
-            $pagedUriArray=@()
-            for ($page = 2; $page -le $totalPages; $page++) {
-                $pagedUriArray += $uri + "&page={0}" -f $page
+            $val = $Row[$name]
+            if ($val -ne [DBNull]::Value) {
+                $body[$name] = $val
             }
-            write-debug "$(get-date -format 'o') Existing uniqueIdentifiers - Geting next $totalPages pages"
-            $pagedUriArray | ForEach-Object -Parallel {
-                $dict = $using:threadSafeDictionary
-                $pagedUri = $_
-                $getComplete = $false
-                $retryAttempts = 0
-                Do{
-                    try{
-                        $pagedResult = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $using:UIDheaders
-                        #$pagedResult = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $UIDheaders
-                        $getComplete = $true
-                    }catch{
-                        Write-Debug "Error Caught: $_"
-                        $retryAttempts++
-                        if ($retryAttempts -eq 3){throw "3rd Error on GET: $_"}
-                    }
-                }
-                while(!$getComplete)
-
-                if ($pagedResult.length -gt 0)
-                {
-                    Foreach($entry in ([System.Text.Encoding]::UTF8.GetString($pagedResult.Content) | ConvertFrom-Json).data)
-                    {
-                        $dict.TryAdd($entry.uniqueIdentifier,$entry.lastUpdated) | Out-Null
-                    }
-                }
-            } -ThrottleLimit 10
         }
-    } else {
-        $threadSafeDictionary.TryAdd('#NULL#','2000-01-01')
-    }
-    write-debug "$(get-date -format 'o') Existing uniqueIdentifiers - Data retrieved"
 
-    if ($threadSafeDictionary.Count -gt 0)
-    {
-        $dtExistingDevices = ConvertTo-DataTable ($threadSafeDictionary.GetEnumerator()  | select-Object -Property @{Name='uniqueIdentifier';Expression={$_.key}})
-        write-debug "$(get-date -format 'o') Existing uniqueIdentifiers - Written to table"
-        $dtPostPatch = Merge-DataTable -primaryTable $DPCDeviceDataTable -secondaryTable $dtExistingDevices -LeftjoinKeyProperty "UniqueIdentifier" -rightjoinkeyproperty "uniqueIdentifier" -AddColumn @{"uniqueIdentifier"="ExistsInSource"}
-        write-debug "$(get-date -format 'o') Existing uniqueIdentifiers - Post & Patch Rows calculated"
-        $dtDelete = Merge-DataTable -primaryTable $dtExistingDevices -secondaryTable $DPCDeviceDataTable -LeftjoinKeyProperty "uniqueIdentifier" -rightjoinkeyproperty "UniqueIdentifier" -AddColumn @{"UniqueIdentifier"="ExistsInSource"}
-        write-debug "$(get-date -format 'o') Existing uniqueIdentifiers - Delete Rows calculated"
+        # Remove Owner if present but empty
+        if ($body.ContainsKey("Owner") -and [string]::IsNullOrWhiteSpace([string]$body["Owner"])) {
+            $body.Remove("Owner")
+        }
+
+        # Owner validation (only if UserTable is provided)
+        if ($body.ContainsKey("Owner") -and $UserTable) {
+            $ownerId = ([string]$body.Owner -split '/')[ -1 ]
+            $ownerExists = $UserTable | Where-Object uniqueIdentifier -EQ $ownerId
+            if ($null -eq $ownerExists) {
+                $body["Owner"] = $null
+            }
+        }
+
+        # -------------------------
+        # Applications
+        # -------------------------
+        $apps = @()
+        if ($AppTable -and $AppTable.Rows.Count -gt 0 -and $Row.Table.Columns.Contains("UniqueIdentifier")) {
+
+            $uid = $Row["UniqueIdentifier"]
+            if ($uid -ne [DBNull]::Value -and $uid) {
+
+                $filterUid = Escape-DataTableFilterValue ([string]$uid)
+
+                foreach ($app in $AppTable.Select("deviceUniqueIdentifier='$filterUid'")) {
+                    if ($APIVersion -eq 1) {
+                        # If v1 uses a different shape, adjust here if needed
+                        $apps += @{
+                            applicationBusinessKey = $app.appUniqueIdentifier
+                            entitled               = $app.entitled
+                            installed              = $app.installed
+                        }
+                    }
+                    else {
+                        $apps += @{
+                            applicationUniversalDataImportId = $app.applicationUniversalDataImportId
+                            applicationBusinessKey           = $app.appUniqueIdentifier
+                            entitled                         = $app.entitled
+                            installed                        = $app.installed
+                        }
+                    }
+                }
+            }
+        }
+        $body["applications"] = $apps
+
+        # -------------------------
+        # CustomFieldValues
+        # -------------------------
+        $cfv = @()
+        foreach ($field in $CustomFields) {
+            if ($Row.Table.Columns.Contains($field)) {
+                $val = $Row[$field]
+                if ($val -ne [DBNull]::Value) {
+                    $cfv += @{ name = $field; value = $val }
+                }
+            }
+        }
+        $body["CustomFieldValues"] = $cfv
+
+        # -------------------------
+        # Properties
+        # -------------------------
+        $props = @()
+        foreach ($prop in $Properties) {
+            if ($Row.Table.Columns.Contains($prop)) {
+                $val = $Row[$prop]
+                if ($val -ne [DBNull]::Value) {
+                    $props += @{ name = $prop; value = @($val) }
+                }
+            }
+        }
+        $body["Properties"] = $props
+
+        return $body
+    }
+
+    function Get-ExistingDeviceIdsPaged {
+        param(
+            [Parameter(Mandatory)][string]$FirstPageUri,
+            [Parameter(Mandatory)][hashtable]$Headers
+        )
+
+        $dict = [System.Collections.Concurrent.ConcurrentDictionary[string,byte]]::new()
+
+        Write-Debug "$(Get-Date -Format o) Existing uniqueIdentifiers - Get Page 1"
+
+        $resp1    = Invoke-WebRequest -Uri $FirstPageUri -Headers $Headers -Method GET
+        $content1 = Get-WebResponseContentString -Response $resp1
+
+        if ($content1 -and $content1 -ne '[]') {
+            $data1 = ConvertFrom-JsonSafeDataArray -JsonText $content1
+            foreach ($e in @($data1)) {
+                if ($e.uniqueIdentifier) { $dict.TryAdd([string]$e.uniqueIdentifier, 0) | Out-Null }
+            }
+        }
+
+        if ($resp1.Headers.ContainsKey("X-Pagination")) {
+            $totalPages = ($resp1.Headers."X-Pagination" | ConvertFrom-Json).totalPages
+            if ($totalPages -gt 1) {
+
+                $pageUris = for ($p = 2; $p -le $totalPages; $p++) { "$FirstPageUri&page=$p" }
+                Write-Debug "$(Get-Date -Format o) Existing uniqueIdentifiers - Getting pages 2..$totalPages"
+
+                $pageUris | ForEach-Object -Parallel {
+                    $u   = $_
+                    $hdr = $using:Headers
+                    $d   = $using:dict
+
+                    $tries = 0
+                    do {
+                        try {
+                            $r = Invoke-WebRequest -Uri $u -Headers $hdr -Method GET
+                            $c = if ($r.Content -is [byte[]]) { [System.Text.Encoding]::UTF8.GetString($r.Content) } else { [string]$r.Content }
+                            if ($c -and $c -ne '[]') {
+                                $obj = $null
+                                try { $obj = $c | ConvertFrom-Json } catch { $obj = $null }
+
+                                $data = @()
+                                if ($obj -and ($obj.PSObject.Properties.Name -contains 'data')) { $data = @($obj.data) }
+                                elseif ($obj -is [System.Collections.IEnumerable]) { $data = @($obj) }
+
+                                foreach ($e in @($data)) {
+                                    if ($e.uniqueIdentifier) { $d.TryAdd([string]$e.uniqueIdentifier, 0) | Out-Null }
+                                }
+                            }
+                            break
+                        }
+                        catch {
+                            $tries++
+                            if ($tries -ge 3) { throw }
+                            Start-Sleep -Seconds 2
+                        }
+                    } while ($true)
+
+                } -ThrottleLimit 10
+            }
+        }
+
+        $set = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+        foreach ($k in $dict.Keys) { [void]$set.Add($k) }
+
+        return ,$set
+    }
+
+    # ------------------------
+    # Resolve ImportId
+    # ------------------------
+    if (-not $ImportId) {
+        if (-not $FeedName) {
+            throw "Device feed name or ImportId must be specified"
+        }
+        $ImportId = (Get-JuribaImportDeviceFeed -Instance $Instance -ApiKey $APIKey -Name $FeedName).id
+        if (-not $ImportId) { throw "Device feed not found by name or ID" }
+    }
+
+    # ------------------------
+    # Detect API version properly (<= 5.13 is API v1 shape)
+    # ------------------------
+    [version]$juribaVersion = (Invoke-WebRequest -Uri "$Instance/apiv1").Content.Replace('Hello World - ', '')
+    $APIVersion = if (
+        ($juribaVersion.Major -lt 5) -or
+        ($juribaVersion.Major -eq 5 -and $juribaVersion.Minor -le 13)
+    ) { 1 } else { 2 }
+
+    Write-Debug "$(Get-Date -Format o) ProductVersion: $juribaVersion - API Version: $APIVersion"
+
+    # ------------------------
+    # Headers
+    # ------------------------
+    $getHeaders  = @{ 'x-api-key' = $APIKey; 'Accept' = 'application/vnd.juriba.dashworks+json' }
+    $bulkHeaders = @{ 'X-API-KEY' = $APIKey; 'content-type' = 'application/json' }
+
+    # ------------------------
+    # URIs
+    # ------------------------
+    if ($APIVersion -eq 1) {
+        $listUri = "{0}/apiv2/imports/devices/{1}/items?fields=uniqueIdentifier&order=uniqueIdentifier&limit=1000" -f $Instance, $ImportId
+        $bulkUri = "{0}/apiv2/imports/devices/{1}/items/`$bulk" -f $Instance, $ImportId
     }
     else {
-        $dtPostPatch = $DPCDeviceDataTable.Copy()
-        $dtPostPatch.Columns.Add("ExistsInSource") | Out-Null
-    }
-    $Postheaders = @{
-        "content-type" = "application/json"
-        "X-API-KEY" = "$APIKey"
+        $listUri = "{0}/apiv2/imports/{1}/devices?fields=uniqueIdentifier&order=uniqueIdentifier&limit=1000" -f $Instance, $ImportId
+        $bulkUri = "{0}/apiv2/imports/{1}/devices/`$bulk" -f $Instance, $ImportId
+        if ($Async) { $bulkUri += "?async" }
     }
 
-    if ($APIVersion -eq 1)
-    {
-        $uri = '{0}/apiv2/imports/devices/{1}/items/$bulk' -f $Instance, $ImportId
+    # ------------------------
+    # Validate source table has UniqueIdentifier
+    # ------------------------
+    if (-not $DPCDeviceDataTable.Columns.Contains("UniqueIdentifier")) {
+        throw "DPCDeviceDataTable must contain a 'UniqueIdentifier' column."
     }
-    else{
-        $uri = '{0}/apiv2/imports/{1}/devices/$bulk' -f $Instance, $ImportId
-        if ($Async)
-        {
-            $uri += '?async'
+
+    # ------------------------
+    # Get ALL existing uniqueIdentifiers (paged)
+    # ------------------------
+    $existingSet = Get-ExistingDeviceIdsPaged -FirstPageUri $listUri -Headers $getHeaders
+    Write-Debug "$(Get-Date -Format o) Existing uniqueIdentifiers - Retrieved: $($existingSet.Count)"
+
+    # ------------------------
+    # Build SOURCE set + dedupe rows (last row wins)
+    # ------------------------
+    $sourceSet = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+    $rowById   = @{}  # uid -> DataRow (last wins)
+
+    foreach ($r in $DPCDeviceDataTable.Rows) {
+        $uid = $r["UniqueIdentifier"]
+        if ($uid -eq [DBNull]::Value -or -not $uid) { continue }
+        $uidS = [string]$uid
+        [void]$sourceSet.Add($uidS)
+        $rowById[$uidS] = $r
+    }
+
+    # ------------------------
+    # Split into POST and PATCH
+    # ------------------------
+    $postRows  = @()
+    $patchRows = @()
+
+    foreach ($uid in $rowById.Keys) {
+        if ($existingSet.Contains($uid)) { $patchRows += $rowById[$uid] }
+        else { $postRows += $rowById[$uid] }
+    }
+
+    # ------------------------
+    # BULK POST / PATCH
+    # ------------------------
+    foreach ($method in @("POST","PATCH")) {
+
+        $rows = if ($method -eq "POST") { $postRows } else { $patchRows }
+
+        if (-not $rows -or @($rows).Count -eq 0) {
+            Write-Debug "$(Get-Date -Format FileDate) Skipping $method - no rows to process"
+            continue
         }
-    }
 
-    $ExcludeProperty = @("ItemArray", "Table", "RowError", "RowState", "HasErrors","ExistsInSource","DataView","RowVersion","Row","IsNew","IsEdit","Error","RequireRegisteredTypes")
-    if ($CustomFields.count -gt 0) {$ExcludeProperty += $CustomFields}
-    if ($Properties.count -gt 0) {$ExcludeProperty += $Properties}
+        $rowTotal = @($rows).Count
+        Write-Debug "$(Get-Date -Format o) Starting $method - ObjectCount: $rowTotal"
 
-    $dvDeviceData = New-Object System.Data.DataView($dtPostPatch)
-    for($i=0;$i -le 1;$i++)
-    {
-        if ($i -eq 0) #Post
-        {
-            $Method = 'Post'
-            $dvDeviceData.RowFilter ="ISNULL(ExistsInSource,'') = ''" #"Len(ExistsInSource) = 0"
-        } else {
-            $Method = 'Patch'
-            $dvDeviceData.RowFilter ="Len(ExistsInSource) > 0"
-        }
-        $dtDeviceData = $dvDeviceData.ToTable()
-        Write-Debug "$(Get-date -Format 'o'):Starting upload loop - i=: $i - Method: $Method - ObjectCount: $($dtDeviceData.Rows.Count)"
+        # Use List to avoid hashtable enumeration issues
+        $batch = [System.Collections.Generic.List[object]]::new()
+        $rowCount = 0
+        $errorFound = $false
 
-        $BulkUploadObject = @()
-        $RowCount = 0
-        $errorFoundInUpload = $false
-
-        $stopwatch =  [system.diagnostics.stopwatch]::StartNew()
+        $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
         $stopwatch.Stop()
 
-        foreach($Row in $dtDeviceData){
-            $RowCount++
-            $Body = $null
-            $Body = $Row | Select-Object *,applications,CustomFieldValues,Properties -ExcludeProperty $ExcludeProperty
-            #$Body = $Row | Select-Object * -ExcludeProperty $ExcludeProperty
+        foreach ($row in @($rows)) {
+            $rowCount++
 
-            # if($body.Owner -eq ''){$body.PSObject.Properties.Remove('Owner')}
-            # Check owner exists in feed
-            $deviceOwner = ($body.owner -split '/')[ -1 ]
-            if ($null -ne (Get-Variable ownerExists -ErrorAction SilentlyContinue)) {
-                Clear-Variable ownerExists
-            }
-            $ownerExists = $DPCUserDataTable | Where-Object -Property uniqueIdentifier -EQ $deviceOwner
-            if($null -eq $ownerExists){$Body.Owner = $null}
+            $body = Build-DeviceBodyFromRow `
+                        -Row $row `
+                        -AppTable $DPCDeviceAppDataTable `
+                        -UserTable $DPCUserDataTable `
+                        -APIVersion $APIVersion `
+                        -CustomFields $CustomFields `
+                        -Properties $Properties
 
-            
-            $applications = @()
-            if ($null -ne $DPCDeviceAppDataTable -and $DPCDeviceAppDataTable.Rows.Count -gt 0)
-            {
-                foreach($App in $DPCDeviceAppDataTable.select("deviceUniqueIdentifier='$($Row.UniqueIdentifier)'"))
-                {
-                    $applications += @{"applicationUniversalDataImportId"=$App.applicationUniversalDataImportId;"applicationBusinessKey"=$App.AppUniqueIdentifier;"entitled"=$App.entitled;"installed"=$App.installed}
-                }
-            }
-            $Body.applications = $applications            
-            
-            $CustomFieldValues = @(
-                foreach ($CustomFieldName in $CustomFields) {
-                    if ($Row.Table.Columns.Contains($CustomFieldName) -and
-                        $Row[$CustomFieldName] -ne [dbnull]::Value)
-                    {
-                        @{
-                            name  = $CustomFieldName
-                            value = $Row[$CustomFieldName]
-                        }
-                    }
-                }
-            )
-            $Body.CustomFieldValues = $CustomFieldValues
+            $batch.Add($body)
 
-            $PropertyEntries = @(
-                foreach ($Property in $Properties) {
-                    if ($Row.Table.Columns.Contains($Property) -and
-                        $Row[$Property] -ne [dbnull]::Value)
-                    {
-                        @{
-                            name  = $Property
-                            value = @($Row[$Property])
-                        }
-                    }
-                }
-            )
-            $Body.Properties = $PropertyEntries
+            if ($batch.Count -eq $BatchSize -or $rowCount -eq $rowTotal) {
 
-            $BulkUploadObject += $Body
-
-            if ($BulkUploadObject.Count -eq $BatchSize -or $RowCount -eq $dtDeviceData.Rows.Count)
-            {
-                $JSONBody = ConvertTo-Json -Depth 10 -InputObject $BulkUploadObject
-                $ByteArrayBody = [System.Text.Encoding]::UTF8.GetBytes($JSONBody)
-                try{
+                try {
+                    Write-Debug "$(Get-Date -Format o) Sending $method batch size: $($batch.Count)"
                     $stopwatch.Start()
-                    if ($Async -and $Method -eq 'Post')
-                    {
-                        $APIResponse = Invoke-webrequest -Headers $Postheaders -Uri $uri -Method $Method -Body $ByteArrayBody -MaximumRetryCount 3 -RetryIntervalSec 20
-                        if ($APIResponse.Headers.Location.Length -gt 0)
-                        {
-                            $JobDetails = Invoke-RestMethod -Headers @{"X-API-KEY" = "$APIKey"} -Uri $($APIResponse.Headers.Location)
-                            while ($JobDetails.status -eq "InProgress")
-                            {
-                                start-sleep -Milliseconds 500
-                                $JobDetails = Invoke-RestMethod -Headers @{"X-API-KEY" = "$APIKey"} -Uri $($APIResponse.Headers.Location)
-                            }
-                            if ($JobDetails.status -eq "Completed")
-                            {
-                                foreach($RowResult in $JobDetails.result)
-                                {
-                                    if($RowResult.status -ne 201)
-                                    {
-                                        write-debug "$(Get-date -Format 'o'):Job-$($JobDetails.requestId) record-$($RowResult.data.uniqueIdentifier) status-$($RowResult.status):$($RowResult.details)"
-                                        #All rows here should be accepted, thus, if there are any failures, end the upload process.
-                                        $errorFoundInUpload=$true
-                                    }
-                                }
-                            } elseif ($JobDetails.status -eq "Failed")
-                            {
-                                write-debug "$(Get-date -Format 'o'):Job-$($JobDetails.requestId) Failed with error-$($JobDetails.error)"
-                                $errorFoundInUpload=$true
-                            }
-                        }else{
-                            $errorFoundInUpload=$true
-                            throw "$(Get-date -Format 'o'):No job found in response headers"
-                        }
-                    }else{
-                        $APIResponse = Invoke-RestMethod -Headers $Postheaders -Uri $uri -Method $Method -Body $ByteArrayBody -MaximumRetryCount 3 -RetryIntervalSec 20
-                        foreach($RowResult in $APIResponse)
-                        {
-                            if(($Method -eq 'Post' -and $RowResult.status -ne 201) -or ($Method -eq 'Patch' -and $RowResult.status -ne 204))
-                            {
-                                write-debug "$(Get-date -Format 'o'):Method-$Method Record-$($RowResult.data.uniqueIdentifier) Status-$($RowResult.status) $($RowResult.details)"
-                                #All rows here should be accepted, thus, if there are any failures, end the upload process.
-                                $errorFoundInUpload=$true
-                            }
-                        }
-                    }
+                    $apiResponse = Invoke-BulkRequest -Uri $bulkUri -Method $method -Headers $bulkHeaders -Payload $batch.ToArray()
                     $stopwatch.Stop()
-                    write-debug "$(Get-date -Format 'o'):Method $Method - $RowCount rows processed. Total Upload: $($stopwatch.ElapsedMilliseconds)ms - Speed: $([math]::Round($RowCount / ($stopwatch.ElapsedMilliseconds / 1000)))/s"
-                }catch{
-                    $timeNow = (Get-date -Format 'o')
-                    write-error "$timeNow;$_"
-                    $errorFoundInUpload = $true
-                }finally{
-                    if ($errorFoundInUpload)
-                    {
-                        Throw "Errors found in upload. Re-run after enabling debug messages (`$debugPreference = 'Continue')"
-                        #exit 1
+
+                    foreach ($rr in @($apiResponse)) {
+                        if (($method -eq "POST"  -and $rr.status -ne 201) -or
+                            ($method -eq "PATCH" -and $rr.status -ne 204)) {
+                            Write-Debug "$(Get-Date -Format o):Method-$method Record-$($rr.data.uniqueIdentifier) Status-$($rr.status) $($rr.details)"
+                            $errorFound = $true
+                        }
+                    }
+
+                    Write-Debug "$(Get-Date -Format o):Method $method - $rowCount rows processed. Total Upload: $($stopwatch.ElapsedMilliseconds)ms"
+                }
+                catch {
+                    Write-Error "$(Get-Date -Format o);$_"
+                    $errorFound = $true
+                }
+                finally {
+                    if ($errorFound) {
+                        throw "Errors found in upload. Re-run after enabling debug messages (`$debugPreference = 'Continue')"
                     }
                 }
-                $BulkUploadObject = @()
+
+                $batch.Clear()
             }
         }
     }
 
-    $stopwatch.Reset()
-    $dvDeviceDelete   = New-Object System.Data.DataView($dtDelete)
-    $dvDeviceDelete.RowFilter ="ISNULL(ExistsInSource,'') = ''"
-    $deleteArray = @()
-    $RowCount=0
-    $Method = "Delete"
-    if($dvDeviceDelete.count -eq 1 -and $dvDeviceDelete[0].uniqueIdentifier -eq '#NULL#')
-    {
-        write-debug "Rows to delete: 0"
-    }else{
-        write-debug "Rows to delete: $($dvDeviceDelete.Count)"
+    # ------------------------
+    # DELETE (existing - source)
+    # ------------------------
+    $deleteIds = @()
+    foreach ($eid in $existingSet) {
+        if (-not $sourceSet.Contains($eid)) { $deleteIds += $eid }
     }
 
-    foreach($row in $dvDeviceDelete)
-    {
-        if($row.uniqueIdentifier -eq '#NULL#'){continue}
-        $RowCount++
-        if ($APIVersion -eq 1)
-        {
-            $deleteArray += "/imports/devices/{0}/items/{1}" -f $ImportId,$row.UniqueIdentifier
-        }
-        else{
-            $deleteArray += "/imports/{0}/devices/{1}" -f $ImportId,$row.UniqueIdentifier
-        }
-        if ($deleteArray.Count -eq $BatchSize -or $RowCount -eq $dvDeviceDelete.Count)
-        {
-            $JSONBody = $deleteArray | ConvertTo-Json -Depth 10
-            $ByteArrayBody = [System.Text.Encoding]::UTF8.GetBytes($JSONBody)
-            try{
-                $stopwatch.Start()
-                $DeleteResponse = Invoke-RestMethod -Headers $Postheaders -Uri $uri -Method $Method -Body $ByteArrayBody -MaximumRetryCount 3 -RetryIntervalSec 20
-                $stopwatch.Stop()
-                foreach($RowResult in $APIResponse)
-                {
-                    if(($Method -eq 'Delete' -and $RowResult.status -ne 204))
-                    {
-                        write-debug "$(Get-date -Format 'o'):Method-$Method Record-$($RowResult.data) Status-$($RowResult.status) $($RowResult.details)"
-                        #All rows here should be accepted, thus, if there are any failures, end the upload process.
-                        $errorFoundInUpload=$true
+    Write-Debug "$(Get-Date -Format o) Rows to delete: $(@($deleteIds).Count)"
+
+    if (@($deleteIds).Count -gt 0) {
+
+        # DELETE should not be async even if Async is true
+        $deleteBulkUri = $bulkUri -replace '\?async$',''
+
+        $deleteArray = [System.Collections.Generic.List[string]]::new()
+        $rowCount = 0
+        $errorFound = $false
+
+        $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+        $stopwatch.Stop()
+
+        $deleteTotal = @($deleteIds).Count
+
+        foreach ($id in @($deleteIds)) {
+            $rowCount++
+
+            if ($APIVersion -eq 1) {
+                $deleteArray.Add(("/imports/devices/{0}/items/{1}" -f $ImportId, $id))
+            }
+            else {
+                $deleteArray.Add(("/imports/{0}/devices/{1}" -f $ImportId, $id))
+            }
+
+            if ($deleteArray.Count -eq $BatchSize -or $rowCount -eq $deleteTotal) {
+
+                try {
+                    Write-Debug "$(Get-Date -Format o) Sending DELETE batch size: $($deleteArray.Count)"
+                    $stopwatch.Start()
+                    $deleteResponse = Invoke-BulkRequest -Uri $deleteBulkUri -Method "DELETE" -Headers $bulkHeaders -Payload $deleteArray.ToArray()
+                    $stopwatch.Stop()
+
+                    foreach ($rr in @($deleteResponse)) {
+                        if ($rr.status -ne 204) {
+                            Write-Debug "$(Get-Date -Format o):Method-DELETE Record-$($rr.data) Status-$($rr.status) $($rr.details)"
+                            $errorFound = $true
+                        }
+                    }
+
+                    Write-Debug "$(Get-Date -Format o):Method DELETE - $rowCount rows processed. Total Upload: $($stopwatch.ElapsedMilliseconds)ms"
+                }
+                catch {
+                    Write-Error "$(Get-Date -Format o);$_"
+                    $errorFound = $true
+                }
+                finally {
+                    if ($errorFound) {
+                        throw "Errors found in delete. Re-run after enabling debug messages (`$debugPreference = 'Continue')"
                     }
                 }
-                write-debug "$(Get-date -Format 'o'):Method $Method - $RowCount rows processed. Total Upload: $($stopwatch.ElapsedMilliseconds)ms"
-            }catch{
-                $timeNow = (Get-date -Format 'o')
-                write-error "$timeNow;$_"
-            }finally{
-                if ($errorFoundInUpload)
-                {
-                    Throw "Errors found in upload. Re-run after enabling debug messages (`$debugPreference = 'Continue')"
-                    #exit 1
-                }
+
+                $deleteArray.Clear()
             }
-            $deleteArray = @()
         }
     }
+
+    return "Device feed import completed successfully"
 }

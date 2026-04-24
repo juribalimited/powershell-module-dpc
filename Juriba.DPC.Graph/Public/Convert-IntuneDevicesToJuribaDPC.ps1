@@ -1,4 +1,3 @@
-
 function Convert-IntuneDevicesToJuribaDPC {
 <#
 .SYNOPSIS
