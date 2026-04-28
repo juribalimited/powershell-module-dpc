@@ -20,7 +20,7 @@ Function Set-JuribaListTeamUserAccess {
 
         .PARAMETER AccessType
 
-        Sets the Team Access permissions for the list. Accepts one of: "Read", "Edit", "Admin". Optional, if ommited "Edit" is used.
+        Sets the Team Access permissions for the list. Accepts one of: "ReadOnly", "Edit", "Admin". Optional, if ommited "Edit" is used.
 
         .PARAMETER UserTeam
 
@@ -56,7 +56,7 @@ Function Set-JuribaListTeamUserAccess {
         [Parameter(Mandatory = $true)]
         [string]$ObjectType,
         [Parameter(Mandatory = $false)]
-        [ValidateSet("Read", "Admin", "Edit")]
+        [ValidateSet("ReadOnly", "Admin", "Edit")]
         [string]$AccessType = "Edit",
         [Parameter(Mandatory = $true)]
         [ValidateSet("Team", "User")]
