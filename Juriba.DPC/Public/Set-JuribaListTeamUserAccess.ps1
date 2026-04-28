@@ -16,17 +16,17 @@ Function Set-JuribaListTeamUserAccess {
 
         .PARAMETER ObjectType
 
-        Base object type for the new list. Accepts one of: "Device", "User", "Application", "Mailbox", "ApplicationUser", "ApplciationDevice"
+        Base object type for the new list. Accepts one of: "Device", "User", "Application", "Mailbox", "ApplicationUser", "ApplicationDevice"
 
         .PARAMETER AccessType
 
-        Sets the Team Access permissions for the list. Accepts one of: "Edit", "Admin". Optional, if ommited "Edit" is used.
-  
+        Sets the Team Access permissions for the list. Accepts one of: "Read", "Edit", "Admin". Optional, if ommited "Edit" is used.
+
         .PARAMETER UserTeam
-		
-		Sets the type of User / Team to be set up. Accepts one of: "Team", "User".
-		
-		.PARAMETER ListID
+
+        Sets the type of User / Team to be set up. Accepts one of: "Team", "User".
+
+        .PARAMETER ListID
 
         Used in the Header to find the Lsit to update Team permissions.
 
@@ -36,15 +36,15 @@ Function Set-JuribaListTeamUserAccess {
 
         .EXAMPLE
 
-        PS> Set-JuribaListTeamUserAccess 
+        PS> Set-JuribaListTeamUserAccess
             -Instance "https://myinstance.juriba.app:8443"
             -APIKey "xxxxx"
             -ObjectType "Device"
             -AccessType "Admin"
-			-UserTeam "User"
+            -UserTeam "User"
             -ListID 1234
             -TeamID 3
-			-UserId "xxxxxxxxx"
+            -UserId "xxxxxxxxx"
 
     #>
     [CmdletBinding(SupportsShouldProcess)]
@@ -53,19 +53,19 @@ Function Set-JuribaListTeamUserAccess {
         [string]$Instance,
         [Parameter(Mandatory=$false)]
         [string]$APIKey,
-		[Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [string]$ObjectType,
-        [Parameter(Mandatory = $false)] 
-        [ValidateSet("Admin", "Edit")]
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("Read", "Admin", "Edit")]
         [string]$AccessType = "Edit",
-		[Parameter(Mandatory = $true)]
-		[ValidateSet("Team", "User")]
-		[string]$UserTeam,
-		[Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("Team", "User")]
+        [string]$UserTeam,
+        [Parameter(Mandatory = $true)]
         [string]$ListID,
         [Parameter(Mandatory = $false)]
         [string]$Teamid,
-		[Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false)]
         [string]$Userid
     )
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
@@ -75,7 +75,7 @@ Function Set-JuribaListTeamUserAccess {
 
     if ($APIKey -and $Instance) {
         $endpoint = ""
-		switch ($ObjectType) {
+        switch ($ObjectType) {
             "ApplicationUser" { throw "not implemented" }
             "ApplicationDevice" { throw "not implemented" }
             "Device" { $endpoint = "devices"}
@@ -83,11 +83,11 @@ Function Set-JuribaListTeamUserAccess {
             "Application" { $endpoint = "applications" }
             "Mailbox" { $endpoint = "mailboxes" }
         }
-		
+
         $body = @{
-            "userid"						= $Userid
-			"teamID"                        = $TeamId
-            "accessType"				    = $AccessType
+            "userid"     = $Userid
+            "teamID"     = $TeamId
+            "accessType" = $AccessType
         } | ConvertTo-Json
 
         $contentType = "application/json"
