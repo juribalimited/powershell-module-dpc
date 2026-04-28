@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.DPC.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.1.16.0'
+    ModuleVersion     = '1.1.18.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -183,6 +183,7 @@
         'Remove-JuribaImportUserFeedAllItem',
         'Remove-JuribaImportVulnerability',
         'Remove-JuribaList',
+        'Remove-JuribaListTeamUserAccess',
         'Remove-JuribaTag',
         'Remove-JuribaTaskValueDate',
         'Remove-JuribaTaskValueText',
@@ -209,7 +210,8 @@
         'Set-JuribaImportMailboxFeed',
         'Set-JuribaImportUser',
         'Set-JuribaImportVulnerability',
-		'Set-JuribaListTeamUserAccess',
+        'Set-JuribaListAccessType',
+        'Set-JuribaListTeamUserAccess',
         'Set-JuribaProjectCapacityDetail',
         'Set-JuribaTaskValueBulk',
         'Set-JuribaTaskValueDate',
