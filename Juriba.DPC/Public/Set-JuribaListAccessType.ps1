@@ -121,18 +121,22 @@ function Set-JuribaListAccessType {
             throw "Administer access ($newAdmin) cannot be more permissive than Edit access ($newEdit). The DPC API requires View >= Edit >= Administer."
         }
 
-        $body = @{
-            listId                     = $current.listId
-            listName                   = $current.listName
-            listDescription            = $current.listDescription
-            listType                   = $current.listType
-            queryString                = $current.queryString
-            sharedReadAccessType       = $newView
-            sharedEditAccessType       = $newEdit
-            sharedAdministerAccessType = $newAdmin
-            userId                     = $current.userId
-            cachedKeySetId             = $current.cachedKeySetId
-        } | ConvertTo-Json
+        # Build the PUT body from the fields the GET actually returned. Older DPC
+        # versions may omit fields like listDescription, and direct property access
+        # under Set-StrictMode would error on those. Copying conditionally also
+        # avoids pinning the function to one DPC schema version.
+        $putBody = [ordered]@{}
+        foreach ($field in @('listId', 'listName', 'listDescription', 'listType',
+                             'queryString', 'userId', 'cachedKeySetId')) {
+            if ($current.PSObject.Properties.Name -contains $field) {
+                $putBody[$field] = $current.$field
+            }
+        }
+        $putBody['sharedReadAccessType']       = $newView
+        $putBody['sharedEditAccessType']       = $newEdit
+        $putBody['sharedAdministerAccessType'] = $newAdmin
+
+        $body = $putBody | ConvertTo-Json
 
         try {
             if ($PSCmdlet.ShouldProcess("List $ListId")) {
