@@ -35,19 +35,19 @@ Function New-JuribaList {
 
         .PARAMETER ObjectType
 
-        Base object type for the new list. Accepts one of: "Device", "User", "Application", "Mailbox", "ApplicationUser", "ApplciationDevice"
+        Base object type for the new list. Accepts one of: "Device", "User", "Application", "Mailbox", "ApplicationUser", "ApplicationDevice"
 
         .PARAMETER SharedViewAccessType
 
-        Sets the View Access permissions for the list. Accepts one of: "Owner", "Eveyone". Optional, if ommited "Owner" is used.
+        Sets the View Access permissions for the list. Accepts one of: "Owner", "Everyone". Optional, if ommited "Owner" is used.
 
         .PARAMETER SharedEditAccessType
 
-        Sets the Edit Access permissions for the list. Accepts one of: "Owner", "Eveyone". Optional, if ommited "Owner" is used.
+        Sets the Edit Access permissions for the list. Accepts one of: "Owner", "Everyone". Optional, if ommited "Owner" is used.
 
         .PARAMETER SharedAdminAccessType
 
-        Sets the Admin Access permissions for the list. Accepts one of: "Owner", "Eveyone". Optional, if ommited "Owner" is used.
+        Sets the Admin Access permissions for the list. Accepts one of: "Owner", "Everyone". Optional, if ommited "Owner" is used.
 
         .EXAMPLE
 
@@ -81,7 +81,7 @@ Function New-JuribaList {
         [Parameter(Mandatory = $true)]
         [string]$QueryString,
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Device", "User", "Application", "Mailbox", "ApplicationUser", "ApplciationDevice")]
+        [ValidateSet("Device", "User", "Application", "Mailbox", "ApplicationUser", "ApplicationDevice")]
         [string]$ObjectType,
         [Parameter(Mandatory = $false)]
         [ValidateSet("Owner", "Everyone")]
