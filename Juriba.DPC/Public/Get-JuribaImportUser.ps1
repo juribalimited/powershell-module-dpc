@@ -38,7 +38,7 @@ function Get-JuribaImportUser {
         .PARAMETER InfoLevel
 
         Optional. Sets the level of information that this function returns. Accepts Basic or Full.
-        Basic returns only the Username, use when confirming a user exists.
+        Basic returns only the UniqueIdentifier, use when confirming a user exists.
         Full returns the full json object for the user.
         Default is Basic.
 
@@ -123,26 +123,10 @@ function Get-JuribaImportUser {
     
         $user = ""
         try {
-            $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json"
+            $items = Invoke-JuribaPagedRequest -Uri $uri -Headers $headers
             $user = switch($InfoLevel) {
-                "Basic" { ($result.Content | ConvertFrom-Json).Username }
-                "Full"  { $result.Content | ConvertFrom-Json }
-            }
-            # check if result is paged, if so get remaining pages and add to result set
-            if ($result.Headers.ContainsKey("X-Pagination")) {
-                $totalPages = ($result.Headers."X-Pagination" | ConvertFrom-Json).totalPages
-                for ($page = 2; $page -le $totalPages; $page++) {
-                    if ($uri -match '\?') {
-                        $pagedUri = $uri + "&page={0}" -f $page
-                    } else {
-                        $pagedUri = $uri + "?page={0}" -f $page
-                    }
-                    $pagedResult = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $headers -ContentType "application/json"
-                    $user += switch($InfoLevel) {
-                        "Basic" { ($pagedResult.Content | ConvertFrom-Json).Username }
-                        "Full"  { $pagedResult.Content | ConvertFrom-Json }
-                    }
-                }
+                "Basic" { $items.UniqueIdentifier }
+                "Full"  { $items }
             }
             return $user
         }

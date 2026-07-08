@@ -49,8 +49,7 @@ function Get-JuribaApplicationV1 {
         $headers = @{'x-api-key' = $APIKey}
 
         try {
-            $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json"
-            return (($result.content) | ConvertFrom-Json)
+            return Invoke-JuribaPagedRequest -Uri $uri -Headers $headers
         }
         catch {
             if ($_.Exception.Response.StatusCode.Value__ -eq 404) {
