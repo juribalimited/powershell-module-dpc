@@ -5,10 +5,13 @@ function Invoke-JuribaWebRequestWithRetry {
         exponential backoff retry for transient failures.
 
         .DESCRIPTION
-        Retries only on transient responses (HTTP 429 and 5xx). All other
-        failures (e.g. 404) are re-thrown immediately so that calling functions
-        can apply their own catch semantics. Returns the raw response object from
-        Invoke-WebRequest.
+        Retries on transient conditions: rate limiting (HTTP 429), server errors
+        (HTTP 5xx) and transport-level failures that produced no HTTP response
+        (e.g. a dropped connection). All other failures (e.g. 404) are re-thrown
+        immediately so that calling functions can apply their own catch semantics.
+        When a 429 response carries a Retry-After header its delay is honoured,
+        otherwise an exponential backoff is used. Returns the raw response object
+        from Invoke-WebRequest.
 
         .PARAMETER Uri
         The request URI.
@@ -50,12 +53,29 @@ function Invoke-JuribaWebRequestWithRetry {
             }
 
             $attempt++
-            $retryable = ($status -eq 429) -or ($null -ne $status -and $status -ge 500)
+            # Retry rate limiting (429), server errors (5xx) and transport-level
+            # failures (no HTTP response, so $status is $null).
+            $retryable = ($null -eq $status) -or ($status -eq 429) -or ($status -ge 500)
             if ($attempt -ge $MaxAttempts -or -not $retryable) {
                 throw
             }
-            # Exponential backoff: 400ms, 800ms, 1600ms, ...
-            Start-Sleep -Milliseconds ([int](200 * [math]::Pow(2, $attempt)))
+
+            # Exponential backoff: 400ms, 800ms, 1600ms, ... Honour Retry-After
+            # (best effort) when the server supplies it on a 429.
+            $delayMs = [int](200 * [math]::Pow(2, $attempt))
+            if ($status -eq 429 -and $responseProperty -and $responseProperty.Value) {
+                try {
+                    $retryAfter = $responseProperty.Value.Headers.RetryAfter
+                    if ($retryAfter -and $retryAfter.Delta -and $retryAfter.Delta.TotalMilliseconds -gt 0) {
+                        $delayMs = [int]$retryAfter.Delta.TotalMilliseconds
+                    }
+                }
+                catch {
+                    # Header shape differs across PowerShell editions; fall back to backoff.
+                    Write-Verbose "Could not parse Retry-After header; using exponential backoff."
+                }
+            }
+            Start-Sleep -Milliseconds $delayMs
         }
     }
 }

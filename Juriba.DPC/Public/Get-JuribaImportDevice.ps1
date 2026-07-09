@@ -19,6 +19,10 @@ function Get-JuribaImportDevice {
 
         Optional. API key to be provided if not authenticating using Connect-Juriba.
 
+        .PARAMETER ThrottleLimit
+
+        Optional. Maximum number of pages to request concurrently on PowerShell 7+. Defaults to 8. Set to 1 to force sequential paging.
+
         .PARAMETER UniqueIdentifier
 
         UniqueIdentifier for the device. Cannot be used with Hostname or Filter.
@@ -81,7 +85,10 @@ function Get-JuribaImportDevice {
         [Parameter(Mandatory=$false ,ParameterSetName="fields")]
         [string[]]$Fields,
         [Parameter(Mandatory=$false)]
-        [int]$PageSize = 200
+        [int]$PageSize = 200,
+        [Parameter(Mandatory=$false)]
+        [ValidateRange(1, 64)]
+        [int]$ThrottleLimit = 8
     )
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
         $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
@@ -138,7 +145,7 @@ function Get-JuribaImportDevice {
     
         $device = @()
         try {
-            $items = Invoke-JuribaPagedRequest -Uri $uri -Headers $headers
+            $items = Invoke-JuribaPagedRequest -Uri $uri -Headers $headers -ThrottleLimit $ThrottleLimit
             if ($null -eq $items -or $items.Count -eq 0) { return $device }
             $device = switch($InfoLevel) {
                 "Basic" { $items.UniqueIdentifier }

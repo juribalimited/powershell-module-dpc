@@ -19,6 +19,10 @@ function Get-JuribaImportMailbox {
 
         Optional. API key to be provided if not authenticating using Connect-Juriba.
 
+        .PARAMETER ThrottleLimit
+
+        Optional. Maximum number of pages to request concurrently on PowerShell 7+. Defaults to 8. Set to 1 to force sequential paging.
+
         .PARAMETER UniqueIdentifier
 
         UniqueIdentifier for the mailbox. Cannot be used with Hostname or Filter.
@@ -74,7 +78,10 @@ function Get-JuribaImportMailbox {
         [Parameter(Mandatory=$false ,ParameterSetName="fields")]
         [string[]]$Fields,
         [Parameter(Mandatory=$false)]
-        [int]$PageSize = 200
+        [int]$PageSize = 200,
+        [Parameter(Mandatory=$false)]
+        [ValidateRange(1, 64)]
+        [int]$ThrottleLimit = 8
     )
 
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
@@ -128,7 +135,7 @@ function Get-JuribaImportMailbox {
     
         $mailbox = ""
         try {
-            $items = Invoke-JuribaPagedRequest -Uri $uri -Headers $headers
+            $items = Invoke-JuribaPagedRequest -Uri $uri -Headers $headers -ThrottleLimit $ThrottleLimit
             $mailbox = switch($InfoLevel) {
                 "Basic" { $items.UniqueIdentifier }
                 "Full"  { $items }

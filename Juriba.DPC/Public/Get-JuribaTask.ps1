@@ -9,6 +9,8 @@ function Get-JuribaTask {
         Dashworks instance. For example, https://myinstance.dashworks.app:8443
         .PARAMETER APIKey
         Dashworks API Key.
+        .PARAMETER ThrottleLimit
+        Optional. Maximum number of pages to request concurrently on PowerShell 7+. Defaults to 8. Set to 1 to force sequential paging.
         .PARAMETER ProjectID
         Project ID to get project tasks from
         .OUTPUTS
@@ -23,7 +25,10 @@ function Get-JuribaTask {
         [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [Parameter(Mandatory=$true)]
-        [int]$ProjectID
+        [int]$ProjectID,
+        [Parameter(Mandatory=$false)]
+        [ValidateRange(1, 64)]
+        [int]$ThrottleLimit = 8
     )
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
         $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
@@ -37,7 +42,7 @@ function Get-JuribaTask {
             'x-api-key' = $ApiKey
         }
         try {
-            $tasks = Invoke-JuribaPagedRequest -Uri $uri -Headers $headers
+            $tasks = Invoke-JuribaPagedRequest -Uri $uri -Headers $headers -ThrottleLimit $ThrottleLimit
             return $tasks
         }
         catch {

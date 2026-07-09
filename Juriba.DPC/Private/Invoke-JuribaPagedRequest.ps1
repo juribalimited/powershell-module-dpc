@@ -8,9 +8,15 @@ function Invoke-JuribaPagedRequest {
         .DESCRIPTION
         Fetches the first page, reads totalPages from the X-Pagination header and
         then pulls pages 2..N. On PowerShell 7+ the remaining pages are pulled in
-        parallel (throttled by ThrottleLimit); on Windows PowerShell 5.1 it falls
-        back to sequential paging. Transient failures (HTTP 429 and 5xx) are
-        retried with a short backoff.
+        parallel (throttled by ThrottleLimit). If any parallel request fails the
+        helper falls back to the sequential path for pages 2..N; this ensures the
+        caller receives a faithful terminating error (HTTP details are lost when an
+        exception crosses the parallel runspace boundary) and that transient
+        failures are retried rather than silently returning partial data. On
+        Windows PowerShell 5.1, or when ThrottleLimit is 1, paging is sequential.
+
+        Transient failures (HTTP 429, 5xx and transport errors) are retried by
+        Invoke-JuribaWebRequestWithRetry on the sequential path.
 
         Returns the combined array of parsed JSON objects across all pages. The
         caller is responsible for any InfoLevel / property selection. Errors are
@@ -77,45 +83,43 @@ function Invoke-JuribaPagedRequest {
     $remainingPages = 2..$totalPages
 
     if ($PSVersionTable.PSVersion.Major -ge 7 -and $ThrottleLimit -gt 1) {
-        # PowerShell 7+: pull the remaining pages in parallel. Parallel runspaces
-        # cannot see module-private functions, so the retry logic is inlined here
-        # to mirror Invoke-JuribaWebRequestWithRetry.
+        # Fast path: pull the remaining pages in parallel. Each iteration reports
+        # success or failure via a flag - -ErrorAction / -ErrorVariable are not
+        # supported in the -Parallel parameter set. Retry is intentionally omitted
+        # here: any failure drops through to the sequential fallback below, which
+        # retries and surfaces a faithful error.
         $pages = $remainingPages | ForEach-Object -ThrottleLimit $ThrottleLimit -Parallel {
             $pagedUri = "{0}{1}page={2}" -f $using:Uri, $using:separator, $_
-            $attempt = 0
-            $maxAttempts = 4
-            while ($true) {
-                try {
-                    $response = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $using:Headers -ContentType $using:ContentType
-                    break
-                }
-                catch {
-                    $status = $null
-                    $responseProperty = $_.Exception.psobject.Properties['Response']
-                    if ($responseProperty -and $responseProperty.Value) {
-                        $status = [int]$responseProperty.Value.StatusCode
-                    }
-                    $attempt++
-                    $retryable = ($status -eq 429) -or ($null -ne $status -and $status -ge 500)
-                    if ($attempt -ge $maxAttempts -or -not $retryable) { throw }
-                    Start-Sleep -Milliseconds ([int](200 * [math]::Pow(2, $attempt)))
-                }
+            try {
+                $response = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $using:Headers -ContentType $using:ContentType
+                # Emit page number alongside content so results can be re-ordered.
+                [pscustomobject]@{ Page = $_; Content = $response.Content; Failed = $false }
             }
-            # Emit page number alongside content so results can be re-ordered.
-            [pscustomobject]@{ Page = $_; Content = $response.Content }
+            catch {
+                [pscustomobject]@{ Page = $_; Content = $null; Failed = $true }
+            }
         }
-        # Parallel results arrive out of order; re-sort to keep output deterministic.
-        foreach ($page in ($pages | Sort-Object Page)) {
-            & $addContent $page.Content
+
+        if (-not ($pages | Where-Object { $_.Failed })) {
+            # Parallel results arrive out of order; re-sort for deterministic output.
+            foreach ($page in ($pages | Sort-Object Page)) {
+                & $addContent $page.Content
+            }
+            return $items.ToArray()
         }
+
+        # A parallel request failed. Discard the partial parallel output (only
+        # page 1 has been added to $items) and rebuild pages 2..N sequentially so
+        # the caller gets a faithful, retryable result.
+        Write-Verbose "Parallel paging failed; retrying pages 2..$totalPages sequentially."
     }
-    else {
-        # Windows PowerShell 5.1 (or ThrottleLimit = 1): sequential paging.
-        foreach ($page in $remainingPages) {
-            $pagedUri = "{0}{1}page={2}" -f $Uri, $separator, $page
-            $pagedResult = Invoke-JuribaWebRequestWithRetry -Uri $pagedUri -Headers $Headers -ContentType $ContentType
-            & $addContent $pagedResult.Content
-        }
+
+    # Sequential paging: Windows PowerShell 5.1, ThrottleLimit = 1, or the
+    # fallback after a parallel failure.
+    foreach ($page in $remainingPages) {
+        $pagedUri = "{0}{1}page={2}" -f $Uri, $separator, $page
+        $pagedResult = Invoke-JuribaWebRequestWithRetry -Uri $pagedUri -Headers $Headers -ContentType $ContentType
+        & $addContent $pagedResult.Content
     }
 
     return $items.ToArray()

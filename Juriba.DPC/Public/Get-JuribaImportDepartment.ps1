@@ -19,6 +19,10 @@ function Get-JuribaImportDepartment {
 
         Optional. API key to be provided if not authenticating using Connect-Juriba.
 
+        .PARAMETER ThrottleLimit
+
+        Optional. Maximum number of pages to request concurrently on PowerShell 7+. Defaults to 8. Set to 1 to force sequential paging.
+
         .PARAMETER Name
 
         Name for the department. Cannot be used with Filter.
@@ -63,7 +67,10 @@ function Get-JuribaImportDepartment {
         [int]$ImportId,
         [parameter(Mandatory=$false)]
         [ValidateSet("Basic", "Full")]
-        [string]$InfoLevel = "Basic"
+        [string]$InfoLevel = "Basic",
+        [parameter(Mandatory=$false)]
+        [ValidateRange(1, 64)]
+        [int]$ThrottleLimit = 8
     )
 
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
@@ -101,7 +108,7 @@ function Get-JuribaImportDepartment {
     
         $department = ""
         try {
-            $items = Invoke-JuribaPagedRequest -Uri $uri -Headers $headers
+            $items = Invoke-JuribaPagedRequest -Uri $uri -Headers $headers -ThrottleLimit $ThrottleLimit
             $department = switch($InfoLevel) {
                 "Basic" { $items.Name }
                 "Full"  { $items }
