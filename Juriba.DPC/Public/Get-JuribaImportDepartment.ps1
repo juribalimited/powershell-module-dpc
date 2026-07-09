@@ -38,7 +38,7 @@ function Get-JuribaImportDepartment {
         .PARAMETER InfoLevel
 
         Optional. Sets the level of information that this function returns. Accepts Basic or Full.
-        Basic returns only the Name, use when confirming a department exists.
+        Basic returns only the UniqueIdentifier, use when confirming a department exists.
         Full returns the full json object for the department.
         Default is Basic.
 
@@ -110,7 +110,7 @@ function Get-JuribaImportDepartment {
         try {
             $items = Invoke-JuribaPagedRequest -Uri $uri -Headers $headers -ThrottleLimit $ThrottleLimit
             $department = switch($InfoLevel) {
-                "Basic" { $items.Name }
+                "Basic" { $items.UniqueIdentifier }
                 "Full"  { $items }
             }
             return $department
