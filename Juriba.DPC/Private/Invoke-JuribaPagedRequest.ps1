@@ -8,15 +8,17 @@ function Invoke-JuribaPagedRequest {
         .DESCRIPTION
         Fetches the first page, reads totalPages from the X-Pagination header and
         then pulls pages 2..N. On PowerShell 7+ the remaining pages are pulled in
-        parallel (throttled by ThrottleLimit). If any parallel request fails the
-        helper falls back to the sequential path for pages 2..N; this ensures the
+        parallel (throttled by ThrottleLimit). Each parallel page retries transient
+        failures in place (see below), so a rate-limit response - including one
+        provoked by the concurrent burst - is absorbed rather than aborting the
+        batch. If a page still fails after retries (a non-transient error such as
+        404/401) the helper falls back to the sequential path for pages 2..N so the
         caller receives a faithful terminating error (HTTP details are lost when an
-        exception crosses the parallel runspace boundary) and that transient
-        failures are retried rather than silently returning partial data. On
-        Windows PowerShell 5.1, or when ThrottleLimit is 1, paging is sequential.
+        exception crosses the parallel runspace boundary). On Windows PowerShell
+        5.1, or when ThrottleLimit is 1, paging is sequential.
 
         Transient failures (HTTP 429, 5xx and transport errors) are retried by
-        Invoke-JuribaWebRequestWithRetry on the sequential path.
+        Invoke-JuribaWebRequestWithRetry on both the parallel and sequential paths.
 
         Returns the combined array of parsed JSON objects across all pages. The
         caller is responsible for any InfoLevel / property selection. Errors are
@@ -85,13 +87,21 @@ function Invoke-JuribaPagedRequest {
     if ($PSVersionTable.PSVersion.Major -ge 7 -and $ThrottleLimit -gt 1) {
         # Fast path: pull the remaining pages in parallel. Each iteration reports
         # success or failure via a flag - -ErrorAction / -ErrorVariable are not
-        # supported in the -Parallel parameter set. Retry is intentionally omitted
-        # here: any failure drops through to the sequential fallback below, which
-        # retries and surfaces a faithful error.
+        # supported in the -Parallel parameter set.
+        #
+        # The retry helper is recreated inside each runspace (functions defined in
+        # the module scope are not visible to -Parallel) so every parallel page
+        # gets the same 429/5xx backoff and Retry-After handling as the sequential
+        # path. This lets transient failures - including a 429 provoked by the
+        # concurrent burst itself - self-heal in place rather than discarding all
+        # parallel work and forcing a full sequential re-fetch. Only a persistent,
+        # non-transient failure (e.g. 404/401) drops through to the fallback below.
+        $retryFuncDef = ${function:Invoke-JuribaWebRequestWithRetry}.ToString()
         $pages = $remainingPages | ForEach-Object -ThrottleLimit $ThrottleLimit -Parallel {
+            ${function:Invoke-JuribaWebRequestWithRetry} = $using:retryFuncDef
             $pagedUri = "{0}{1}page={2}" -f $using:Uri, $using:separator, $_
             try {
-                $response = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $using:Headers -ContentType $using:ContentType
+                $response = Invoke-JuribaWebRequestWithRetry -Uri $pagedUri -Headers $using:Headers -ContentType $using:ContentType
                 # Emit page number alongside content so results can be re-ordered.
                 [pscustomobject]@{ Page = $_; Content = $response.Content; Failed = $false }
             }
@@ -108,9 +118,11 @@ function Invoke-JuribaPagedRequest {
             return $items.ToArray()
         }
 
-        # A parallel request failed. Discard the partial parallel output (only
-        # page 1 has been added to $items) and rebuild pages 2..N sequentially so
-        # the caller gets a faithful, retryable result.
+        # A page failed even after in-runspace retries (i.e. a non-transient
+        # error, or one that exhausted its retries). Discard the partial parallel
+        # output (only page 1 has been added to $items) and rebuild pages 2..N
+        # sequentially so the caller gets a faithful terminating error - HTTP
+        # details are lost when an exception crosses the parallel runspace boundary.
         Write-Verbose "Parallel paging failed; retrying pages 2..$totalPages sequentially."
     }
 
