@@ -20,10 +20,6 @@ function Get-JuribaApplicationV1 {
 
         Optional. API key to be provided if not authenticating using Connect-Juriba.
 
-        .PARAMETER ThrottleLimit
-
-        Optional. Maximum number of pages to request concurrently on PowerShell 7+. Defaults to 8. Set to 1 to force sequential paging.
-
         .EXAMPLE
         PS> Get-JuribaImportApplication -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
@@ -34,10 +30,7 @@ function Get-JuribaApplicationV1 {
         [Parameter(Mandatory=$false)]
         [string]$Instance,
         [Parameter(Mandatory=$false)]
-        [string]$APIKey,
-        [Parameter(Mandatory=$false)]
-        [ValidateRange(1, 64)]
-        [int]$ThrottleLimit = 8
+        [string]$APIKey
     )
 
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
@@ -56,7 +49,8 @@ function Get-JuribaApplicationV1 {
         $headers = @{'x-api-key' = $APIKey}
 
         try {
-            return Invoke-JuribaPagedRequest -Uri $uri -Headers $headers -ThrottleLimit $ThrottleLimit
+            $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json"
+            return (($result.content) | ConvertFrom-Json)
         }
         catch {
             if ($_.Exception.Response.StatusCode.Value__ -eq 404) {
