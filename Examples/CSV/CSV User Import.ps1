@@ -28,7 +28,7 @@ $JuribaParams = @{
     APIKey = $JuribaAPIKey
 }
 
-# Get Jruiba DPC feed
+# Get Juriba DPC feed
 $feed = Get-JuribaImportUserFeed @JuribaParams -Name $JuribaFeedName
 # If it doesnt exist, create it
 if (-Not $feed) {
@@ -41,7 +41,7 @@ Write-Information ("Using feed id {0}" -f $importId) -InformationAction Continue
 # Get data from CSV file
 $csvFile = Import-Csv -Path $Path
 
-<# Optional Format File data 
+<# Optional Format File data
 $columnsToRemove = @("ImportID")
 #Validate that columns exist before removing
     foreach ($col in $columnsToRemove) {
