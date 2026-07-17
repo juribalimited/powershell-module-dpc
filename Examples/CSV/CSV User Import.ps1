@@ -1,10 +1,10 @@
 <#
 .SYNOPSIS
 A sample script to query a CSV file for users and import
-those users into Dashworks.
+those users into Juriba DPC.
 .DESCRIPTION
 A sample script to query a CSV file for users and import
-those users into Dashworks. Script will either update or create
+those users into Juriba DPC. Script will either update or create
 the user.
 #>
 
@@ -28,7 +28,7 @@ $JuribaParams = @{
     APIKey = $JuribaAPIKey
 }
 
-# Get DW feed
+# Get Jruiba DPC feed
 $feed = Get-JuribaImportUserFeed @JuribaParams -Name $JuribaFeedName
 # If it doesnt exist, create it
 if (-Not $feed) {
