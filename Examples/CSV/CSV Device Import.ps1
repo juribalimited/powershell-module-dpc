@@ -59,7 +59,8 @@ $columnsToRemove = @("ImportID")
 #add owner field.
 $csvFile = $csvFile | Select-Object *,@{Name='owner'; Expression={"/imports/" + $ImportID + "/users/" + $_."User Principal Name"}}
 foreach ($line in $csvFile) {
-    if ($line.owner -eq '/imports/1/users/') {
+    $emptyline = "/imports/" + $ImportID + "/users/"
+    if ($line.owner -eq $emptyline) {
         $line.owner = ''
     }
 }
