@@ -41,6 +41,19 @@ Write-Information ("Using feed id {0}" -f $importId) -InformationAction Continue
 # Get data from CSV file
 $csvFile = Import-Csv -Path $Path
 
+<# Optional Format File data 
+$columnsToRemove = @("ImportID")
+#Validate that columns exist before removing
+    foreach ($col in $columnsToRemove) {
+        if ($csvFile[0].PSObject.Properties.Name -contains $col) {
+            $csvFile | ForEach-Object { $_.PSObject.Properties.Remove($col) }
+        }
+        else {
+            Write-Warning "Column '$col' not found in CSV. Skipping."
+        }
+    }
+#>
+
 $i = 0
 foreach ($line in $csvFile) {
     $i++
