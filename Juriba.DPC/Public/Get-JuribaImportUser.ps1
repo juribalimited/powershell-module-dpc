@@ -19,6 +19,10 @@ function Get-JuribaImportUser {
 
         Optional. API key to be provided if not authenticating using Connect-Juriba.
 
+        .PARAMETER ThrottleLimit
+
+        Optional. Maximum number of pages to request concurrently on PowerShell 7+. Defaults to 8. Set to 1 to force sequential paging.
+
         .PARAMETER Username
 
         Useraname for the user. Cannot be used with Filter.
@@ -38,7 +42,7 @@ function Get-JuribaImportUser {
         .PARAMETER InfoLevel
 
         Optional. Sets the level of information that this function returns. Accepts Basic or Full.
-        Basic returns only the Username, use when confirming a user exists.
+        Basic returns only the UniqueIdentifier, use when confirming a user exists.
         Full returns the full json object for the user.
         Default is Basic.
 
@@ -71,7 +75,10 @@ function Get-JuribaImportUser {
         [Parameter(Mandatory=$false ,ParameterSetName="fields")]
         [string[]]$Fields,
         [Parameter(Mandatory=$false)]
-        [int]$PageSize = 200
+        [int]$PageSize = 200,
+        [Parameter(Mandatory=$false)]
+        [ValidateRange(1, 64)]
+        [int]$ThrottleLimit = 8
     )
 
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
@@ -123,26 +130,10 @@ function Get-JuribaImportUser {
     
         $user = ""
         try {
-            $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json"
+            $items = Invoke-JuribaPagedRequest -Uri $uri -Headers $headers -ThrottleLimit $ThrottleLimit
             $user = switch($InfoLevel) {
-                "Basic" { ($result.Content | ConvertFrom-Json).Username }
-                "Full"  { $result.Content | ConvertFrom-Json }
-            }
-            # check if result is paged, if so get remaining pages and add to result set
-            if ($result.Headers.ContainsKey("X-Pagination")) {
-                $totalPages = ($result.Headers."X-Pagination" | ConvertFrom-Json).totalPages
-                for ($page = 2; $page -le $totalPages; $page++) {
-                    if ($uri -match '\?') {
-                        $pagedUri = $uri + "&page={0}" -f $page
-                    } else {
-                        $pagedUri = $uri + "?page={0}" -f $page
-                    }
-                    $pagedResult = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $headers -ContentType "application/json"
-                    $user += switch($InfoLevel) {
-                        "Basic" { ($pagedResult.Content | ConvertFrom-Json).Username }
-                        "Full"  { $pagedResult.Content | ConvertFrom-Json }
-                    }
-                }
+                "Basic" { $items.UniqueIdentifier }
+                "Full"  { $items }
             }
             return $user
         }

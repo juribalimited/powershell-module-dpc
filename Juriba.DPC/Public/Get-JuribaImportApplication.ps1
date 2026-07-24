@@ -19,6 +19,10 @@ function Get-JuribaImportApplication {
 
         Optional. API key to be provided if not authenticating using Connect-Juriba.
 
+        .PARAMETER ThrottleLimit
+
+        Optional. Maximum number of pages to request concurrently on PowerShell 7+. Defaults to 8. Set to 1 to force sequential paging.
+
         .PARAMETER UniqueIdentifier
 
         UniqueIdentifier for the application.
@@ -71,7 +75,10 @@ function Get-JuribaImportApplication {
         [Parameter(Mandatory=$false ,ParameterSetName="fields")]
         [string[]]$Fields,
         [Parameter(Mandatory=$false)]
-        [int]$PageSize = 200
+        [int]$PageSize = 200,
+        [Parameter(Mandatory=$false)]
+        [ValidateRange(1, 64)]
+        [int]$ThrottleLimit = 8
     )
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
         $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
@@ -122,26 +129,10 @@ function Get-JuribaImportApplication {
     
         $application = ""
         try {
-            $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType "application/json"
+            $items = Invoke-JuribaPagedRequest -Uri $uri -Headers $headers -ThrottleLimit $ThrottleLimit
             $application = switch($InfoLevel) {
-                "Basic" { ($result.Content | ConvertFrom-Json).UniqueIdentifier }
-                "Full"  { $result.Content | ConvertFrom-Json }
-            }
-            # check if result is paged, if so get remaining pages and add to result set
-            if ($result.Headers.ContainsKey("X-Pagination")) {
-                $totalPages = ($result.Headers."X-Pagination" | ConvertFrom-Json).totalPages
-                for ($page = 2; $page -le $totalPages; $page++) {
-                    if ($uri -match '\?') {
-                        $pagedUri = $uri + "&page={0}" -f $page
-                    } else {
-                        $pagedUri = $uri + "?page={0}" -f $page
-                    }
-                    $pagedResult = Invoke-WebRequest -Uri $pagedUri -Method GET -Headers $headers -ContentType "application/json"
-                    $application += switch($InfoLevel) {
-                        "Basic" { ($pagedResult.Content | ConvertFrom-Json).UniqueIdentifier }
-                        "Full"  { $pagedResult.Content | ConvertFrom-Json }
-                    }
-                }
+                "Basic" { $items.UniqueIdentifier }
+                "Full"  { $items }
             }
         }
         catch {
