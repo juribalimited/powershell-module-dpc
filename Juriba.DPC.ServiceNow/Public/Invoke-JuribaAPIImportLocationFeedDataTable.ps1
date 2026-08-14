@@ -56,8 +56,7 @@ function Invoke-JuribaAPIImportLocationFeedDataTable{
             $ImportId = (Get-JuribaImportLocationFeed -Instance $Instance -ApiKey $APIKey -Name $FeedName).id
         }
         catch {
-            write-error "User feed lookup returned no results"
-            exit 1
+            throw "Location feed lookup failed. $_"
         }
 
         if (-not $ImportId)

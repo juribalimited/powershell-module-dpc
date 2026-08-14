@@ -33,7 +33,9 @@ function Merge-DataTable {
     $dtMerge = $primaryTable.Copy()
     $ScriptBlock=$null
     $LeftJoinField= '$Row.''' + $LeftjoinKeyProperty + ''''
-    $ScriptBlock = '$joinRow = $secondaryTable.select("['+ $rightjoinkeyproperty + ']=''$(' + $LeftJoinField + ')''")' + "`n"
+    # Escape embedded single quotes in the join value, otherwise DataTable.Select throws on values like O'Brien.
+    $ScriptBlock = '$leftJoinValue = ([string](' + $LeftJoinField + ')).Replace("''","''''")' + "`n"
+    $ScriptBlock += '$joinRow = $secondaryTable.select("['+ $rightjoinkeyproperty + ']=''$leftJoinValue''")' + "`n"
     $AddedColumnList = ''
     Foreach ($AddColumn in $AddColumns.GetEnumerator()) {
         if (!$dtMerge.Columns.Contains($AddColumn.Value))

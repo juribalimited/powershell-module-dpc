@@ -56,8 +56,7 @@ function Invoke-JuribaAPIImportDepartmentFeedDataTable{
             $ImportId = (Get-JuribaImportDepartmentFeed -Instance $Instance -ApiKey $APIKey -Name $FeedName).id
         }
         catch {
-            write-error "User feed lookup returned no results"
-            exit 1
+            throw "Department feed lookup failed. $_"
         }
         
         if (-not $ImportId)
@@ -93,7 +92,9 @@ function Invoke-JuribaAPIImportDepartmentFeedDataTable{
         try{
             Invoke-RestMethod -Headers $Using:Postheaders -Uri $Using:uri -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($Body)) -AllowInsecureRedirect | out-null
         }catch{
-            write-output "Error row sysid $($row.uniqueIdentifier) : $body"
+            # Write-Warning: preference variables do not propagate into -Parallel runspaces,
+            # so Write-Debug/Write-Verbose here would never be visible to the caller.
+            Write-Warning "Error row sysid $($row.uniqueIdentifier) : $body"
         }
         #$RowCount++
     } -ThrottleLimit 25

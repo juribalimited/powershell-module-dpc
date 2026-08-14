@@ -53,6 +53,7 @@ function Invoke-JuribaAPIBulkImportDeviceFeedDataTable{
     )
 
     $Deleteheaders = @{"X-API-KEY" = "$APIKey"}
+    $deleteIssued = $false
 
     if (-not $ImportId)
     {
@@ -64,8 +65,7 @@ function Invoke-JuribaAPIBulkImportDeviceFeedDataTable{
         try{
             $ImportId = (Get-JuribaImportDeviceFeed -Instance $Instance -ApiKey $APIKey -Name $FeedName).id
         } catch {
-            write-error "Device feed lookup returned no results"
-            exit 1
+            throw "Device feed lookup failed. $_"
         }
 
         if (-not $ImportId)
@@ -74,21 +74,23 @@ function Invoke-JuribaAPIBulkImportDeviceFeedDataTable{
         } else {
             $Deleteuri = "{0}/apiv2/imports/devices/{1}/items" -f $Instance, $ImportId
             Invoke-RestMethod -Headers $Deleteheaders -Uri $Deleteuri -Method Delete| out-null
+            $deleteIssued = $true
             Write-Debug ("$(get-date -format 'o'):INFO: Deleted records for ImportID $ImportID, $Feedname")
         }
     }
 
-    #wait until all of the objects are deleted from the feed.
-    try{
-        while(((Invoke-RestMethod -uri "$Instance/apiv1/admin/data-imports" -Method Get -Headers $Deleteheaders) | Where-Object{$_.typeName -eq 'hardware-inventory' -and $_.id -eq $ImportID}).ObjectsCount -gt 0)
-        {
-            Start-sleep 2
-            Write-Debug "$(get-date -format 'o'):Waiting for delete to complete"
+    #wait until all of the objects are deleted from the feed. Only applies when this function issued the delete;
+    #when an ImportId is passed directly no delete happens, and waiting on a non-empty feed would never return.
+    if ($deleteIssued) {
+        try{
+            while(((Invoke-RestMethod -uri "$Instance/apiv1/admin/data-imports" -Method Get -Headers $Deleteheaders) | Where-Object{$_.typeName -eq 'hardware-inventory' -and $_.id -eq $ImportID}).ObjectsCount -gt 0)
+            {
+                Start-sleep 2
+                Write-Debug "$(get-date -format 'o'):Waiting for delete to complete"
+            }
+        } catch {
+            throw "Reading of data imports failed, check the APIv1 is accessible to external tools. $_"
         }
-    } catch {
-        write-error $_.Exception
-        write-error "Reading of data imports failed, check the APIv1 is accessible to external tools"
-        exit 1
     }
 
     $Postheaders = @{
@@ -113,7 +115,8 @@ function Invoke-JuribaAPIBulkImportDeviceFeedDataTable{
         $applications = @()
         if ($null -ne $DPCDeviceAppDataTable -and $DPCDeviceAppDataTable.Rows.Count -gt 0)
         {
-            foreach($App in $DPCDeviceAppDataTable.select("DeviceUniqueIdentifier='$($Row.uniqueIdentifier)'"))
+            $rowUid = ([string]$Row.uniqueIdentifier).Replace("'","''")
+            foreach($App in $DPCDeviceAppDataTable.select("DeviceUniqueIdentifier='$rowUid'"))
             {
                 $applications += @{"applicationDistHierId"=$App.applicationDistHierId;"applicationBusinessKey"=$App.AppUniqueIdentifier;"installed" = $true}
             }

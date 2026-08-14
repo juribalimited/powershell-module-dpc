@@ -12,7 +12,7 @@
 RootModule = 'Juriba.DPC.ServiceNow.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.0.5'
+ModuleVersion = '0.0.0.6'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -51,7 +51,9 @@ PowerShellVersion = '7.1'
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-# RequiredModules = @()
+RequiredModules = @(
+    @{ ModuleName = 'Juriba.DPC'; ModuleVersion = '1.1.17.0' }
+)
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
@@ -77,13 +79,17 @@ FunctionsToExport = @(
 	'Convert-DwAPIDeviceFromServiceNowAlm_Asset',
 	'Convert-DwAPILocationFromServiceNowCMN_Location',
 	'Convert-DwAPIUserFromServiceNowSys_User',
+	'ConvertTo-DataTable',
 	'Get-ServiceNowTable',
 	'Get-ServiceNowToken',
-	'Invoke-JuribaAPIBulkImportAppFeedDataTable',
+	'Invoke-JuribaAPIBulkImportApplicationFeedDataTableDiff',
 	'Invoke-JuribaAPIBulkImportDeviceFeedDataTable',
+	'Invoke-JuribaAPIBulkImportDeviceFeedDataTableDiff',
 	'Invoke-JuribaAPIBulkImportUserFeedDataTable',
-        'Invoke-JuribaAPIImportDepartmentFeedDataTable',
-        'Invoke-JuribaAPIImportLocationFeedDataTable',
+	'Invoke-JuribaAPIBulkImportUserFeedDataTableDiff',
+	'Invoke-JuribaAPIImportDepartmentFeedDataTable',
+	'Invoke-JuribaAPIImportLocationFeedDataTable',
+	'Invoke-JuribaWebRequestWithRetry',
 	'IsValidEmail',
 	'Merge-DataTable',
 	'Update-ServiceNowToken'
