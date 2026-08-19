@@ -4,10 +4,10 @@ function Invoke-JuribaAPIImportDepartmentFeedDataTable{
     Loops a correctly formatted data table inserting all of the rows it contains.
 
     .Description
-    Takes a System.Data.Datatable object with the columns required for the DwAPI user. Inserts these users one at a time.
+    Takes a System.Data.Datatable object with the columns required for the Juriba DPC department import API. Inserts these departments one at a time.
 
     .Parameter Instance
-    The URI to the Dashworks instance being examined.
+    The URI to the Juriba DPC instance being examined.
 
     .Parameter APIKey
     The APIKey for a user with access to the required resources.
@@ -16,10 +16,10 @@ function Invoke-JuribaAPIImportDepartmentFeedDataTable{
     The name of the feed to be searched for and used.
 
     .Parameter ImportId
-    The id of the user feed to be used.
+    The id of the department feed to be used.
 
-    .Parameter DWDataTable
-    [System.Data.DataTable] Data table containing the fields required to insert data into the DW user API.
+    .Parameter DWDepartmentDataTable
+    [System.Data.DataTable] Data table containing the fields required to insert data into the Juriba DPC department import API.
 
     .Outputs
     Output type [string]

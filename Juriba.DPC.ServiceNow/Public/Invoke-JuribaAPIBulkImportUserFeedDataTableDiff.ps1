@@ -4,12 +4,13 @@ function Invoke-JuribaAPIBulkImportUserFeedDataTableDiff{
     Synchronizes a user import feed from a data table using a differential load.
 
     .Description
-    Takes a System.Data.Datatable object with the columns required for the DwAPI User. Compares
+    Takes a System.Data.Datatable object with the columns required for the Juriba DPC user import API. Compares
     the table to the existing feed items by uniqueIdentifier, POSTs new rows, PATCHes existing rows
     and deletes feed items no longer present in the source data.
+    Uses the universal imports API and therefore requires Juriba DPC 5.14 or later.
 
     .Parameter Instance
-    The URI to the Dashworks instance being examined.
+    The URI to the Juriba DPC instance being examined.
 
     .Parameter APIKey
     The APIKey for a user with access to the required resources.
@@ -21,11 +22,10 @@ function Invoke-JuribaAPIBulkImportUserFeedDataTableDiff{
     The id of the User feed to be used.
 
     .Parameter DPCUserDataTable
-    [System.Data.DataTable] Data table containing the fields required to insert data into the DW User API.
+    [System.Data.DataTable] Data table containing the fields required to insert data into the Juriba DPC user import API.
 
     .Parameter DPCUserAppDataTable
-    [System.Data.DataTable] Data table containing the columns UserUniqueIdentifier, appUniqueIdentifier and
-    appDistHierId (DPC 5.13 and earlier) or appUniversalDataImportId (DPC 5.14 and later).
+    [System.Data.DataTable] Data table containing the columns UserUniqueIdentifier, appUniqueIdentifier and appUniversalDataImportId.
 
     .Outputs
     Output type [string]
@@ -81,32 +81,17 @@ function Invoke-JuribaAPIBulkImportUserFeedDataTableDiff{
         $ImportId = [string]$feedIds[0]
     }
 
-    try{
-        [version]$juribaVersion = (Invoke-JuribaWebRequestWithRetry -Uri "$Instance/apiv1").Content.Replace('Hello World - ','')
-        if($juribaVersion.Major -le 5 -and $juribaVersion.Minor -le 13){$APIVersion = 1}else{$APIVersion = 2}
-        write-debug "$(get-date -format 'o') ProductVersion: $($juribaVersion.Major).$($juribaVersion.Minor) - API Version: $APIVersion"
-    }catch{
-        throw "API Version Check failed. $_"
-    }
-
     if ($null -ne $DPCUserAppDataTable -and $DPCUserAppDataTable.Rows.Count -gt 0)
     {
-        $requiredAppColumn = if ($APIVersion -eq 1) { 'appDistHierId' } else { 'appUniversalDataImportId' }
-        if (-not $DPCUserAppDataTable.Columns.Contains($requiredAppColumn))
+        if (-not $DPCUserAppDataTable.Columns.Contains('appUniversalDataImportId'))
         {
-            throw "DPCUserAppDataTable must contain an '$requiredAppColumn' column when the DPC instance uses API version $APIVersion."
+            throw "DPCUserAppDataTable must contain an 'appUniversalDataImportId' column."
         }
     }
 
     write-debug "$(get-date -format 'o') Existing uniqueIdentifiers - Get Page 1"
 
-    if ($APIVersion -eq 1)
-    {
-        $uri = '{0}/apiv2/imports/users/{1}/items?fields=uniqueIdentifier,lastUpdated&order=uniqueIdentifier&limit=1000' -f $Instance,$ImportId
-    }
-    else{
-        $uri = '{0}/apiv2/imports/{1}/users?fields=uniqueIdentifier,lastUpdated&order=uniqueIdentifier&limit=1000' -f $Instance,$ImportId
-    }
+    $uri = '{0}/apiv2/imports/{1}/users?fields=uniqueIdentifier,lastUpdated&order=uniqueIdentifier&limit=1000' -f $Instance,$ImportId
 
     $UIDheaders = @{'x-api-key' = $APIKey;'Accept'='application/vnd.juriba.dashworks+json'}
 
@@ -176,13 +161,7 @@ function Invoke-JuribaAPIBulkImportUserFeedDataTableDiff{
         "X-API-KEY" = "$APIKey"
     }
 
-    if ($APIVersion -eq 1)
-    {
-        $uri = '{0}/apiv2/imports/users/{1}/items/$bulk' -f $Instance, $ImportId
-    }
-    else{
-        $uri = '{0}/apiv2/imports/{1}/users/$bulk' -f $Instance, $ImportId
-    }
+    $uri = '{0}/apiv2/imports/{1}/users/$bulk' -f $Instance, $ImportId
 
     $ExcludeProperty = @("ItemArray", "Table", "RowError", "RowState", "HasErrors","ExistsInSource","DataView","RowVersion","Row","IsNew","IsEdit","Error","RequireRegisteredTypes")
     if ($CustomFields.count -gt 0) {$ExcludeProperty += $CustomFields}
@@ -216,22 +195,20 @@ function Invoke-JuribaAPIBulkImportUserFeedDataTableDiff{
 
             if($body.PSObject.Properties['Owner'] -and $body.Owner -eq ''){$body.PSObject.Properties.Remove('Owner')}
 
-            $applications = @()
             if ($null -ne $DPCUserAppDataTable -and $DPCUserAppDataTable.Rows.Count -gt 0)
             {
+                $applications = @()
                 $rowUid = ([string]$Row.uniqueIdentifier).Replace("'","''")
                 foreach($App in $DPCUserAppDataTable.select("userUniqueIdentifier='$rowUid'"))
                 {
-                    if ($APIVersion -eq 1)
-                    {
-                        $applications += @{"appDistHierId"=$App.appDistHierId;"applicationBusinessKey"=$App.AppUniqueIdentifier;"entitled"=$true}
-                    }
-                    else{
-                        $applications += @{"applicationUniversalDataImportId"=$App.appUniversalDataImportId;"applicationBusinessKey"=$App.AppUniqueIdentifier;"entitled"=$true}
-                    }
+                    $applications += @{"applicationUniversalDataImportId"=$App.appUniversalDataImportId;"applicationBusinessKey"=$App.AppUniqueIdentifier;"entitled"=$true}
                 }
+                $Body.applications = $applications
+            } else {
+                # No link table supplied: omit the property entirely so a PATCH does not clear
+                # existing application associations with an empty array.
+                $Body.PSObject.Properties.Remove('applications')
             }
-            $Body.applications = $applications
 
             $CustomFieldValues = @()
             $CFVtemplate = 'if ($Row.### -ne [dbnull]::value)
@@ -324,16 +301,11 @@ function Invoke-JuribaAPIBulkImportUserFeedDataTableDiff{
         {
             if($row.uniqueIdentifier -eq '#NULL#'){continue}
             $RowCount++
-            if ($APIVersion -eq 1)
-            {
-                $deleteArray += "/imports/users/{0}/items/{1}" -f $ImportId,$row.UniqueIdentifier
-            }
-            else{
-                $deleteArray += "/imports/{0}/users/{1}" -f $ImportId,$row.UniqueIdentifier
-            }
+            $deleteArray += "/imports/{0}/users/{1}" -f $ImportId,$row.UniqueIdentifier
             if ($deleteArray.Count -eq $BatchSize -or $RowCount -eq $dvUserDelete.Count)
             {
-                $JSONBody = $deleteArray | ConvertTo-Json -Depth 10
+                # -InputObject keeps a single-element batch as a JSON array; piping would unwrap it to a bare string.
+                $JSONBody = ConvertTo-Json -Depth 10 -InputObject $deleteArray
                 $ByteArrayBody = [System.Text.Encoding]::UTF8.GetBytes($JSONBody)
                 try{
                     $stopwatch.Start()

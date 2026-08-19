@@ -4,12 +4,13 @@ function Invoke-JuribaAPIBulkImportApplicationFeedDataTableDiff{
     Synchronizes an application import feed from a data table using a differential load.
 
     .Description
-    Takes a System.Data.Datatable object with the columns required for the DwAPI Application. Compares
+    Takes a System.Data.Datatable object with the columns required for the Juriba DPC application import API. Compares
     the table to the existing feed items by uniqueIdentifier, POSTs new rows, PATCHes existing rows
     and deletes feed items no longer present in the source data.
+    Uses the universal imports API and therefore requires Juriba DPC 5.14 or later.
 
     .Parameter Instance
-    The URI to the Dashworks instance being examined.
+    The URI to the Juriba DPC instance being examined.
 
     .Parameter APIKey
     The APIKey for a user with access to the required resources.
@@ -21,7 +22,7 @@ function Invoke-JuribaAPIBulkImportApplicationFeedDataTableDiff{
     The id of the feed to be used.
 
     .Parameter DPCApplicationDataTable
-    [System.Data.DataTable] Data table containing the fields required to insert data into the DW Application API.
+    [System.Data.DataTable] Data table containing the fields required to insert data into the Juriba DPC application import API.
 
     .Parameter DPCDeviceAppDataTable
     [System.Data.DataTable] Data table containing the columns DeviceUniqueIdentifier, deviceImportID, appUniqueIdentifier
@@ -80,23 +81,20 @@ function Invoke-JuribaAPIBulkImportApplicationFeedDataTableDiff{
         $ImportId = [string]$feedIds[0]
     }
 
-    try{
-        [version]$juribaVersion = (Invoke-JuribaWebRequestWithRetry -Uri "$Instance/apiv1").Content.Replace('Hello World - ','')
-        if($juribaVersion.Major -le 5 -and $juribaVersion.Minor -le 13){$APIVersion = 1}else{$APIVersion = 2}
-        write-debug "$(get-date -format 'o') ProductVersion: $($juribaVersion.Major).$($juribaVersion.Minor) - API Version: $APIVersion"
-    }catch{
-        throw "API Version Check failed. $_"
+    if ($null -ne $DPCDeviceAppDataTable -and $DPCDeviceAppDataTable.Rows.Count -gt 0)
+    {
+        foreach ($requiredColumn in @('appUniqueIdentifier','deviceImportID','DeviceUniqueIdentifier'))
+        {
+            if (-not $DPCDeviceAppDataTable.Columns.Contains($requiredColumn))
+            {
+                throw "DPCDeviceAppDataTable must contain a '$requiredColumn' column."
+            }
+        }
     }
 
     write-debug "$(get-date -format 'o') Existing uniqueIdentifiers - Get Page 1"
 
-    if ($APIVersion -eq 1)
-    {
-        $uri = '{0}/apiv2/imports/applications/{1}/items?fields=uniqueIdentifier,lastUpdated&order=uniqueIdentifier&limit=1000' -f $Instance,$ImportId
-    }
-    else{
-        $uri = '{0}/apiv2/imports/{1}/applications?fields=uniqueIdentifier,lastUpdated&order=uniqueIdentifier&limit=1000' -f $Instance,$ImportId
-    }
+    $uri = '{0}/apiv2/imports/{1}/applications?fields=uniqueIdentifier,lastUpdated&order=uniqueIdentifier&limit=1000' -f $Instance,$ImportId
 
     $UIDheaders = @{'x-api-key' = $APIKey;'Accept'='application/vnd.juriba.dashworks+json'}
 
@@ -166,13 +164,7 @@ function Invoke-JuribaAPIBulkImportApplicationFeedDataTableDiff{
         "X-API-KEY" = "$APIKey"
     }
 
-    if ($APIVersion -eq 1)
-    {
-        $uri = '{0}/apiv2/imports/applications/{1}/items/$bulk' -f $Instance, $ImportId
-    }
-    else{
-        $uri = '{0}/apiv2/imports/{1}/applications/$bulk' -f $Instance, $ImportId
-    }
+    $uri = '{0}/apiv2/imports/{1}/applications/$bulk' -f $Instance, $ImportId
 
     $ExcludeProperty = @("ItemArray", "Table", "RowError", "RowState", "HasErrors","ExistsInSource","DataView","RowVersion","Row","IsNew","IsEdit","Error","RequireRegisteredTypes")
     if ($CustomFields.count -gt 0) {$ExcludeProperty += $CustomFields}
@@ -310,16 +302,11 @@ function Invoke-JuribaAPIBulkImportApplicationFeedDataTableDiff{
         {
             if($row.uniqueIdentifier -eq '#NULL#'){continue}
             $RowCount++
-            if ($APIVersion -eq 1)
-            {
-                $deleteArray += "/imports/applications/{0}/items/{1}" -f $ImportId,$row.UniqueIdentifier
-            }
-            else{
-                $deleteArray += "/imports/{0}/applications/{1}" -f $ImportId,$row.UniqueIdentifier
-            }
+            $deleteArray += "/imports/{0}/applications/{1}" -f $ImportId,$row.UniqueIdentifier
             if ($deleteArray.Count -eq $BatchSize -or $RowCount -eq $dvApplicationDelete.Count)
             {
-                $JSONBody = $deleteArray | ConvertTo-Json -Depth 10
+                # -InputObject keeps a single-element batch as a JSON array; piping would unwrap it to a bare string.
+                $JSONBody = ConvertTo-Json -Depth 10 -InputObject $deleteArray
                 $ByteArrayBody = [System.Text.Encoding]::UTF8.GetBytes($JSONBody)
                 try{
                     $stopwatch.Start()
