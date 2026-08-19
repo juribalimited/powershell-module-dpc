@@ -1,10 +1,13 @@
 function Invoke-JuribaAPIImportLocationFeedDataTable{
     <#
     .Synopsis
-    Loops a correctly formatted data table inserting all of the rows it contains.
+    Synchronizes a location import feed from a data table using a differential load.
 
     .Description
-    Takes a System.Data.Datatable object with the columns required for the Juriba DPC location import API. Inserts these locations one at a time.
+    Takes a System.Data.Datatable object with the columns required for the Juriba DPC location import API.
+    Compares the table to the existing feed items by uniqueIdentifier, POSTs new rows, PATCHes existing rows
+    and deletes feed items no longer present in the source data.
+    Uses the universal imports API and therefore requires Juriba DPC 5.14 or later.
 
     .Parameter Instance
     The URI to the Juriba DPC instance being examined.
@@ -18,12 +21,16 @@ function Invoke-JuribaAPIImportLocationFeedDataTable{
     .Parameter ImportId
     The id of the location feed to be used.
 
-    .Parameter DWLocationDataTable
+    .Parameter DPCLocationDataTable
     [System.Data.DataTable] Data table containing the fields required to insert data into the Juriba DPC location import API.
 
     .Outputs
     Output type [string]
-    Text confirming the number of rows to be inserted.
+    Text confirming the number of rows processed.
+
+    .Example
+    # Synchronize the location feed with the given id from the data table.
+    Invoke-JuribaAPIImportLocationFeedDataTable -Instance $Instance -DPCLocationDataTable $dtJuribaLocationImport -ImportId $LocationImportID -APIKey $APIKey
     #>
 
     [OutputType([string])]
@@ -32,7 +39,7 @@ function Invoke-JuribaAPIImportLocationFeedDataTable{
         [string]$Instance,
 
         [Parameter(Mandatory=$True)]
-        [System.Data.DataTable]$DWLocationDataTable,
+        [System.Data.DataTable]$DPCLocationDataTable,
 
         [Parameter(Mandatory=$True)]
         [string]$APIKey,
@@ -44,34 +51,95 @@ function Invoke-JuribaAPIImportLocationFeedDataTable{
         [string]$ImportId
     )
 
-
     if (-not $ImportId)
     {
         if (-not $FeedName)
         {
-            return 'Location feed not found by name or ID'
+            throw "Either -ImportId or -FeedName must be provided."
         }
-
         try{
-            $ImportId = (Get-JuribaImportLocationFeed -Instance $Instance -ApiKey $APIKey -Name $FeedName).id
+            $feedIds = @((Get-JuribaImportLocationFeed -Instance $Instance -ApiKey $APIKey -Name $FeedName -ErrorAction Stop).id)
         }
         catch {
             throw "Location feed lookup failed. $_"
         }
-
-        if (-not $ImportId)
+        if ($feedIds.Count -eq 0 -or -not $feedIds[0])
         {
-            return 'Location feed not found by name or ID'
-        } else {
-            
-            $Deleteheaders = @{
-                                "X-API-KEY" = "$APIKey"
-                            }
-            $Deleteuri = "{0}/apiv2/imports/locations/{1}/items" -f $Instance, $ImportId
-            Invoke-RestMethod -Headers $Deleteheaders -Uri $Deleteuri -Method DELETE | out-null
-
-            Write-Debug ("INFO: Deleted records for ImportID $ImportID, $Feedname")
+            throw "Location feed not found by name '$FeedName'."
         }
+        if ($feedIds.Count -gt 1)
+        {
+            throw "Multiple import feeds matched name '$FeedName'. Pass -ImportId to disambiguate."
+        }
+        $ImportId = [string]$feedIds[0]
+    }
+
+    write-debug "$(get-date -format 'o') Existing uniqueIdentifiers - Get Page 1"
+
+    $uri = '{0}/apiv2/imports/{1}/locations?fields=uniqueIdentifier,lastUpdated&order=uniqueIdentifier&limit=1000' -f $Instance,$ImportId
+
+    $UIDheaders = @{'x-api-key' = $APIKey;'Accept'='application/vnd.juriba.dashworks+json'}
+
+    # Capture the retry helper's definition so it can be injected into the
+    # ForEach-Object -Parallel runspaces below (functions don't cross that boundary).
+    $retryFunctionDef = ${function:Invoke-JuribaWebRequestWithRetry}.ToString()
+
+    $response = Invoke-JuribaWebRequestWithRetry -Uri $uri -Headers $UIDheaders -Method Get
+
+    $threadSafeDictionary = [System.Collections.Concurrent.ConcurrentDictionary[string,object]]::new()
+
+    if([System.Text.Encoding]::UTF8.GetString($response.Content) -ne '[]')
+    {
+        write-debug "$(get-date -format 'o') Existing uniqueIdentifiers - Adding Page 1 to dictionary"
+        Foreach($entry in ([System.Text.Encoding]::UTF8.GetString($response.Content) | ConvertFrom-Json).data)
+        {
+            $threadSafeDictionary.TryAdd($entry.uniqueIdentifier,$entry.lastUpdated) | Out-Null
+        }
+
+        if ($response.Headers.ContainsKey("X-Pagination")) {
+            $totalPages = ($response.Headers."X-Pagination" | ConvertFrom-Json).totalPages
+            $pagedUriArray=@()
+            for ($page = 2; $page -le $totalPages; $page++) {
+                $pagedUriArray += $uri + "&page={0}" -f $page
+            }
+            write-debug "$(get-date -format 'o') Existing uniqueIdentifiers - Geting next $totalPages pages"
+            $pagedUriArray | ForEach-Object -Parallel {
+                # Recreate the retry helper inside this runspace from the captured
+                # definition, then use it so transient network failures on any page
+                # are retried rather than aborting the run.
+                ${function:Invoke-JuribaWebRequestWithRetry} = $using:retryFunctionDef
+                $dict = $using:threadSafeDictionary
+                $pagedUri = $_
+
+                $pagedResult = Invoke-JuribaWebRequestWithRetry -Uri $pagedUri -Method Get -Headers $using:UIDheaders
+
+                if ($pagedResult.length -gt 0)
+                {
+                    Foreach($entry in ([System.Text.Encoding]::UTF8.GetString($pagedResult.Content) | ConvertFrom-Json).data)
+                    {
+                        $dict.TryAdd($entry.uniqueIdentifier,$entry.lastUpdated) | Out-Null
+                    }
+                }
+            } -ThrottleLimit 10
+        }
+    } else {
+        $threadSafeDictionary.TryAdd('#NULL#','2000-01-01') | Out-Null
+    }
+    write-debug "$(get-date -format 'o') Existing uniqueIdentifiers - Data retrieved"
+
+    $dtDelete = $null
+    if ($threadSafeDictionary.Count -gt 0)
+    {
+        $dtExistingLocations = ConvertTo-DataTable ($threadSafeDictionary.GetEnumerator()  | select-Object -Property @{Name='uniqueIdentifier';Expression={$_.key}})
+        write-debug "$(get-date -format 'o') Existing uniqueIdentifiers - Written to table"
+        $dtPostPatch = Merge-DataTable -primaryTable $DPCLocationDataTable -secondaryTable $dtExistingLocations -LeftjoinKeyProperty "UniqueIdentifier" -rightjoinkeyproperty "uniqueIdentifier" -AddColumns @{"uniqueIdentifier"="ExistsInSource"}
+        write-debug "$(get-date -format 'o') Existing uniqueIdentifiers - Post & Patch Rows calculated"
+        $dtDelete = Merge-DataTable -primaryTable $dtExistingLocations -secondaryTable $DPCLocationDataTable -LeftjoinKeyProperty "uniqueIdentifier" -rightjoinkeyproperty "UniqueIdentifier" -AddColumns @{"UniqueIdentifier"="ExistsInSource"}
+        write-debug "$(get-date -format 'o') Existing uniqueIdentifiers - Delete Rows calculated"
+    }
+    else {
+        $dtPostPatch = $DPCLocationDataTable.Copy()
+        $dtPostPatch.Columns.Add("ExistsInSource") | Out-Null
     }
 
     $Postheaders = @{
@@ -79,21 +147,91 @@ function Invoke-JuribaAPIImportLocationFeedDataTable{
         "X-API-KEY" = "$APIKey"
     }
 
-    $uri = "{0}/apiv2/imports/locations/{1}/items" -f $Instance, $ImportId
+    $uri = "{0}/apiv2/imports/{1}/locations/" -f $Instance, $ImportId
+    $dvLocationData = New-Object System.Data.DataView($dtPostPatch)
+    $failedRowCount = 0
 
-    #$DWLocationDataTable | Foreach-Object -Parallel {
-    #    $Row = $_
-    foreach($Row in $DWLocationDataTable) {
+    for($i=0;$i -le 1;$i++)
+    {
+        if ($i -eq 0) #Post
+        {
+            $Method = 'Post'
+            $dvLocationData.RowFilter ="ISNULL(ExistsInSource,'') = ''"
+        } else {
+            $Method = 'Patch'
+            $dvLocationData.RowFilter ="Len(ExistsInSource) > 0"
+        }
+        $stopwatch =  [system.diagnostics.stopwatch]::StartNew()
+        $stopwatch.Stop()
+        $uploadCount = 1
+        foreach($Row in $dvLocationData) {
+            $Body = $null
+            $Body = $Row | Select-Object * -ExcludeProperty DataView,RowVersion,Row,IsNew,IsEdit,RequireRegisteredTypes,Error,ExistsInSource | ConvertTo-Json -Depth 10
+            try{
+                if ($Method -eq 'Patch') {$locationURI = $uri + $Row.uniqueIdentifier}else{$locationURI=$uri}
+                $stopwatch.start()
+                $apiReturn = Invoke-JuribaWebRequestWithRetry -Headers $Postheaders -Uri $locationURI -Method $Method -Body ([System.Text.Encoding]::UTF8.GetBytes($Body))
+                $stopwatch.Stop()
+                if (($Method -eq 'Post' -and $apiReturn.StatusCode -ne 201) -or ($Method -eq 'Patch' -and $apiReturn.StatusCode -ne 204))
+                {
+                    write-error "$Method returned $($apiReturn.StatusCode) : $($apiReturn.StatusDescription)"
+                    $failedRowCount++
+                }
+            }catch{
+                write-error "$Method failed for location '$($Row.uniqueIdentifier)': $_"
+                $failedRowCount++
+            }
+            if ($uploadCount%10 -eq 0 -and $stopwatch.ElapsedMilliseconds -gt 0) {write-debug "$(Get-date -Format 'o'):Method $Method - $uploadCount rows processed. Total Upload: $($stopwatch.ElapsedMilliseconds)ms - Speed: $([math]::Round($uploadCount / ($stopwatch.ElapsedMilliseconds / 1000)))/s"}
+            $uploadCount++
+        }
+        write-debug ("$(Get-date -Format 'o'):{0} locations {1}ed" -f $dvLocationData.Count,$method)
+    }
 
-        $Body = $null
-        $Body = $Row | Select-Object * -ExcludeProperty ItemArray, Table, RowError, RowState, HasErrors | ConvertTo-Json
-        #try{
-            #Invoke-RestMethod -Headers $Using:Postheaders -Uri $Using:uri -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($Body)) | out-null
-            Invoke-RestMethod -Headers $Postheaders -Uri $uri -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($Body)) -AllowInsecureRedirect | out-null
-        #}
-        #catch{write-host "Location $($Row.uniqueIdentifier) Failed with Error: $($_.ErrorDetails)"}
-        #$RowCount++
-    }# -ThrottleLimit 25
+    if ($null -ne $dtDelete)
+    {
+        $stopwatch =  [system.diagnostics.stopwatch]::StartNew()
+        $stopwatch.Stop()
+        $dvLocationDelete = New-Object System.Data.DataView($dtDelete)
+        $dvLocationDelete.RowFilter = "ISNULL(ExistsInSource,'') = ''"
+        $Method = 'Delete'
+        if($dvLocationDelete.Count -eq 1 -and $dvLocationDelete[0].uniqueIdentifier -eq '#NULL#')
+        {
+            write-debug "$(get-date -format 'o') Rows to delete: 0"
+        }else{
+            write-debug "$(get-date -format 'o') Rows to delete: $($dvLocationDelete.Count)"
+        }
 
-    Return ("{0} locations sent" -f $DWLocationDataTable.Rows.Count)
+        $uploadCount = 1
+        $deletedCount = 0
+        foreach($rowToDelete in $dvLocationDelete)
+        {
+            if($rowToDelete.uniqueIdentifier -eq '#NULL#'){continue}
+            $deleteURI = "{0}/apiv2/imports/{1}/locations/{2}" -f $Instance, $ImportId, $rowToDelete.uniqueIdentifier
+            try{
+                $stopwatch.start()
+                $apiReturn = Invoke-JuribaWebRequestWithRetry -Headers $Postheaders -Uri $deleteURI -Method $Method
+                $stopwatch.Stop()
+                if ($apiReturn.StatusCode -ne 204)
+                {
+                    write-error "$Method returned $($apiReturn.StatusCode) : $($apiReturn.StatusDescription)"
+                    $failedRowCount++
+                }else{
+                    $deletedCount++
+                }
+            }catch{
+                write-error "$Method failed for location '$($rowToDelete.uniqueIdentifier)': $_"
+                $failedRowCount++
+            }
+            if ($uploadCount%10 -eq 0) {write-debug "$(Get-date -Format 'o'):Method $Method - $uploadCount rows processed. Total: $($stopwatch.ElapsedMilliseconds)ms"}
+            $uploadCount++
+        }
+        write-debug ("$(Get-date -Format 'o'):{0} locations deleted" -f $deletedCount)
+    }
+
+    if ($failedRowCount -gt 0)
+    {
+        throw "$failedRowCount location row(s) failed to import or delete. Review the error output for details."
+    }
+
+    Return ("{0} locations processed" -f $DPCLocationDataTable.Rows.Count)
 }
