@@ -1,30 +1,36 @@
-function Convert-DwAPIUserFromServiceNowSys_User {
+function Convert-JuribaUserFromServiceNowSys_User {
+    <#
+    .Synopsis
+    Returns a datatable in the Juriba DPC user import format from ServiceNow sys_user data.
+
+    .Description
+    Takes in a datatable of ServiceNow sys_user records returned from Get-ServiceNowTable and strips the
+    fields required for insertion into the Juriba DPC user import API. Rows without a user_name are skipped
+    and a placeholder email address is substituted where the source email is not valid.
+
+    .Parameter ServiceNowDataTable
+    [System.Data.DataTable] object returned from the Get-ServiceNowTable function for the sys_user table.
+
+    .Parameter CustomFields
+    Optional hashtable mapping Juriba DPC custom field names (keys) to sys_user column names (values) to be
+    added to the output table.
+
+    .Outputs
+    Output type [System.Data.DataTable]
+    A table with the schema used by the Juriba DPC user import API populated from the ServiceNow sys_user data.
+
+    .Example
+    # Convert the data for use with the Juriba DPC user import API.
+    $dtUsers = Convert-JuribaUserFromServiceNowSys_User -ServiceNowDataTable $dtSysUser
+    #>
+    [Alias("Convert-DwAPIUserFromServiceNowSys_User")]
     [OutputType([System.Data.DataTable])]
     Param(
         [Parameter(Mandatory=$True)][System.Data.DataTable] $ServiceNowDataTable,
         [parameter(Mandatory=$False)][hashtable]$CustomFields = @{}
     )
-    
-    <#
-    .Synopsis
-    Return a datatable in the DWAPI Computers data format from the Get-ServiceNowTable for sys_user
 
-    .Description
-    Takes in a datatable returned from the Get-ServiceNowTable and strips the fields required for insertion into the Dashworks User API.
-
-    .Parameter IntuneDataTable
-    A System.Data.DataTable object returned from the Get-ServiceNowTable function in the DWAzure module
-
-    .Outputs
-    Output type [System.Data.DataTable]
-    A table with the schema as used in the DW Users API calls populated with the provided data from serviceNow sys_user.
-
-    .Example
-    # Convert the data for use in the DWAPI
-    $dtDashworksInput = Convert-DwAPIUserFromServiceNowSys_User -SerivceNowDataTable $dtSysUser
-    #>
-
-    Write-Debug ("INFO: Starting conversion for Sys_User to DWAPI format.")
+    Write-Debug ("INFO: Starting conversion for sys_user to the Juriba DPC user import format.")
 
     $dataTable = New-Object System.Data.DataTable
     $dataTable.Columns.Add("uniqueIdentifier", [string]) | Out-Null
@@ -76,6 +82,6 @@ function Convert-DwAPIUserFromServiceNowSys_User {
 
     }
 
-    Write-Debug ("INFO: Finished conversion for Sys_User to DWAPI format.")
+    Write-Debug ("INFO: Finished conversion for sys_user to the Juriba DPC user import format.")
     Return ,$dataTable
 }

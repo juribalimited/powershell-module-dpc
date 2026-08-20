@@ -1,5 +1,38 @@
 function Merge-DataTable {
-    [OutputType([System.Data.DataTable])] 
+    <#
+    .Synopsis
+    Adds columns from a second data table to the first where rows match on the join keys.
+
+    .Description
+    Takes two System.Data.DataTable objects, joins them on the given key columns and copies the requested
+    columns from the secondary table onto matching rows of a copy of the primary table. Rows without a
+    match keep the added columns empty.
+
+    .Parameter primaryTable
+    [System.Data.DataTable] The table to copy and enrich.
+
+    .Parameter secondaryTable
+    [System.Data.DataTable] The table supplying the additional column values.
+
+    .Parameter LeftjoinKeyProperty
+    The column name in the primary table used as the join key.
+
+    .Parameter rightjoinkeyproperty
+    The column name in the secondary table used as the join key.
+
+    .Parameter AddColumns
+    Hashtable mapping secondary table column names (keys) to the column names to populate on the primary
+    table (values).
+
+    .Outputs
+    Output type [System.Data.DataTable]
+    A copy of the primary table with the additional columns populated where the join matched.
+
+    .Example
+    # Add user_name from sys_user to cmdb_ci_computer rows.
+    $dtMerged = Merge-DataTable -primaryTable $dtComputers -secondaryTable $dtSysUser -LeftjoinKeyProperty "assigned_to_link" -rightjoinkeyproperty "sys_id" -AddColumns @{"user_name"="user_name"}
+    #>
+    [OutputType([System.Data.DataTable])]
     param (
         [Parameter(Mandatory=$True)]
         [System.Data.DataTable] $primaryTable,
@@ -13,21 +46,6 @@ function Merge-DataTable {
         [hashtable] $AddColumns
     )
 
-    <#
-    .Synopsis
-    Takes an input of two tables and adds column data from the second table to the first where they can perform a join.
-
-    .Description
-    Takes an input of two PSObject tables from Get-ServiceNowTable, then uses the join keys to iterate through the second table and add column data as values to the first.
-
-    .Outputs
-    Outputs the same PSObject table with the additional properties
-
-    .Example
-    # add user_name from sys_user to cmdb_ci_computer
-     Merge-ServiceNowTable -primaryTable $CMDB_CI_Data -secondaryTable $sysUser -LeftjoinKeyProperty "assigned_to" -LeftjoinKeySubProperty "link" -rightjoinkeyproperty "sys_id" -AddColumn "user_name"
-    #>
-    
     Write-Debug ("INFO: Starting merge between data tables.")
     $secondaryTable | Out-Null #Added to get past the analyzer. The table is only used in the dynamic scripting.
     $dtMerge = $primaryTable.Copy()
@@ -59,5 +77,5 @@ function Merge-DataTable {
     }
 
     Write-Debug ("INFO: Finished merge between data tables. $AddedColumnList added to primary table.")
-    return @(,($dtMerge)) 
+    return @(,($dtMerge))
 }

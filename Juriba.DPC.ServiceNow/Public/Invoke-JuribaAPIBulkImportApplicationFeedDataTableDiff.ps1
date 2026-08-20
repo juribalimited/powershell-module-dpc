@@ -25,7 +25,16 @@ function Invoke-JuribaAPIBulkImportApplicationFeedDataTableDiff{
     [System.Data.DataTable] Data table containing the fields required to insert data into the Juriba DPC application import API.
 
     .Parameter DPCDeviceAppDataTable
-    [System.Data.DataTable] Data table containing the columns DeviceUniqueIdentifier, deviceImportID, appUniqueIdentifier
+    [System.Data.DataTable] Data table containing the columns DeviceUniqueIdentifier, deviceImportID and appUniqueIdentifier.
+
+    .Parameter CustomFields
+    Optional list of DPCApplicationDataTable column names to be sent as customFieldValues instead of top-level fields.
+
+    .Parameter Properties
+    Optional list of DPCApplicationDataTable column names to be sent as properties instead of top-level fields.
+
+    .Parameter BatchSize
+    The number of objects to send per bulk request. Defaults to 500.
 
     .Outputs
     Output type [string]

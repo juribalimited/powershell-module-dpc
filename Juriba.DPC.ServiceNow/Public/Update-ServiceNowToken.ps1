@@ -1,10 +1,29 @@
 function Update-ServiceNowToken {
+    <#
+    .Synopsis
+    Refreshes a ServiceNow OAuth token using its refresh token.
+
+    .Description
+    Takes the token object returned from Get-ServiceNowToken (AuthType OAuth) and requests a new access
+    token from /oauth_token.do using the refresh_token grant. Returns a new token object with an updated
+    Authorization header and expiry.
+
+    .Parameter OAuthToken
+    The token object returned from Get-ServiceNowToken with AuthType OAuth.
+
+    .Outputs
+    Output type [PSCustomObject]
+    A refreshed token object with ServerURL, AuthHeader and expiry properties.
+
+    .Example
+    $OAuthToken = Update-ServiceNowToken -OAuthToken $OAuthToken
+    #>
     [CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='High')]
     [OutputType([System.Object[]])]
     param (
         [Parameter(Mandatory=$true)][PSObject] $OAuthToken
     )
-    
+
     $Reply = New-Object -TypeName PSCustomObject
 
     $body = [System.Text.Encoding]::UTF8.GetBytes('grant_type=refresh_token&client_id='+[uri]::EscapeDataString($OAuthToken.ClientID)+'&client_secret='+[uri]::EscapeDataString($OAuthToken.ClientSecret)+'&refresh_token='+[uri]::EscapeDataString($OAuthToken.Refresh_Token))
@@ -31,7 +50,6 @@ function Update-ServiceNowToken {
             $Reply | Add-Member -NotePropertyName AuthHeader -NotePropertyValue "Bearer $($Reply.access_token)"
             $Reply | Add-Member -NotePropertyName refresh_token_expires -NotePropertyValue (get-date).AddDays(100)
         }
-        #write-output "Auth Token Refreshed - expires $($OAuthToken.expires)" 
     }
     catch{
         write-error "Auth Token Refresh Failed - $($_.exception)"

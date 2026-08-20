@@ -1,4 +1,32 @@
-function Convert-DwAPIDeviceFromServiceNowAlm_Asset {
+function Convert-JuribaDeviceFromServiceNowAlm_Asset {
+    <#
+    .Synopsis
+    Returns a datatable in the Juriba DPC device import format from ServiceNow alm_asset data.
+
+    .Description
+    Takes in a datatable of ServiceNow alm_hardware/alm_asset records returned from Get-ServiceNowTable and
+    strips the fields required for insertion into the Juriba DPC device import API, including the owner
+    reference path when a user_name column is present.
+
+    .Parameter ServiceNowDataTable
+    [System.Data.DataTable] object returned from the Get-ServiceNowTable function for the alm_asset table.
+
+    .Parameter UserFeedId
+    The id of the Juriba DPC user import feed used to build the owner reference paths. Defaults to 1.
+
+    .Parameter CustomFields
+    Optional hashtable mapping Juriba DPC custom field names (keys) to alm_asset column names (values) to be
+    added to the output table. Keys ending in _static are written with their value as a literal instead.
+
+    .Outputs
+    Output type [System.Data.DataTable]
+    A table with the schema used by the Juriba DPC device import API populated from the ServiceNow alm_asset data.
+
+    .Example
+    # Convert the data for use with the Juriba DPC device import API.
+    $dtDevices = Convert-JuribaDeviceFromServiceNowAlm_Asset -ServiceNowDataTable $dtAlmAsset -UserFeedId 3
+    #>
+    [Alias("Convert-DwAPIDeviceFromServiceNowAlm_Asset")]
     [OutputType([System.Data.DataTable])]
     Param(
         [Parameter(Mandatory=$True)][System.Data.DataTable] $ServiceNowDataTable,
@@ -6,26 +34,7 @@ function Convert-DwAPIDeviceFromServiceNowAlm_Asset {
         [parameter(Mandatory=$False)][hashtable]$CustomFields = @{}
     )
 
-    <#
-    .Synopsis
-    Return a datatable in the DWAPI Computers data format from the Get-ServiceNowTable for cmdb_ci_computer
-
-    .Description
-    Takes in a datatable returned from the Get-ServiceNowTable and strips the fields required for insertion into the Dashworks Computer API.
-
-    .Parameter IntuneDataTable
-    A System.Data.DataTable object returned from the Get-ServiceNowTable function in the DWAzure module
-
-    .Outputs
-    Output type [System.Data.DataTable]
-    A table with the schema as used in the DW Computers API calls populated with the provided data from serviceNow CMDB_CI_Computer.
-
-    .Example
-    # Convert the data for use in the DWAPI
-    $dtDashworksInput = Convert-DwAPIDeviceFromServiceNowCMDB_CI_Computer -SerivceNowDataTable $dtCMDB_CI_Computer -UserFeedID 3
-    #>
-
-    Write-Debug ("INFO: Starting conversion for ALM_Asset to DWAPI format.")
+    Write-Debug ("INFO: Starting conversion for alm_asset to the Juriba DPC device import format.")
 
     $dataTable = New-Object System.Data.DataTable
     $dataTable.Columns.Add("uniqueIdentifier", [string]) | Out-Null
@@ -95,6 +104,6 @@ function Convert-DwAPIDeviceFromServiceNowAlm_Asset {
         $dataTable.Rows.Add($NewRow)
     }
 
-    Write-Debug ("INFO: Finished conversion for ALM_Asset to DWAPI format.")
+    Write-Debug ("INFO: Finished conversion for alm_asset to the Juriba DPC device import format.")
     Return @(,($dataTable))
 }

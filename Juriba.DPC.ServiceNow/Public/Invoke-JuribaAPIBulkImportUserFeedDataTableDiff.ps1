@@ -27,6 +27,15 @@ function Invoke-JuribaAPIBulkImportUserFeedDataTableDiff{
     .Parameter DPCUserAppDataTable
     [System.Data.DataTable] Data table containing the columns UserUniqueIdentifier, appUniqueIdentifier and appUniversalDataImportId.
 
+    .Parameter CustomFields
+    Optional list of DPCUserDataTable column names to be sent as customFieldValues instead of top-level fields.
+
+    .Parameter Properties
+    Optional list of DPCUserDataTable column names to be sent as properties instead of top-level fields.
+
+    .Parameter BatchSize
+    The number of objects to send per bulk request. Defaults to 500.
+
     .Outputs
     Output type [string]
     Text confirming the number of rows processed.

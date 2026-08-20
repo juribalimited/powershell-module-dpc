@@ -1,4 +1,29 @@
-function Convert-DwAPIDeptFromServiceNowSys_User {
+function Convert-JuribaDeptFromServiceNowSys_User {
+    <#
+    .Synopsis
+    Returns a datatable in the Juriba DPC department import format from ServiceNow sys_user data.
+
+    .Description
+    Takes in a datatable of ServiceNow sys_user records returned from Get-ServiceNowTable and builds the
+    department hierarchy (companies as top level, departments as their children) required by the Juriba DPC
+    department import API, including the list of user reference paths attached to each department.
+
+    .Parameter UserDataTable
+    [System.Data.DataTable] object returned from the Get-ServiceNowTable function for the sys_user table.
+    Must include the company, company_link, department, department_link and user_name columns.
+
+    .Parameter UserFeedId
+    The id of the Juriba DPC user import feed used to build the user reference paths. Defaults to 1.
+
+    .Outputs
+    Output type [System.Data.DataTable]
+    A table with the schema used by the Juriba DPC department import API populated from the ServiceNow sys_user data.
+
+    .Example
+    # Convert the data for use with the Juriba DPC department import API.
+    $dtDepartments = Convert-JuribaDeptFromServiceNowSys_User -UserDataTable $dtSysUser -UserFeedId 2
+    #>
+    [Alias("Convert-DwAPIDeptFromServiceNowSys_User")]
     [OutputType([System.Data.DataTable])]
     Param(
         [Parameter(Mandatory=$True)]
@@ -7,25 +32,7 @@ function Convert-DwAPIDeptFromServiceNowSys_User {
         [string] $UserFeedId = 1
     )
 
-    <#
-    .Synopsis
-    Return a datatable in the DWAPI department data format from the Get-ServiceNowTable for cmn_department
-
-    .Description
-    Takes in a datatable returned from the Get-ServiceNowTable and strips the fields required for insertion into the Dashworks Department API.
-
-    .Parameter ServiceNowDataTable
-    A System.Data.DataTable object returned from the Get-ServiceNowTable function
-
-    .Outputs
-    Output type [System.Data.DataTable]
-    A table with the schema as used in the DW Users API calls populated with the provided data from serviceNow cmn_department.
-
-    .Example
-    # Convert the data for use in the DWAPI
-    $dtDashworksInput = Convert-DwAPIDeptFromServiceNowCMN_Department -SerivceNowDataTable $dtDepartment
-    #>
-    Write-Debug ("INFO: Starting conversion for cmn_department to DWAPI format.")
+    Write-Debug ("INFO: Starting conversion for sys_user to the Juriba DPC department import format.")
 
     $dataTable = New-Object System.Data.DataTable
     $dataTable.Columns.Add("uniqueIdentifier", [string]) | Out-Null
@@ -102,6 +109,6 @@ function Convert-DwAPIDeptFromServiceNowSys_User {
         $Row.Users = $AddUsers
     }
 
-    Write-Debug ("INFO: Finished conversion for cmn_department to DWAPI format.")
+    Write-Debug ("INFO: Finished conversion for sys_user to the Juriba DPC department import format.")
     Return ,$dataTable
 }

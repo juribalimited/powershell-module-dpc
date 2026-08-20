@@ -1,48 +1,35 @@
 function Get-ServiceNowTable {
-    [OutputType([System.Data.DataTable])] 
-<#
-    .SYNOPSIS
-    Gets table from ServiceNow and writes data back to Dashworks database table 
+    <#
+    .Synopsis
+    Reads a ServiceNow table and returns it as a System.Data.DataTable.
 
-    .DESCRIPTION
-    Uses ServiceNow REST API to read table data and writes data back to a Dashworks database table
-    Creates the table in Custom if it does not already exist
-    Supports OAuth and Basic Auth 
+    .Description
+    Uses the ServiceNow REST table API to read all rows of the named table in pages, expanding reference
+    fields into display-value and _link columns, and returns the result as a DataTable for use with the
+    Convert-Juriba* functions. Authenticates with the token object returned from Get-ServiceNowToken
+    (OAuth or Basic) and refreshes OAuth tokens with Update-ServiceNowToken when they near expiry.
 
-    .PARAMETER TableName 
-    Name of ServiceNow table to import. 
+    .Parameter TableName
+    The name of the ServiceNow table to read. For example, sys_user or alm_hardware.
 
-    .PARAMETER DBPath 
-    SQLite DB file to write data too.
-        
-    .PARAMETER DLLPath 
-    Path to the System.Data.SQLite.dll file
+    .Parameter NameValuePairs
+    Optional. Additional query string parameters appended to the table API request, for example
+    sysparm_query filters or a sysparm_fields list. If omitted, all fields of all rows are returned.
 
-    .PARAMETER NameValuePairs 
-    Optional . Specify name value pairs to be imported from table. 
-    If ommited all name value pairs are imported.
+    .Parameter ChunkSize
+    The number of rows to request per page. Defaults to 1000.
 
-    .PARAMETER ChunkSize 
-    Specifies number of rows to import from each ServiceNow table at a time. 
-    Default is 5000 rows. 
+    .Parameter AuthToken
+    The token object returned from Get-ServiceNowToken, containing the server URL and authorization header.
 
-    .PARAMETER UseOAuth 
-    If true use OAuth otherwise use Basic Auth. 
-    Default is true.
+    .Outputs
+    Output type [System.Data.DataTable]
+    A table containing the rows read from the ServiceNow table.
 
-    .INPUTS
-    None. You cannot pipe objects to Add-Extension.
-
-    .OUTPUTS
-    None. 
-
-    .EXAMPLE
-    PS> Get-ServiceNowTableSQLite -TableName cmdb_ci_computer -DLLPath $DLLPath -DBPath $DBPath
-
-    .LINK
-    Online version: https://dashworks.atlassian.net/wiki/spaces/DWY/pages/1111949418/ServiceNow+preview
-
-#>
+    .Example
+    $dtSysUser = Get-ServiceNowTable -TableName sys_user -AuthToken $OAuthToken
+    #>
+    [OutputType([System.Data.DataTable])]
 param (
     [Parameter(Mandatory=$true)][string] $TableName,
     [Parameter(Mandatory=$false)][string] $NameValuePairs,

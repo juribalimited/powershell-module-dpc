@@ -2,6 +2,8 @@ function ConvertTo-DataTable {
 <#
 .SYNOPSIS
 Takes an array and converts it to a datatable, useful for sql or bulk transactions. All objects must be the same (or at least share properties with the first object)
+.PARAMETER array
+The array of objects to convert. All objects are assumed to share the first object's properties.
 .EXAMPLE
 convertto-datatable @(
     [PSCustomObject]@{Name = 'Test'; Food = 'Burgers' },

@@ -1,4 +1,37 @@
 function Get-ServiceNowToken {
+    <#
+    .Synopsis
+    Gets an authentication token object for the ServiceNow REST API.
+
+    .Description
+    Builds an authentication object for use with Get-ServiceNowTable. Supports two AuthTypes:
+    OAuth (resource owner password credentials grant against /oauth_token.do, returning a bearer token
+    with a refresh token) and Basic (a basic authentication header built from the credential).
+    The returned object carries the server URL, the Authorization header value and expiry times.
+
+    .Parameter AuthType
+    The authentication method to use. One of: OAuth, Basic.
+
+    .Parameter Server
+    The URI of the ServiceNow instance. For example, https://myinstance.service-now.com
+
+    .Parameter Credential
+    [pscredential] The ServiceNow account used to authenticate.
+
+    .Parameter ClientID
+    OAuth only. The client id of the ServiceNow OAuth application registry entry.
+
+    .Parameter ClientSecret
+    OAuth only. The client secret of the ServiceNow OAuth application registry entry.
+
+    .Outputs
+    Output type [PSCustomObject]
+    A token object with ServerURL, AuthHeader and expiry properties for use with Get-ServiceNowTable
+    and Update-ServiceNowToken.
+
+    .Example
+    $OAuthToken = Get-ServiceNowToken -AuthType OAuth -Server "https://myinstance.service-now.com" -Credential $cred -ClientID $clientId -ClientSecret $clientSecret
+    #>
     [OutputType([System.Management.Automation.PSCustomObject[]])]
     param (
             [Parameter(Mandatory=$true)][ValidateSet("OAuth", "Basic")][string] $AuthType,
