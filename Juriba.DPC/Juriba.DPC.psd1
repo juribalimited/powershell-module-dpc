@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.DPC.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.1.18.0'
+    ModuleVersion     = '1.1.19.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -110,6 +110,7 @@
         'Get-JuribaImportVulnerability',
         'Get-JuribaList',
         'Get-JuribaProject',
+        'Get-JuribaProjectCategory',
         'Get-JuribaProjectDetail',
         'Get-JuribaProjectPath',
         'Get-JuribaProjectReadiness',
