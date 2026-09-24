@@ -17,7 +17,7 @@ function Get-JuribaProjectCategory {
         Category objects
         id, name
         .EXAMPLE
-        PS> Get-JuribaProjectCategory @DwParams -ProjectID 49 -ObjectType Device
+        PS> Get-JuribaProjectCategory -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxx" -ProjectID 49 -ObjectType Device
     #>
     [CmdletBinding()]
     param(
