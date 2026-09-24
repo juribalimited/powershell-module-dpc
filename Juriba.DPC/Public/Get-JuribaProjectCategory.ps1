@@ -49,7 +49,7 @@ function Get-JuribaProjectCategory {
         $headers = @{ 'x-api-key' = $APIKey }
  
         try {
-            $result = Invoke-RestMethod -Uri $uri -Method GET -Headers $headers'application/json'
+            $result = Invoke-RestMethod -Uri $uri -Method GET -Headers $headers
             return $result
         }
         catch {
