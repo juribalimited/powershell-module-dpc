@@ -50,7 +50,7 @@ function Get-JuribaProjectCategory {
  
         try {
             $result = Invoke-RestMethod -Uri $uri -Method GET -Headers $headers'application/json'
-            return ($result.Content | ConvertFrom-Json)
+            return $result
         }
         catch {
             Write-Error $_
