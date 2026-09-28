@@ -53,6 +53,7 @@ function Set-JuribaDashboardAccessType {
  
     if ($APIKey -and $Instance) {
         $headers = @{ 'x-api-key' = $APIKey }
+        $uri = "{0}/apiv1/dashboard/{1}" -f $Instance, $DashboardId
         $current = Get-JuribaDashboard -Instance $Instance -APIKey $APIKey -DashboardId $DashboardId
         if (-not $current) { return }
  
