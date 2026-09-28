@@ -70,7 +70,7 @@ function Set-JuribaDashboardAccessType {
         } | ConvertTo-Json
  
         try {
-            if ($PSCmdlet.ShouldProcess("Dashboard $DashboardId")) {
+            if ($PSCmdlet.ShouldProcess("Dashboard $DashboardId", "Set shared access type to $SharedAccessType")) {
                 $result = Invoke-RestMethod -Uri $uri -Method PUT -Headers $headers -ContentType "application/json" -Body $body
                 return $result
             }
