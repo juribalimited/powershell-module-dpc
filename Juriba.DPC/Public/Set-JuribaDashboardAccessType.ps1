@@ -53,15 +53,8 @@ function Set-JuribaDashboardAccessType {
  
     if ($APIKey -and $Instance) {
         $headers = @{ 'x-api-key' = $APIKey }
-        $uri = "{0}/apiv1/dashboard/{1}" -f $Instance, $DashboardId
- 
-        try {
-            $current = Invoke-RestMethod -Uri $uri -Method GET -Headers $headers
-        }
-        catch {
-            Write-Error ("Failed to fetch dashboard {0}: {1}" -f $DashboardId, $_)
-            return
-        }
+        $current = Get-JuribaDashboard -Instance $Instance -APIKey $APIKey -DashboardId $DashboardId
+        if (-not $current) { return }
  
         $body = @{
             "dashboardName"    = $current.dashboardName
