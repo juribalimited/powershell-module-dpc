@@ -107,7 +107,7 @@ function Set-JuribaDashboardTeamUserAccess {
  
         try {
             if ($PSCmdlet.ShouldProcess("Dashboard $DashboardId")) {
-                $result = Invoke-RestMethod -Uri $uri -Method $method -Headers $headers -ContentType "application/json" -Body $body
+                $result = Invoke-RestMethod -Uri $uri -Method $method -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($body))
                 return $result
             }
         }
