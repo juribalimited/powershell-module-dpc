@@ -60,7 +60,7 @@ function Set-JuribaDashboardTeamUserAccess {
         [Parameter(Mandatory = $true, ParameterSetName = 'User')]
         [string]$UserId,
         [Parameter(Mandatory = $true, ParameterSetName = 'Team')]
-        [string]$TeamId
+        [int]$TeamId
     )
  
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
