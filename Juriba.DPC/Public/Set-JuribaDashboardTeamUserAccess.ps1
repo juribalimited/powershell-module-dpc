@@ -86,15 +86,8 @@ function Set-JuribaDashboardTeamUserAccess {
  
         $headers = @{ 'x-api-key' = $APIKey }
         $uri = "{0}/apiv1/dashboard/{1}/{2}" -f $Instance, $DashboardId, $target
-        $dashboardUri = "{0}/apiv1/dashboard/{1}" -f $Instance, $DashboardId
- 
-        try {
-            $dashboard = Invoke-RestMethod -Uri $dashboardUri -Method GET -Headers $headers
-        }
-        catch {
-            Write-Error ("Failed to fetch dashboard {0}: {1}" -f $DashboardId, $_)
-            return
-        }
+        $dashboard = Get-JuribaDashboard -Instance $Instance -APIKey $APIKey -DashboardId $DashboardId
+        if (-not $dashboard) { return }
  
         if ($PSCmdlet.ParameterSetName -eq 'User') {
             $existingGrant = $dashboard.evergreenDashboardUserAccesses | Where-Object { "$($_.userId)" -eq "$UserId" }
@@ -104,9 +97,10 @@ function Set-JuribaDashboardTeamUserAccess {
         }
  
         $method = if ($existingGrant) { "PUT" } else { "POST" }
+        $targetId = if ($PSCmdlet.ParameterSetName -eq 'User') { $UserId } else { $TeamId }
  
         try {
-            if ($PSCmdlet.ShouldProcess("Dashboard $DashboardId")) {
+            if ($PSCmdlet.ShouldProcess("Dashboard $DashboardId", "Grant $AccessType access to $target $targetId")) {
                 $result = Invoke-RestMethod -Uri $uri -Method $method -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($body))
                 return $result
             }
