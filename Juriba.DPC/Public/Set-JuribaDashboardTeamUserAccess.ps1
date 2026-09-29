@@ -97,10 +97,11 @@ function Set-JuribaDashboardTeamUserAccess {
         }
  
         $method = if ($existingGrant) { "PUT" } else { "POST" }
+        $action = if ($existingGrant) { "Update" } else { "Grant" }
         $targetId = if ($PSCmdlet.ParameterSetName -eq 'User') { $UserId } else { $TeamId }
- 
+
         try {
-            if ($PSCmdlet.ShouldProcess("Dashboard $DashboardId", "Grant $AccessType access to $target $targetId")) {
+            if ($PSCmdlet.ShouldProcess("Dashboard $DashboardId", "$action $AccessType access for $target $targetId")) {
                 $result = Invoke-RestMethod -Uri $uri -Method $method -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($body))
                 return $result
             }
