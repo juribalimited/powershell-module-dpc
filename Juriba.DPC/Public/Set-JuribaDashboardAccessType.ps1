@@ -1,0 +1,79 @@
+#requires -Version 7
+function Set-JuribaDashboardAccessType {
+    <#
+        .SYNOPSIS
+        Updates the shared access type of an existing dashboard.
+ 
+        .DESCRIPTION
+        Uses ApiV1 to update the sharedAccessType field of an existing dashboard.
+        The endpoint requires the dashboardName and owning userId alongside the
+        access type, so this function fetches the current dashboard first and
+        PUTs those fields back unchanged together with the new access type.
+ 
+        Setting -SharedAccessType to "SharedSpecificUsers" configures the
+        dashboard to accept specific user/team grants but does not assign any.
+        Use Set-JuribaDashboardTeamUserAccess to grant access to a user or team
+        after changing the access type.
+ 
+        .PARAMETER Instance
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
+ 
+        .PARAMETER APIKey
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
+ 
+        .PARAMETER DashboardId
+        The id of the dashboard to update.
+ 
+        .PARAMETER SharedAccessType
+        The shared access type to set. Accepts one of: "Private", "SharedAllUsersEdit", "SharedAllUsersReadOnly", "SharedSpecificUsers".
+ 
+        .OUTPUTS
+        The API response from the PUT call.
+ 
+        .EXAMPLE
+        PS> Set-JuribaDashboardAccessType -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxx" -DashboardId 654 -SharedAccessType SharedAllUsersReadOnly
+    #>
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [Parameter(Mandatory = $false)]
+        [string]$Instance,
+        [Parameter(Mandatory = $false)]
+        [string]$APIKey,
+        [Parameter(Mandatory = $true)]
+        [int]$DashboardId,
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("Private", "SharedAllUsersEdit", "SharedAllUsersReadOnly", "SharedSpecificUsers")]
+        [string]$SharedAccessType
+    )
+ 
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
+    }
+ 
+    if ($APIKey -and $Instance) {
+        $headers = @{ 'x-api-key' = $APIKey }
+        $uri = "{0}/apiv1/dashboard/{1}" -f $Instance, $DashboardId
+        $current = Get-JuribaDashboard -Instance $Instance -APIKey $APIKey -DashboardId $DashboardId
+        if (-not $current) { return }
+ 
+        $body = @{
+            "dashboardName"    = $current.dashboardName
+            "sharedAccessType" = $SharedAccessType
+            "userId"           = $current.userId
+        } | ConvertTo-Json
+ 
+        try {
+            if ($PSCmdlet.ShouldProcess("Dashboard $DashboardId", "Set shared access type to $SharedAccessType")) {
+                $result = Invoke-RestMethod -Uri $uri -Method PUT -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($body))
+                return $result
+            }
+        }
+        catch {
+            Write-Error $_
+        }
+    }
+    else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
+    }
+}

@@ -1,0 +1,116 @@
+#requires -Version 7
+function Set-JuribaDashboardTeamUserAccess {
+    <#
+        .SYNOPSIS
+        Grants a user or team access to a dashboard, or updates an existing grant.
+ 
+        .DESCRIPTION
+        Uses ApiV1 to grant a user or team a specific access level to a
+        dashboard. Use this after setting the dashboard's SharedAccessType to
+        "SharedSpecificUsers" with Set-JuribaDashboardAccessType.
+ 
+        The endpoint uses POST to add a brand new grant and PUT (to the same
+        URL and payload shape) to update an existing one - the API does not
+        error on a POST for a user/team that already has access, it just
+        silently fails to apply the change. So this function first fetches
+        the dashboard and checks its evergreenDashboardUserAccesses list for
+        an existing grant matching the given -UserId or -TeamId, and uses PUT
+        if one is found or POST if not, so a single call works whether you
+        are granting access for the first time or changing an existing
+        grant's access level.
+ 
+        .PARAMETER Instance
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
+ 
+        .PARAMETER APIKey
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
+ 
+        .PARAMETER DashboardId
+        The id of the dashboard to grant access to.
+ 
+        .PARAMETER AccessType
+        The access level to grant. Accepts one of: "Admin", "Edit", "ReadOnly".
+ 
+        .PARAMETER UserId
+        The id of the user to grant access to. Mutually exclusive with -TeamId.
+ 
+        .PARAMETER TeamId
+        The id of the team to grant access to. Mutually exclusive with -UserId.
+ 
+        .OUTPUTS
+        The API response from the call.
+ 
+        .EXAMPLE
+        PS> Set-JuribaDashboardTeamUserAccess -DashboardId 654 -UserId "f98fa56f-e271-47ff-a90e-31e2f02748b3" -AccessType Admin
+ 
+        .EXAMPLE
+        PS> Set-JuribaDashboardTeamUserAccess -DashboardId 654 -TeamId 2836 -AccessType Edit
+    #>
+    [CmdletBinding(SupportsShouldProcess, DefaultParameterSetName = 'User')]
+    param(
+        [Parameter(Mandatory = $false)]
+        [string]$Instance,
+        [Parameter(Mandatory = $false)]
+        [string]$APIKey,
+        [Parameter(Mandatory = $true)]
+        [int]$DashboardId,
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("Admin", "Edit", "ReadOnly")]
+        [string]$AccessType,
+        [Parameter(Mandatory = $true, ParameterSetName = 'User')]
+        [string]$UserId,
+        [Parameter(Mandatory = $true, ParameterSetName = 'Team')]
+        [int]$TeamId
+    )
+ 
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
+    }
+ 
+    if ($APIKey -and $Instance) {
+        if ($PSCmdlet.ParameterSetName -eq 'User') {
+            $target = "user"
+            $body = @{
+                "userId"     = $UserId
+                "accessType" = $AccessType
+            } | ConvertTo-Json
+        }
+        else {
+            $target = "team"
+            $body = @{
+                "teamId"     = $TeamId
+                "accessType" = $AccessType
+            } | ConvertTo-Json
+        }
+ 
+        $headers = @{ 'x-api-key' = $APIKey }
+        $uri = "{0}/apiv1/dashboard/{1}/{2}" -f $Instance, $DashboardId, $target
+        $dashboard = Get-JuribaDashboard -Instance $Instance -APIKey $APIKey -DashboardId $DashboardId
+        if (-not $dashboard) { return }
+ 
+        if ($PSCmdlet.ParameterSetName -eq 'User') {
+            $existingGrant = $dashboard.evergreenDashboardUserAccesses | Where-Object { "$($_.userId)" -eq "$UserId" }
+        }
+        else {
+            $existingGrant = $dashboard.evergreenDashboardUserAccesses | Where-Object { "$($_.teamId)" -eq "$TeamId" }
+        }
+ 
+        $method = if ($existingGrant) { "PUT" } else { "POST" }
+        $action = if ($existingGrant) { "Update" } else { "Grant" }
+        $targetId = if ($PSCmdlet.ParameterSetName -eq 'User') { $UserId } else { $TeamId }
+
+        try {
+            if ($PSCmdlet.ShouldProcess("Dashboard $DashboardId", "$action $AccessType access for $target $targetId")) {
+                $result = Invoke-RestMethod -Uri $uri -Method $method -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($body))
+                return $result
+            }
+        }
+        catch {
+            Write-Error $_
+        }
+    }
+    else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
+    }
+}

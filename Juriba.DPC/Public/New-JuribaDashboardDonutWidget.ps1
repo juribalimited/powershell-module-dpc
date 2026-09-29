@@ -97,7 +97,7 @@ function New-JuribaDashboardDonutWidget {
         "Right" {$LegendValue = 2}
         "Left" {$LegendValue = 3}
         "Top" {$LegendValue = 4}
-        "Bottom" {$LegendValue = 4}
+        "Bottom" {$LegendValue = 5}
     }
     switch ($OrderByField){
         "Split Value" {$OrderById = 1}
