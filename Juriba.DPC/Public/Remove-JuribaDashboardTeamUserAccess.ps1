@@ -67,7 +67,7 @@ function Remove-JuribaDashboardTeamUserAccess {
         $uri = "{0}/apiv1/dashboard/{1}/{2}/{3}" -f $Instance, $DashboardId, $target, $targetId
  
         try {
-            if ($PSCmdlet.ShouldProcess($targetId)) {
+            if ($PSCmdlet.ShouldProcess("Dashboard $DashboardId", "Remove $target $targetId access")) {
                 $result = Invoke-RestMethod -Uri $uri -Method DELETE -Headers $headers
                 return $result
             }
