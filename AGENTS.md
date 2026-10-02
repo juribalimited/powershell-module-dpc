@@ -1,4 +1,4 @@
-# CLAUDE.md - Juriba.DPC PowerShell Module
+# AGENTS.md - Juriba.DPC PowerShell Module
 
 ## Project Overview
 
