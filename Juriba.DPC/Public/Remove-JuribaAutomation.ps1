@@ -8,6 +8,18 @@ Function Remove-JuribaAutomation {
 
     Deletes an automation using Dashworks API v1.
 
+    .PARAMETER Instance
+
+    Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
+
+    .PARAMETER APIKey
+
+    Optional. API key to be provided if not authenticating using Connect-Juriba.
+
+    .PARAMETER AutomationId
+
+    Id of the automation to delete.
+
     #>
     [alias("Remove-DwAutomation")]
 

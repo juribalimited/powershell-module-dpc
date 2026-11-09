@@ -12,10 +12,6 @@ function Remove-JuribaImportUserFeedAllItem {
 
         Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
-        .PARAMETER Port
-
-        Dashworks API port number. Default = 8443
-
         .PARAMETER APIKey
 
         Optional. API key to be provided if not authenticating using Connect-Juriba.

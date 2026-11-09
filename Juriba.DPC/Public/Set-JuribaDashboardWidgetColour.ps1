@@ -2,11 +2,35 @@ Function Set-JuribaDashboardWidgetColour {
     <#
     .SYNOPSIS
 
-    Gets all Dashboards.
+    Updates a dashboard widget.
 
     .DESCRIPTION
 
-    Gets all Dashboards using Dashworks API v1.
+    Updates a dashboard widget using Dashworks API v1. Sends JsonBody as the new widget definition, for example to change its colours.
+
+    .PARAMETER Instance
+
+    Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
+
+    .PARAMETER APIKey
+
+    Optional. API key to be provided if not authenticating using Connect-Juriba.
+
+    .PARAMETER DashboardId
+
+    Id of the dashboard that contains the widget.
+
+    .PARAMETER SectionId
+
+    Id of the dashboard section that contains the widget.
+
+    .PARAMETER WidgetId
+
+    Id of the widget to update.
+
+    .PARAMETER JsonBody
+
+    Json string containing the widget definition to send. Must be valid json.
 
     #>
     [alias("Set-DwDashboardWidgetColour")]

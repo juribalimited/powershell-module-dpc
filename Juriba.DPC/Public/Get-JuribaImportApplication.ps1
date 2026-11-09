@@ -18,6 +18,10 @@ function Get-JuribaImportApplication {
 
         API key for the Juriba instance.
 
+        .PARAMETER PageSize
+
+        Optional. Number of records to request per page when returning more than one record. Defaults to 200.
+
         .PARAMETER ThrottleLimit
 
         Optional. Maximum number of pages to request concurrently on PowerShell 7+. Defaults to 8. Set to 1 to force sequential paging.

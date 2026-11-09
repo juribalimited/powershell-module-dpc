@@ -20,8 +20,8 @@ function Set-JuribaAutomationAction {
         ProjectId for the action.
         .PARAMETER IsEvergreen
         IsEvergreen flag for the action.
-        .PARAMETER Parameter
-        Gets the object of the type from the set structure
+        .PARAMETER Parameters
+        Array of action parameters, each with property, value and meta keys. Sent as the action's parameters list.
         .OUTPUTS
         ActionId.
         .EXAMPLE

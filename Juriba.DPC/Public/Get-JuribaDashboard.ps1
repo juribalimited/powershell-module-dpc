@@ -8,6 +8,18 @@ Function Get-JuribaDashboard {
 
     Gets all Dashboards using Dashworks API v1.
 
+    .PARAMETER Instance
+
+    Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
+
+    .PARAMETER APIKey
+
+    Optional. API key to be provided if not authenticating using Connect-Juriba.
+
+    .PARAMETER DashboardId
+
+    Optional. Id of a single dashboard to return. If omitted, all dashboards are returned.
+
     #>
     [alias("Get-DwDashboard")]
     param(

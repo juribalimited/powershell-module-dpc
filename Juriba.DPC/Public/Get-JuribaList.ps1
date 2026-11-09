@@ -8,6 +8,18 @@ Function Get-JuribaList {
 
     Returns existing lists using Dashworks API v1.
 
+    .PARAMETER Instance
+
+    Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
+
+    .PARAMETER APIKey
+
+    Optional. API key to be provided if not authenticating using Connect-Juriba.
+
+    .PARAMETER ObjectType
+
+    Object type of the lists to return. Accepts one of: "Device", "User", "Application", "Mailbox". "ApplicationUser" and "ApplicationDevice" are accepted but not implemented.
+
     #>
     [alias("Get-DwList")]
     param(

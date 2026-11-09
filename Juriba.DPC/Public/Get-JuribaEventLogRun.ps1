@@ -15,9 +15,9 @@ function Get-JuribaEventLogRun {
 
         Optional. API key to be provided if not authenticating using Connect-Juriba.
 
-        .PARAMETER ServiceName
+        .PARAMETER ServiceID
 
-        The name of the service to search for in the event log services.
+        Id of the event log service to return runs for. Used to build the default filter when Filter is not provided.
 
         .PARAMETER Page
         

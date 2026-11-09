@@ -8,6 +8,18 @@ Function New-JuribaTag {
 
     Creates a new list tag using Dashworks API v1.
 
+    .PARAMETER Instance
+
+    Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
+
+    .PARAMETER APIKey
+
+    Optional. API key to be provided if not authenticating using Connect-Juriba.
+
+    .PARAMETER Name
+
+    Name of the tag to create.
+
     #>
     [alias("New-DwTag")]
 
