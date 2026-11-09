@@ -1,5 +1,4 @@
 function Remove-JuribaCapacityUnit {
-    [alias("Remove-DwCapacityUnit")]
     <#
         .SYNOPSIS
         Delete the capacity unit in the project
@@ -16,6 +15,7 @@ function Remove-JuribaCapacityUnit {
         .EXAMPLE
         PS> Remove-JuribaCapacityUnit @DwParams -UnitID 1
     #>
+    [alias("Remove-DwCapacityUnit")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

@@ -1,5 +1,4 @@
 function Set-JuribaCapacityUnit {
-    [alias("Set-DwCapacityUnit")]
     <#
         .SYNOPSIS
         Create a new capacity unit
@@ -22,6 +21,7 @@ function Set-JuribaCapacityUnit {
         .EXAMPLE
         PS> Set-JuribaCapacityUnit @dwparams -UnitID 1 -ProjectID 4 -Name "Unit 1" -Description "Description" -IsDefault $true
     #>
+    [alias("Set-DwCapacityUnit")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

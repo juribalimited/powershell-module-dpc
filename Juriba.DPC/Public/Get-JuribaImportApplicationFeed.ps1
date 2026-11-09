@@ -1,6 +1,5 @@
 #requires -Version 7
 function Get-JuribaImportApplicationFeed {
-    [alias("Get-DwImportApplicationFeed")]
     <#
         .SYNOPSIS
         Gets application imports.
@@ -20,6 +19,7 @@ function Get-JuribaImportApplicationFeed {
         .EXAMPLE
         PS> Get-JuribaImportApplicationFeed -Name "My App Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
+    [alias("Get-DwImportApplicationFeed")]
     [CmdletBinding(DefaultParameterSetName="Name")]
     param (
         [Parameter(Mandatory=$false)]

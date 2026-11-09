@@ -1,5 +1,4 @@
 function Set-JuribaTaskValueText {
-    [alias("Set-DwTaskValueText")]
     <#
         .SYNOPSIS
         Updates a project task.
@@ -26,6 +25,7 @@ function Set-JuribaTaskValueText {
         .EXAMPLE
         PS> Set-JuribaTaskValueText -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85 -Value "Success"
     #>
+    [alias("Set-DwTaskValueText")]
 
     [CmdletBinding(DefaultParameterSetName = "ByTaskId", SupportsShouldProcess)]
     param(

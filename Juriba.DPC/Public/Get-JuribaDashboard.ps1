@@ -1,5 +1,4 @@
 Function Get-JuribaDashboard {
-    [alias("Get-DwDashboard")]
     <#
     .SYNOPSIS
 
@@ -10,6 +9,7 @@ Function Get-JuribaDashboard {
     Gets all Dashboards using Dashworks API v1.
 
     #>
+    [alias("Get-DwDashboard")]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,

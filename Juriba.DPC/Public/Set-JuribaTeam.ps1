@@ -1,5 +1,4 @@
 function Set-JuribaTeam {
-    [alias("Set-DwTeam")]
     <#
         .SYNOPSIS
         Update the team
@@ -22,6 +21,7 @@ function Set-JuribaTeam {
         .EXAMPLE
         PS> Set-JuribaTeam @DwParams -TeamID 1 -TeamName "A Team" -Description "A new team"
     #>
+    [alias("Set-DwTeam")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

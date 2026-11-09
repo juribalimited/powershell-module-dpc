@@ -1,5 +1,4 @@
 function New-JuribaDashboardColumnWidget {
-    [alias("New-DwDashboardColumnWidget")]
     <#
         .SYNOPSIS
         Creates a new dashboard column widget.
@@ -46,6 +45,7 @@ function New-JuribaDashboardColumnWidget {
         .EXAMPLE
         PS> New-JuribaDashboardColumnWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Devices completed by location" -ListId 337 -SplitBy "locationName" -OrderByField "Aggregate Value" -OrderByDescending $false -AggregateFunction "count" -MaximumValues 100 -CategoriseByMaximumValues 30 -Legend "None" -splitByGroupDatesBy "month" -splitByIncludeEmptyDates $true
     #>
+    [alias("New-DwDashboardColumnWidget")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

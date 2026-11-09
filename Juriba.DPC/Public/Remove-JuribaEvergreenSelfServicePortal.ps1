@@ -1,5 +1,4 @@
 function Remove-JuribaEvergreenSelfServicePortal {
-    [alias("Remove-DwEvergreenSelfServicePortal")]						 
     <#
 		.SYNOPSIS
 		Deletes a self service portal.
@@ -16,6 +15,7 @@ function Remove-JuribaEvergreenSelfServicePortal {
 		.EXAMPLE
 		PS> Remove-JuribaEvergreenSelfServicePortal @dwparams -ServiceId 1
 	#>
+    [alias("Remove-DwEvergreenSelfServicePortal")]						 
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([string])]
     param(

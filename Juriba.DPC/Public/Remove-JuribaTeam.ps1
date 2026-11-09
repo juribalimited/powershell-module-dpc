@@ -1,5 +1,4 @@
 function Remove-JuribaTeam {
-    [alias("Remove-DwTeam")]
     <#
         .SYNOPSIS
         Delete the teams
@@ -18,6 +17,7 @@ function Remove-JuribaTeam {
         .EXAMPLE
         PS> Remove-JuribaTeam @DwParams -ReassignedTeamID 5 -TeamID 1
     #>
+    [alias("Remove-DwTeam")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

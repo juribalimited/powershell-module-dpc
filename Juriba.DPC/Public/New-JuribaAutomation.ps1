@@ -1,5 +1,4 @@
 Function New-JuribaAutomation {
-    [alias("New-DwAutomation")]
     <#
     .SYNOPSIS
 
@@ -54,6 +53,7 @@ Function New-JuribaAutomation {
     PS> New-JuribaAutomation -Instance "https://myinstance.dashworks.app" -APIKey "xxxxx" -Name "My New Automation" -Description "Automation Description" -Active $true -StopOnFailedAction $false -ListId 123 -ObjectType Device -Schedule Manual
 
     #>
+    [alias("New-DwAutomation")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param(

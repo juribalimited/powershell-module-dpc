@@ -1,6 +1,5 @@
 #Requires -Version 7
 function Remove-JuribaImportApplication {
-    [alias("Remove-DwImportApplication")]
     <#
         .SYNOPSIS
         Deletes an application in the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
@@ -36,6 +35,7 @@ function Remove-JuribaImportApplication {
         PS> Remove-JuribaImportApplication -ImportId 1 -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
+    [alias("Remove-DwImportApplication")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param (

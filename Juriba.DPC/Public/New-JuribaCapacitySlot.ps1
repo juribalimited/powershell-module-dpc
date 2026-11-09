@@ -1,5 +1,4 @@
 function New-JuribaCapacitySlot {
-    [alias("New-DwCapacitySlot")]
     <#
         .SYNOPSIS
         Create a new capacity slot
@@ -64,6 +63,7 @@ function New-JuribaCapacitySlot {
             -ObjectType "Device" -TranslationsObject '[{\"languageId\":0,\"language\":\"English\",\"translatedString\":\"Mon - Fri\",\"isTranslated\":true,\"isDefault\":true}]' -SlotAvailableFrom $null 
             -SlotAvailableTo $null -SlotStartTime "" -SlotEndTime "" -Monday 50 -Tuesday 50 -Wednesday 50 -Thursday 50 -Friday 50 -Saturday 0 -Sunday 0 -RequestTypes "" -Teams "" -Tasks 17 -Units 2
     #>
+    [alias("New-DwCapacitySlot")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

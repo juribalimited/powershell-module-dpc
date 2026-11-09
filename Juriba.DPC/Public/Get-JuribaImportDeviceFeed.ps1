@@ -1,6 +1,5 @@
 #requires -Version 7
 function Get-JuribaImportDeviceFeed {
-    [alias("Get-DwImportDeviceFeed")]
     <#
         .SYNOPSIS
         Gets device imports.
@@ -34,6 +33,7 @@ function Get-JuribaImportDeviceFeed {
         PS> Get-JuribaImportDeviceFeed -Name "My Device Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
+    [alias("Get-DwImportDeviceFeed")]
     [CmdletBinding(DefaultParameterSetName="Name")]
     param (
         [Parameter(Mandatory=$false)]

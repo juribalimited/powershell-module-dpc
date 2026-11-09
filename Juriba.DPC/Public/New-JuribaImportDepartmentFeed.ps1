@@ -1,6 +1,5 @@
 #requires -Version 7
 function New-JuribaImportDepartmentFeed {
-    [alias("New-DwImportDepartmentFeed")]
     <#
         .SYNOPSIS
         Creates a new Department feed.
@@ -30,6 +29,7 @@ function New-JuribaImportDepartmentFeed {
         PS> New-JuribaImportDepartmentFeed -Name "My New Import" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
 
     #>
+    [alias("New-DwImportDepartmentFeed")]
     [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory=$false)]

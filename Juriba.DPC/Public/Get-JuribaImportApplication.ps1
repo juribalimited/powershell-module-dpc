@@ -1,5 +1,4 @@
 function Get-JuribaImportApplication {
-    [alias("Get-DwImportApplication")]
     <#
         .SYNOPSIS
         Gets applications from the import API.
@@ -56,6 +55,7 @@ function Get-JuribaImportApplication {
         PS> Get-JuribaImportApplication -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Manufacturer, 'zxy123456')"
 
     #>
+    [alias("Get-DwImportApplication")]
     [OutputType([string])]
     [CmdletBinding(DefaultParameterSetName="Default")]
     param (

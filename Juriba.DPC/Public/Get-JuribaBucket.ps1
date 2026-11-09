@@ -1,5 +1,4 @@
 function Get-JuribaBucket {
-    [alias("Get-DwBucket")]
     <#
         .SYNOPSIS
         Returns all buckets in US English.
@@ -17,6 +16,7 @@ function Get-JuribaBucket {
         .EXAMPLE
         PS> Get-JuribaBucket @DwParams -ProjectID 1
     #>
+    [alias("Get-DwBucket")]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,

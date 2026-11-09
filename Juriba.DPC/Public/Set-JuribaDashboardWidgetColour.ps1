@@ -1,5 +1,4 @@
 Function Set-JuribaDashboardWidgetColour {
-    [alias("Set-DwDashboardWidgetColour")]
     <#
     .SYNOPSIS
 
@@ -10,6 +9,7 @@ Function Set-JuribaDashboardWidgetColour {
     Gets all Dashboards using Dashworks API v1.
 
     #>
+    [alias("Set-DwDashboardWidgetColour")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param(

@@ -1,6 +1,5 @@
 #Requires -Version 7
 function Set-JuribaImportApplication {
-    [alias("Set-DwImportApplication")]
     <#
         .SYNOPSIS
         Updates a application in the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
@@ -33,6 +32,7 @@ function Set-JuribaImportApplication {
         PS> Set-JuribaImportApplication -ImportId 1 -UniqueIdentifier "app123" -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
+    [alias("Set-DwImportApplication")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param (

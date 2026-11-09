@@ -1,6 +1,5 @@
 #Requires -Version 7
 function Remove-JuribaImportDepartment {
-    [alias("Remove-DwImportDepartment")]
     <#
         .SYNOPSIS
         Deletes a department in the import API.
@@ -29,6 +28,7 @@ function Remove-JuribaImportDepartment {
         PS> Remove-JuribaImportDepartment -ImportId 1 -UniqueIdentifier "app123" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
+    [alias("Remove-DwImportDepartment")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param (

@@ -1,6 +1,5 @@
 #requires -Version 7
 function Get-JuribaImportMailboxFeed {
-    [alias("Get-DwImportMailboxFeed")]
     <#
         .SYNOPSIS
         Gets mailbox imports.
@@ -34,6 +33,7 @@ function Get-JuribaImportMailboxFeed {
         PS> Get-JuribaImportMailboxFeed -Name "My Mailbox Feed"
 
     #>
+    [alias("Get-DwImportMailboxFeed")]
     [CmdletBinding(DefaultParameterSetName="Name")]
     param (
         [parameter(Mandatory=$false)]

@@ -1,5 +1,4 @@
 Function Remove-JuribaDashboard {
-    [alias("Remove-DwDashboard")]
     <#
     .SYNOPSIS
 
@@ -10,6 +9,7 @@ Function Remove-JuribaDashboard {
     Deletes a dashboard using Dashworks API v1.
 
     #>
+    [alias("Remove-DwDashboard")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param(

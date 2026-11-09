@@ -1,5 +1,4 @@
 function Set-JuribaAutomation {
-    [alias("Set-DwAutomation")]
     <#
         .SYNOPSIS
         Updates an automation.
@@ -30,6 +29,7 @@ function Set-JuribaAutomation {
         .EXAMPLE
         PS> Set-JuribaAutomation -Instance "https://myinstance.dashworks.app" -APIKey "xxxxx" -AutomationId 1 -Name "My Automation" -Description "Automation Description" -ListId 123 -IsActive $true -StopOnFailedAction $false -ObjectType Device -Schedule Manual
     #>
+    [alias("Set-DwAutomation")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory = $false)]

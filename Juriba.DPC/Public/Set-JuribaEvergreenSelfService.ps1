@@ -1,5 +1,4 @@
 function Set-JuribaEvergreenSelfService {
-    [alias("Set-DwEvergreenSelfService")]
     <#
         .SYNOPSIS
         Updates the Evergreen SelfService.
@@ -26,6 +25,7 @@ function Set-JuribaEvergreenSelfService {
         .EXAMPLE
         PS> Set-JuribaEvergreenSelfService @dwparams -ServiceID 20 -ScopeID 115 -ServiceName 'W11 Deployment' -ServiceShortName 'W11-App' -ObjectType 'Device' -Enabled $true
     #>
+    [alias("Set-DwEvergreenSelfService")]
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([string])]
     param(

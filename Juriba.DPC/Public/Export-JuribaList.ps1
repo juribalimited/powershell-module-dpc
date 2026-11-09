@@ -1,5 +1,4 @@
 function Export-JuribaList {
-    [alias("Export-DwList")]
     <#
         .SYNOPSIS
         Returns an Evergreen List as an array.
@@ -28,6 +27,7 @@ function Export-JuribaList {
 
         PS> Export-JuribaList -ListId 1234 -ObjectType Device -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
+    [alias("Export-DwList")]
 
     [CmdletBinding()]
     param(

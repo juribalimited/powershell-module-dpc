@@ -1,5 +1,4 @@
 function Get-JuribaProjectDetail {
-    [alias("Get-DwProjectDetail")]
     <#
         .SYNOPSIS
         Returns all project details
@@ -17,6 +16,7 @@ function Get-JuribaProjectDetail {
         .EXAMPLE
         PS> Get-JuribaProjectDetail @DwParams -ProjectID 1
     #>
+    [alias("Get-DwProjectDetail")]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,

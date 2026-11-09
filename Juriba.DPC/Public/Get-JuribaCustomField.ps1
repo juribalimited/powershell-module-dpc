@@ -1,5 +1,4 @@
 function Get-JuribaCustomField {
-    [alias("Get-DwCustomField")]
     <#
     .SYNOPSIS
 
@@ -35,6 +34,7 @@ function Get-JuribaCustomField {
     PS> Get-JuribaCustomField -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -CustomFieldId 42
 
     #>
+    [alias("Get-DwCustomField")]
 
     [CmdletBinding()]
     param(

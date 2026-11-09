@@ -1,5 +1,4 @@
 function New-JuribaCustomField {
-    [alias("New-DwCustomField")]
     <#
         .SYNOPSIS
         Creates a new custom field.
@@ -29,6 +28,7 @@ function New-JuribaCustomField {
         .EXAMPLE
         PS> New-JuribaCustomField -ObjectTypes Device, User -Name "MyNewCustomField" -CSVColumnHeader "mynewcustomfield" -Type Text -IsActive $true -AllowUpdate ETL -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
+    [alias("New-DwCustomField")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

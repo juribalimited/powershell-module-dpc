@@ -1,5 +1,4 @@
 function New-JuribaDashboardDonutWidget {
-    [alias("New-DwDashboardDonutWidget")]
     <#
         .SYNOPSIS
         Creates a new dashboard donut widget.
@@ -40,6 +39,7 @@ function New-JuribaDashboardDonutWidget {
         .EXAMPLE
         PS> New-JuribaDashboardDonutWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Application Rationalisation" -ListId 337 -SplitBy "project_1_applicationRationalisation" -OrderByField "Split Value" -OrderByDescending $true -ObjectType "Applications" -AggregateFunction "count" -Legend "Top"
     #>
+    [alias("New-DwDashboardDonutWidget")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

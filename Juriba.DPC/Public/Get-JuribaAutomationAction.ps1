@@ -1,5 +1,4 @@
 function Get-JuribaAutomationAction {
-    [alias("Get-DwAutomationAction")]
     <#
         .SYNOPSIS
         Returns existing automation actions from the automation id.
@@ -17,6 +16,7 @@ function Get-JuribaAutomationAction {
         .EXAMPLE
         PS> Get-JuribaAutomationAction -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -AutomationId 1
     #>
+    [alias("Get-DwAutomationAction")]
     param(
         [Parameter(Mandatory = $false)]
         [string]$Instance,

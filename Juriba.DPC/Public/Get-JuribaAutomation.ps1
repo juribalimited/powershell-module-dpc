@@ -1,5 +1,4 @@
 Function Get-JuribaAutomation {
-    [alias("Get-DwAutomation")]
     <#
     .SYNOPSIS
 
@@ -10,6 +9,7 @@ Function Get-JuribaAutomation {
     Returns existing automations using Dashworks API v1.
 
     #>
+    [alias("Get-DwAutomation")]
 
     param(
         [Parameter(Mandatory = $false)]

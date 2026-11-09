@@ -1,5 +1,4 @@
 function New-JuribaDashboardListWidget {
-    [alias("New-DwDashboardListWidget")]
     <#
         .SYNOPSIS
         Creates a new dashboard list widget.
@@ -28,6 +27,7 @@ function New-JuribaDashboardListWidget {
         .EXAMPLE
         PS> New-JuribaDashboardListWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Today's Direct Ships" -ListId 337 -maxRows 1000 -maxColumns 10
     #>
+    [alias("New-DwDashboardListWidget")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

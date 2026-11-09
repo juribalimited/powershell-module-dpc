@@ -1,5 +1,4 @@
 function New-JuribaDashboardBarWidget {
-    [alias("New-DwDashboardBarWidget")]
     <#
         .SYNOPSIS
         Creates a new dashboard bar widget.
@@ -46,6 +45,7 @@ function New-JuribaDashboardBarWidget {
         .EXAMPLE
         PS> New-JuribaDashboardBarWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Device exceptions by reason/Location" -ListId 337 -SplitBy "project_task_4_49_2_Task" -OrderByField "Aggregate Value" -OrderByDescending $true -AggregateFunction "count" -CategoriseByMaximumValues 30 -Legend "Top" -splitByGroupDatesBy "None" -splitByIncludeEmptyDates $true
     #>
+    [alias("New-DwDashboardBarWidget")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

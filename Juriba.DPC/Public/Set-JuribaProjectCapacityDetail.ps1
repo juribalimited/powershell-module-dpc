@@ -1,5 +1,4 @@
 function Set-JuribaProjectCapacityDetail {
-    [alias("Set-DwProjectCapacityDetail")]
     <#
         .SYNOPSIS
         Update the project capacity detail
@@ -29,6 +28,7 @@ function Set-JuribaProjectCapacityDetail {
         PS> Set-JuribaProjectCapacityDetail @DwParams -CapacityMode "Capacity Units" -CapacityUnitMode "Project Capacity Units" 
             -CapacityToReachBeforeShowAmber 90 -EnableCapacity $true -EnforceCapacityOnProjectObject $false -EnforceCapacityOnSelfService $true
     #>
+    [alias("Set-DwProjectCapacityDetail")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

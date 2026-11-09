@@ -1,5 +1,4 @@
 function Remove-JuribaBucket {
-    [alias("Remove-DwBucket")]
     <#
         .SYNOPSIS
         Delete the bucket in the project
@@ -18,6 +17,7 @@ function Remove-JuribaBucket {
         .EXAMPLE
         PS> Remove-JuribaBucket @DwParams -ProjectID 1 -BucketID "1,2"
     #>
+    [alias("Remove-DwBucket")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

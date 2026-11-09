@@ -1,6 +1,5 @@
 #requires -Version 7
 function Remove-JuribaImportUserFeedAllItem {
-    [alias("Remove-DwImportUserFeedAllItem")]
     <#
         .SYNOPSIS
         Deletes all users in a feed.
@@ -34,6 +33,7 @@ function Remove-JuribaImportUserFeedAllItem {
         PS> Remove-JuribaImportUserFeedAllItem -Confirm:$false -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
 
     #>
+    [alias("Remove-DwImportUserFeedAllItem")]
     [CmdletBinding(
         SupportsShouldProcess,
         ConfirmImpact = 'High'

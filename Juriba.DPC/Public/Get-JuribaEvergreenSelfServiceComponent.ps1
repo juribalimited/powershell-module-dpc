@@ -1,5 +1,4 @@
 function Get-JuribaEvergreenSelfServiceComponent {
-    [alias("Get-DwEvergreenSelfServiceComponent")]
     <#
         .SYNOPSIS
         Get self service component.
@@ -20,6 +19,7 @@ function Get-JuribaEvergreenSelfServiceComponent {
         PS> Get-JuribaEvergreenSelfServiceComponent @dwparams -ServiceId 1
         PS> Get-JuribaEvergreenSelfServiceComponent @dwparams -ServiceId 1 -PageId 7
     #>
+    [alias("Get-DwEvergreenSelfServiceComponent")]
     param(
         [Parameter(Mandatory = $false)]
         [string]$Instance,

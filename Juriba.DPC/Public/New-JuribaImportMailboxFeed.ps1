@@ -1,6 +1,5 @@
 #requires -Version 7
 function New-JuribaImportMailboxFeed {
-    [alias("New-DwImportMailboxFeed")]
     <#
         .SYNOPSIS
         Creates a new mailbox feed.
@@ -49,6 +48,7 @@ function New-JuribaImportMailboxFeed {
         PS> New-JuribaImportMailboxFeed -Name "My New Import" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -SendOnBehalfPermissions 5 -MailboxPermissions 2 -MailboxExtendedRights 5
 
     #>
+    [alias("New-DwImportMailboxFeed")]
     [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory=$false)]

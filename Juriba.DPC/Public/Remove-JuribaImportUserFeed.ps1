@@ -1,6 +1,5 @@
 #requires -Version 7
 function Remove-JuribaImportUserFeed {
-    [alias("Remove-DwImportUserFeed")]
     <#
         .SYNOPSIS
         Deletes a user feed.
@@ -34,6 +33,7 @@ function Remove-JuribaImportUserFeed {
         PS> Remove-JuribaImportUserFeed -Confirm:$false -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
 
     #>
+    [alias("Remove-DwImportUserFeed")]
     [CmdletBinding(
         SupportsShouldProcess,
         ConfirmImpact = 'High'

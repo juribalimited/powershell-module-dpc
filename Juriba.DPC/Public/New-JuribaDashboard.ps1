@@ -1,5 +1,4 @@
 Function New-JuribaDashboard {
-    [alias("New-DwDashboard")]
     <#
         .SYNOPSIS
         Creates a new dashboard.
@@ -18,6 +17,7 @@ Function New-JuribaDashboard {
         .EXAMPLE
         PS> New-JuribaDashboard -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -Name "W11" -SharedAccessType "SharedAllUsersReadOnly"
     #>
+    [alias("New-DwDashboard")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

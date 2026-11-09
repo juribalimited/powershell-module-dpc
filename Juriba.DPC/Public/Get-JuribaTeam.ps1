@@ -1,5 +1,4 @@
 function Get-JuribaTeam {
-    [alias("Get-DwTeam")]
     <#
         .SYNOPSIS
         Returns all teams
@@ -15,6 +14,7 @@ function Get-JuribaTeam {
         .EXAMPLE
         PS> Get-JuribaTeam @DwParams
     #>
+    [alias("Get-DwTeam")]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,

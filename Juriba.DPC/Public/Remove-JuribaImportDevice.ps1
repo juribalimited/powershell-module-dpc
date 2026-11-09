@@ -1,6 +1,5 @@
 #Requires -Version 7
 function Remove-JuribaImportDevice {
-    [alias("Remove-DwImportDevice")]
     <#
         .SYNOPSIS
         Deletes a device in the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
@@ -36,6 +35,7 @@ function Remove-JuribaImportDevice {
         PS> Remove-JuribaImportDevice -ImportId 1 -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
+    [alias("Remove-DwImportDevice")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param (

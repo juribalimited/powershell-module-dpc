@@ -1,6 +1,5 @@
 #requires -Version 7
 function New-JuribaImportDeviceFeed {
-    [alias("New-DwImportDeviceFeed")]
     <#
         .SYNOPSIS
         Creates a new device feed.
@@ -30,6 +29,7 @@ function New-JuribaImportDeviceFeed {
         PS> New-JuribaImportDeviceFeed -Name "My New Import" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
+    [alias("New-DwImportDeviceFeed")]
     [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory=$false)]

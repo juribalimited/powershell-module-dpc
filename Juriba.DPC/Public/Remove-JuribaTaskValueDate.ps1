@@ -1,5 +1,4 @@
 function Remove-JuribaTaskValueDate {
-    [alias("Remove-DwTaskValueDate")]
     <#
         .SYNOPSIS
         Clears a project date task.
@@ -22,6 +21,7 @@ function Remove-JuribaTaskValueDate {
         .EXAMPLE
         PS> Remove-JuribaTaskValueDate -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85
     #>
+    [alias("Remove-DwTaskValueDate")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param(

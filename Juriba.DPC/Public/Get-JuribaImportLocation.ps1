@@ -1,5 +1,4 @@
 function Get-JuribaImportLocation {
-    [alias("Get-DwImportLocation")]
     <#
         .SYNOPSIS
         Gets locations from the import API.
@@ -51,6 +50,7 @@ function Get-JuribaImportLocation {
         PS> Get-JuribaImportLocation -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Region, 'EU')"
 
          #>
+    [alias("Get-DwImportLocation")]
 
     [CmdletBinding(DefaultParameterSetName="UniqueIdentifier")]
     param (

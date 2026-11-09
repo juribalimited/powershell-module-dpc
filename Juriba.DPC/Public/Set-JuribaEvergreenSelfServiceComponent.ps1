@@ -1,5 +1,4 @@
 function Set-JuribaEvergreenSelfServiceComponent {
-    [alias("Set-DwEvergreenSelfServiceComponent")]
     <#
         .SYNOPSIS
         Update a new self service component.
@@ -38,6 +37,7 @@ function Set-JuribaEvergreenSelfServiceComponent {
              @{languageId = "0" ; languageName = "English" ; isDefault = $true ; translation = '<p>This is your text</p>' ; pageId = 0 ; componentId = 0 ; subComponentTypeId = 1 } -helpText "help_text"
              -ComponentTypeDescription "ComponentTypeDescription"
     #>
+    [alias("Set-DwEvergreenSelfServiceComponent")]
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([int32])]
     param(

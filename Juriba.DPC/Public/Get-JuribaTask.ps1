@@ -1,5 +1,4 @@
 function Get-JuribaTask {
-    [alias("Get-DwTask")]
     <#
         .SYNOPSIS
         Returns existing Tasks.
@@ -19,6 +18,7 @@ function Get-JuribaTask {
         .EXAMPLE
         PS> Get-JuribaTask @dwparams -ProjectID 1
     #>
+    [alias("Get-DwTask")]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,

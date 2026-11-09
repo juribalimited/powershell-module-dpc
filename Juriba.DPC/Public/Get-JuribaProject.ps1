@@ -1,5 +1,4 @@
 function Get-JuribaProject {
-    [alias("Get-DwProject")]
     <#
         .SYNOPSIS
         Returns all projects in US English.
@@ -16,6 +15,7 @@ function Get-JuribaProject {
         .EXAMPLE
         PS> Get-JuribaProject @DwParams
     #>   
+    [alias("Get-DwProject")]
     param (
         [Parameter(Mandatory=$false)]
         [string]$Instance,

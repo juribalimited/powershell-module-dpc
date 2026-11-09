@@ -1,6 +1,5 @@
 #requires -Version 7
 function Get-JuribaApplicationV1 {
-    [alias("Get-DwApplicationV1")]
     <#
         .SYNOPSIS
         Gets Dashworks application from V1 API.
@@ -24,6 +23,7 @@ function Get-JuribaApplicationV1 {
         PS> Get-JuribaImportApplication -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
     #>
+    [alias("Get-DwApplicationV1")]
     param (
         [parameter(Mandatory=$false)]
         [string]$Filter,

@@ -1,5 +1,4 @@
 Function Add-JuribaListTag {
-    [alias("Add-DwListTag")]
     <#
     .SYNOPSIS
 
@@ -10,6 +9,7 @@ Function Add-JuribaListTag {
     Adds an existing tag to a list using Dashworks API v1.
 
     #>
+    [alias("Add-DwListTag")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param(

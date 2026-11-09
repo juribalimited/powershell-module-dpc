@@ -1,5 +1,4 @@
 function New-JuribaDashboardPieWidget {
-    [alias("New-DwDashboardPieWidget")]
     <#
         .SYNOPSIS
         Creates a new dashboard pie widget.
@@ -40,6 +39,7 @@ function New-JuribaDashboardPieWidget {
         .EXAMPLE
         PS> New-JuribaDashboardPieWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Forecast next 7 days" -ListId 337 -SplitBy "locationName" -OrderByField "Aggregate Value" -OrderByDescending $false -AggregateFunction "count" -MaximumValues 100 -displayDataLabels $true -Legend "None"
     #>
+    [alias("New-DwDashboardPieWidget")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory = $false)]

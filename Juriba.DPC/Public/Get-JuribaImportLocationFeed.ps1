@@ -1,6 +1,5 @@
 #requires -Version 7
 function Get-JuribaImportLocationFeed {
-    [alias("Get-DwImportLocationFeed")]
     <#
         .SYNOPSIS
         Gets location imports.
@@ -20,6 +19,7 @@ function Get-JuribaImportLocationFeed {
         .EXAMPLE
         PS> Get-JuribaImportLocationFeed -Name "My Location Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
+    [alias("Get-DwImportLocationFeed")]
     [CmdletBinding(DefaultParameterSetName="Name")]
     param (
         [Parameter(Mandatory=$false)]

@@ -1,5 +1,4 @@
 function Set-JuribaBucket {
-    [alias("Set-DwBucket")]
     <#
         .SYNOPSIS
         Update bucket.
@@ -24,6 +23,7 @@ function Set-JuribaBucket {
         .EXAMPLE
         PS> Set-JuribaBucket @DwParams -ProjectID 1 -BucketID 9 -BucketName "01 Preview" -OwnerTeamID 1
     #>
+    [alias("Set-DwBucket")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

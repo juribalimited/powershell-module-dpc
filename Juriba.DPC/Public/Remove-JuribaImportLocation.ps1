@@ -1,6 +1,5 @@
 #Requires -Version 7
 function Remove-JuribaImportLocation {
-    [alias("Remove-DwImportLocation")]
     <#
         .SYNOPSIS
         Deletes a location in the import API.
@@ -29,6 +28,7 @@ function Remove-JuribaImportLocation {
         PS> Remove-JuribaImportLocation -ImportId 1 -UniqueIdentifier "app123" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
+    [alias("Remove-DwImportLocation")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param (
