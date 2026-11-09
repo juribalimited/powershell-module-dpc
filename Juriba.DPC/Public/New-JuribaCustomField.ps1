@@ -13,6 +13,7 @@ function New-JuribaCustomField {
         Name of the new custom field.
         .PARAMETER CSVColumnHeader
         CSV Column Header for the new custom field. Must be unique and no more than 50 characters.
+        The Juriba DPC UI only allows letters, numbers and the characters _ # $ % & @ -. Headers with other characters, such as spaces, are accepted by the API but may need to be changed before the custom field can be saved in the UI.
         .PARAMETER Type
         Type of the new custom field. One of Text, MultiText, LargeText, Number or Date.
         .PARAMETER ObjectTypes
