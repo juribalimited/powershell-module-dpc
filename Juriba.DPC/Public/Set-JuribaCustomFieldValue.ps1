@@ -5,13 +5,13 @@ function Set-JuribaCustomFieldValue {
 		.SYNOPSIS
 		Updates custom field value.
 		.DESCRIPTION
-		Updates custom field value using Dashworks API v1.
+		Updates a custom field value on a device, user, application or mailbox using Juriba DPC API v1.
 		.PARAMETER Instance
-		Dashworks instance. For example, https://myinstance.dashworks.app:8443
+		Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 		.PARAMETER APIKey
-		Dashworks API Key.
+		Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER CSVColumnHeader
-        CSV Column Header
+        CSV column header of the custom field to update.
         .PARAMETER Value
         Custom field value
         .PARAMETER fieldIndex
@@ -23,7 +23,7 @@ function Set-JuribaCustomFieldValue {
         .OUTPUTS
         Custom field value updated successfully
 		.EXAMPLE
-		PS> Update-JuribaCustomFieldValue @dwparams -CustomField "W11 Path" -Value "W11 Device Upgrade" -ObjectKey 100 -ObjectType Device
+		PS> Set-JuribaCustomFieldValue @dwparams -CSVColumnHeader "W11Path" -Value "W11 Device Upgrade" -ObjectKey 100 -ObjectType Device
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
@@ -64,7 +64,7 @@ function Set-JuribaCustomFieldValue {
         
         $jsonbody = $payload | ConvertTo-Json
 
-        $uri = "{0}/apiv1//{1}/{2}/editCustomField" -f $Instance, $path, $ObjectKey
+        $uri = "{0}/apiv1/{1}/{2}/editCustomField" -f $Instance, $path, $ObjectKey
         $headers = @{'x-api-key' = $APIKey }
         
         try {
