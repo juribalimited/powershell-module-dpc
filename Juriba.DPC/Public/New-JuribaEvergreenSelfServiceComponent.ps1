@@ -1,3 +1,4 @@
+#requires -Version 7
 function New-JuribaEvergreenSelfServiceComponent {
     <#
         .SYNOPSIS
@@ -13,7 +14,7 @@ function New-JuribaEvergreenSelfServiceComponent {
         .PARAMETER ServiceId
         ServiceId for the component to be added.
         .PARAMETER ComponentId
-        ComponentId for the component to be added, defaults to 0 as it hasn't been 
+        Optional. ComponentId to send for the new component. Defaults to 0, as the component hasn't been created yet. The id assigned by the API is returned.
         .PARAMETER PageId
         PageId for the self service page the component is being added.
         .PARAMETER ComponentType
@@ -34,7 +35,7 @@ function New-JuribaEvergreenSelfServiceComponent {
         componentId.
         .EXAMPLE
         PS> $source = Get-JuribaEvergreenSelfServiceComponent -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ServiceId 2 -PageId 7 | Where-Object componentName -eq "Welcome text"
-        PS> New-JuribaEvergreenSelfServiceComponent -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ServiceId 2 -PageId 7 -ComponentId 0 -ComponentName "Welcome text copy" -ComponentType "Text" -ExtraProperties $source.extraProperties -Order 2
+        PS> New-JuribaEvergreenSelfServiceComponent -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ServiceId 2 -PageId 7 -ComponentName "Welcome text copy" -ComponentType "Text" -ExtraProperties $source.extraProperties -Order 2
 
         Copies the extra properties of an existing Text component into a new component on the same page.
     #>
@@ -49,8 +50,8 @@ function New-JuribaEvergreenSelfServiceComponent {
         [string]$ComponentName,
         [Parameter(Mandatory = $true)]
         [int]$ServiceId,
-        [Parameter(Mandatory = $true)]
-        [int]$ComponentId,
+        [Parameter(Mandatory = $false)]
+        [int]$ComponentId = 0,
         [Parameter(Mandatory = $true)]
         [int]$PageId,
         [Parameter(Mandatory = $true)]
@@ -70,85 +71,94 @@ function New-JuribaEvergreenSelfServiceComponent {
         [string]$ComponentTypeDescription
     )
 
-    $ComponentTypeId = switch ($ComponentType) {
-        "Text"						{ 1 }
-        "Application Ownership"		{ 2 }
-        "Device Ownership"			{ 3 }
-        "Task"						{ 4 }
-        "List Task"					{ 5 }
-        "Text Task"					{ 6 }
-        "Location"					{ 7 }
-        "Attribute"					{ 8 }
-        "Application"				{ 9 }
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
     }
 
-    $headers = @{'x-api-key' = $APIKey }
+    if ($APIKey -and $Instance) {
+        $ComponentTypeId = switch ($ComponentType) {
+            "Text"						{ 1 }
+            "Application Ownership"		{ 2 }
+            "Device Ownership"			{ 3 }
+            "Task"						{ 4 }
+            "List Task"					{ 5 }
+            "Text Task"					{ 6 }
+            "Location"					{ 7 }
+            "Attribute"					{ 8 }
+            "Application"				{ 9 }
+        }
 
-    # Payload to create SS component
-    $cpayload = @{}
-    $cpayload.Add("componentId", $ComponentId)
-    $cpayload.Add("componentName", $ComponentName)
-    $cpayload.Add("pageId", $PageId)
-    $cpayload.Add("componentTypeId", $ComponentTypeId)
+        $headers = @{'x-api-key' = $APIKey }
 
-    if($ExtraProperties) {
-        $cpayload.Add("extraProperties", $ExtraProperties)
-    }
+        # Payload to create SS component
+        $cpayload = @{}
+        $cpayload.Add("componentId", $ComponentId)
+        $cpayload.Add("componentName", $ComponentName)
+        $cpayload.Add("pageId", $PageId)
+        $cpayload.Add("componentTypeId", $ComponentTypeId)
 
-    $cpayload.Add("order", $Order)
-    $cpayload.Add("showInSelfService", $ShowInSelfService)
+        if($ExtraProperties) {
+            $cpayload.Add("extraProperties", $ExtraProperties)
+        }
 
-    if($helpText) {
-        $cpayload.Add("helpText", $helpText)
-    }
-    else {
-        $cpayload.Add("helpText", $null)
-    }
+        $cpayload.Add("order", $Order)
+        $cpayload.Add("showInSelfService", $ShowInSelfService)
 
-    if($ComponentTypeDescription) {
-        $cpayload.Add("componentTypeDescription", $ComponentTypeDescription)
-    }
+        if($helpText) {
+            $cpayload.Add("helpText", $helpText)
+        }
+        else {
+            $cpayload.Add("helpText", $null)
+        }
 
-    $cjsonbody = $cpayload | ConvertTo-Json -Depth 6
+        if($ComponentTypeDescription) {
+            $cpayload.Add("componentTypeDescription", $ComponentTypeDescription)
+        }
 
-    $curi = "{0}/apiv1/admin/selfservicecomponents" -f $Instance
-    $turi = "{0}/apiv1/admin/selfservices/{1}/translations" -f $Instance, $ServiceId
+        $cjsonbody = $cpayload | ConvertTo-Json -Depth 6
+
+        $curi = "{0}/apiv1/admin/selfservicecomponents" -f $Instance
+        $turi = "{0}/apiv1/admin/selfservices/{1}/translations" -f $Instance, $ServiceId
     
-    #Try to create SS component
-    try {
+        #Try to create SS component
+        try {
 
-        if ($PSCmdlet.ShouldProcess($ComponentName)) {
+            if ($PSCmdlet.ShouldProcess($ComponentName)) {
 
-            $result = Invoke-WebRequest -Uri $curi -Method POST -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($cjsonbody)) -ContentType 'application/json'
+                $result = Invoke-WebRequest -Uri $curi -Method POST -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($cjsonbody)) -ContentType 'application/json'
 
-            if ($result.StatusCode -eq 200)
-            {
-                $componentid = ($result.content | ConvertFrom-Json).componentid
+                if ($result.StatusCode -eq 200)
+                {
+                    $componentid = ($result.content | ConvertFrom-Json).componentid
 
-                if ($ComponentId) {
-                    try {
-                        if($Translations) {
-                            $Translations.ForEach('componentId', $componentid)
-                            $tpayload = @{}
-                            $tlist = New-Object System.Collections.ArrayList
-                            $tlist = $Translations
-                            $tpayload.Add("translations", [Array]$tlist)
-                            $tjsonbody = $tpayload | ConvertTo-Json -Depth 6
-                            $result = Invoke-WebRequest -Uri $turi -Method PUT -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($tjsonbody)) -ContentType 'application/json'
-                        }                    
-                        return $componentid
-                    }
-                    catch {
-                        Write-Error $_
+                    if ($ComponentId) {
+                        try {
+                            if($Translations) {
+                                $Translations.ForEach('componentId', $componentid)
+                                $tpayload = @{}
+                                $tlist = New-Object System.Collections.ArrayList
+                                $tlist = $Translations
+                                $tpayload.Add("translations", [Array]$tlist)
+                                $tjsonbody = $tpayload | ConvertTo-Json -Depth 6
+                                $result = Invoke-WebRequest -Uri $turi -Method PUT -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($tjsonbody)) -ContentType 'application/json'
+                            }                    
+                            return $componentid
+                        }
+                        catch {
+                            Write-Error $_
+                        }
                     }
                 }
-            }
-            else {
-                throw "Error creating self service component."
+                else {
+                    throw "Error creating self service component."
+                }
             }
         }
-    }
-    catch {
-        Write-Error $_
+        catch {
+            Write-Error $_
+        }
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }

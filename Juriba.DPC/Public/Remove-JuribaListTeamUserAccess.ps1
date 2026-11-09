@@ -65,7 +65,7 @@ function Remove-JuribaListTeamUserAccess {
             "ApplicationUser"   { throw "not implemented" }
             "ApplicationDevice" { throw "not implemented" }
             "Device"            { $endpoint = "devices" }
-            "User"              { $endpoint = "users " }
+            "User"              { $endpoint = "users" }
             "Application"       { $endpoint = "applications" }
             "Mailbox"           { $endpoint = "mailboxes" }
         }
