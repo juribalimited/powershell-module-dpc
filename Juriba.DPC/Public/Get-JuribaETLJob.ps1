@@ -10,7 +10,7 @@ function Get-JuribaETLJob {
 
         .PARAMETER Instance
 
-        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -26,11 +26,11 @@ function Get-JuribaETLJob {
 
         .EXAMPLE
 
-        PS> Get-JuribaETLJob -JobId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Get-JuribaETLJob -JobId 1 -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
                 
         .EXAMPLE
 
-        PS> Get-JuribaETLJob -Name "Dashworks ETL (Transform Only)" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Get-JuribaETLJob -Name "Dashworks ETL (Transform Only)" -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
     [CmdletBinding(DefaultParameterSetName="Name")]

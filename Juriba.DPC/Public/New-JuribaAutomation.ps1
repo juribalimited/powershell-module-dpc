@@ -10,7 +10,7 @@ Function New-JuribaAutomation {
 
     .PARAMETER Instance
 
-    Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+    Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
     .PARAMETER APIKey
 
@@ -50,7 +50,7 @@ Function New-JuribaAutomation {
 
     .EXAMPLE
 
-    PS> New-JuribaAutomation -Instance "https://myinstance.dashworks.app" -APIKey "xxxxx" -Name "My New Automation" -Description "Automation Description" -Active $true -StopOnFailedAction $false -ListId 123 -ObjectType Device -Schedule Manual
+    PS> New-JuribaAutomation -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -Name "My New Automation" -Description "Automation Description" -Active $true -StopOnFailedAction $false -ListId 123 -ObjectType Device -Schedule Manual
 
     #>
     [alias("New-DwAutomation")]

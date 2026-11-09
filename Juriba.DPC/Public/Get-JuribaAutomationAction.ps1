@@ -5,7 +5,7 @@ function Get-JuribaAutomationAction {
         .DESCRIPTION
         Returns existing automation actions using Dashworks API v1.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER AutomationId
@@ -14,7 +14,7 @@ function Get-JuribaAutomationAction {
         Automation action object
         id, name, processingOrder, typeId, typeName, projectId, projectName, taskFields, updateType, values, automationId
         .EXAMPLE
-        PS> Get-JuribaAutomationAction -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -AutomationId 1
+        PS> Get-JuribaAutomationAction -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -AutomationId 1
     #>
     [alias("Get-DwAutomationAction")]
     param(

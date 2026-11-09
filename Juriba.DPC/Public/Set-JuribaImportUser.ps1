@@ -10,7 +10,7 @@ function Set-JuribaImportUser {
 
         .PARAMETER Instance
 
-        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -29,7 +29,7 @@ function Set-JuribaImportUser {
         Json payload with updated user details.
 
         .EXAMPLE
-        PS> Set-JuribaImportUser -ImportId 1 -Useranme "w123abc" -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Set-JuribaImportUser -ImportId 1 -Useranme "w123abc" -JsonBody $jsonBody -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
     [alias("Set-DwImportUser")]

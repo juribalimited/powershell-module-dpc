@@ -10,7 +10,7 @@ function Get-JuribaImportDeviceFeed {
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -26,11 +26,11 @@ function Get-JuribaImportDeviceFeed {
 
         .EXAMPLE
 
-        PS> Get-JuribaImportDeviceFeed -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Get-JuribaImportDeviceFeed -ImportId 1 -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
         .EXAMPLE
 
-        PS> Get-JuribaImportDeviceFeed -Name "My Device Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Get-JuribaImportDeviceFeed -Name "My Device Feed" -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
     [alias("Get-DwImportDeviceFeed")]

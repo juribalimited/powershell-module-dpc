@@ -5,7 +5,7 @@ function Set-JuribaCapacityUnit {
         .DESCRIPTION
         Create a new capacity unit using API v1
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ProjectID
@@ -19,7 +19,7 @@ function Set-JuribaCapacityUnit {
 		.PARAMETER IsDefault
 		Define if the new capacity unit is set to default, defaults to false
         .EXAMPLE
-        PS> Set-JuribaCapacityUnit @dwparams -UnitID 1 -ProjectID 4 -Name "Unit 1" -Description "Description" -IsDefault $true
+        PS> Set-JuribaCapacityUnit -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -UnitID 1 -ProjectID 4 -Name "Unit 1" -Description "Description" -IsDefault $true
     #>
     [alias("Set-DwCapacityUnit")]
     [CmdletBinding(SupportsShouldProcess)]

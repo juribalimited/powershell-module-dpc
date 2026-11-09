@@ -9,7 +9,7 @@ function Start-JuribaETLJob {
 
         .PARAMETER Instance
 
-        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -21,7 +21,7 @@ function Start-JuribaETLJob {
 
         .EXAMPLE
 
-        PS> Start-JuribaETLJob -JobId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Start-JuribaETLJob -JobId 1 -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact='Medium')]

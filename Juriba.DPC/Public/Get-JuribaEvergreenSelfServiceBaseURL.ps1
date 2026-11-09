@@ -5,13 +5,13 @@ function Get-JuribaEvergreenSelfServiceBaseURL {
         .DESCRIPTION
         Gets the base URL for Evergreen SelfService using Dashworks API v1.
         .PARAMETER Instance
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
         .OUTPUTS
         settingValue
         .EXAMPLE
-        PS>  Get-JuribaEvergreenSelfServiceBaseURL @dwparams
+        PS>  Get-JuribaEvergreenSelfServiceBaseURL -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
     #>
     [alias("Get-DwEvergreenSelfServiceBaseURL")]
     param(

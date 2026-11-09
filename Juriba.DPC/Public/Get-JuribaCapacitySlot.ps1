@@ -5,7 +5,7 @@ function Get-JuribaCapacitySlot {
         .DESCRIPTION
         Returns all capacity slots using API v1
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ProjectID
@@ -14,7 +14,7 @@ function Get-JuribaCapacitySlot {
         Capacity slot objects
         slotId, projectId, slotName, displayOrder, slotAvailableFrom, slotAvailableTo, slotStartTime, slotEndTime, monday, tuesday, wednesday, thursday, friday, saturday, sunday, allUnits, allRequestTypes, allTeams, objectTypeId, capacityModeId, capacityOverrides, capacitySlotLanguages, objectTaskDateValues, requestTypes, teams, capacityUnits, capacityMode, objectType, projectTasks, taskRules, displayName, requestTypesNames, teamsNames, capacityUnitsNames, tasksNames, translations, uiMonday, uiTuesday, uiWednesday, uiThursday, uiFriday, uiSaturday, uiSunday, objectTypeName, slotSummary, legend, outsideRange, taskId, date, overrideSlotId
         .EXAMPLE
-        PS> Get-JuribaCapacitySlot @DwParams -ProjectID 1
+        PS> Get-JuribaCapacitySlot -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ProjectID 1
     #>
     [alias("Get-DwCapacitySlot")]
     param(

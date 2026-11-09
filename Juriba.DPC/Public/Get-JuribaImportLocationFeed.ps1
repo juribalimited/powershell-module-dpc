@@ -7,7 +7,7 @@ function Get-JuribaImportLocationFeed {
         Gets one or more location feeds.
         Use ImportId to get a specific feed or omit for all feeds.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ImportId
@@ -15,9 +15,9 @@ function Get-JuribaImportLocationFeed {
         .PARAMETER Name
         Optional. Name of location feed to find. Can only be used when ImportId is not specified.
         .EXAMPLE
-        PS> Get-JuribaImportLocationFeed -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Get-JuribaImportLocationFeed -ImportId 1 -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
         .EXAMPLE
-        PS> Get-JuribaImportLocationFeed -Name "My Location Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Get-JuribaImportLocationFeed -Name "My Location Feed" -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
     #>
     [alias("Get-DwImportLocationFeed")]
     [CmdletBinding(DefaultParameterSetName="Name")]

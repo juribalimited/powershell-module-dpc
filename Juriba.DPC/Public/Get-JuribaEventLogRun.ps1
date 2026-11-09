@@ -9,7 +9,7 @@ function Get-JuribaEventLogRun {
 
         .PARAMETER Instance
 
-        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -37,7 +37,7 @@ function Get-JuribaEventLogRun {
 
         .EXAMPLE
 
-        PS> Get-JuribaEventLogRuns -Instance $Instance -APIKey $APIKey -ServiceID $ETLID.id -Latest -ErrorAction Stop
+        PS> Get-JuribaEventLogRuns -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ServiceID $ETLID.id -Latest -ErrorAction Stop
     #>
     [Alias("Get-JuribaEventLogRuns")]
     [CmdletBinding()]

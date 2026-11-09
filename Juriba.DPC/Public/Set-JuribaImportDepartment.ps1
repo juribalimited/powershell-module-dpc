@@ -10,7 +10,7 @@ function Set-JuribaImportDepartment {
 
         .PARAMETER Instance
 
-        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -29,7 +29,7 @@ function Set-JuribaImportDepartment {
         Json payload with updated department details.
 
         .EXAMPLE
-        PS> Set-JuribaImportDepartment -ImportId 1 -Name "w123abc" -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Set-JuribaImportDepartment -ImportId 1 -Name "w123abc" -JsonBody $jsonBody -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
     [alias("Set-DwImportDepartment")]

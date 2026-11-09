@@ -13,14 +13,14 @@ function Get-JuribaApplicationV1 {
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
         Optional. API key to be provided if not authenticating using Connect-Juriba.
 
         .EXAMPLE
-        PS> Get-JuribaImportApplication -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+        PS> Get-JuribaImportApplication -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
     #>
     [alias("Get-DwApplicationV1")]

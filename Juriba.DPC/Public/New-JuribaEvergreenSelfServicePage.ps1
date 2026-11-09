@@ -5,9 +5,9 @@ function New-JuribaEvergreenSelfServicePage {
         .DESCRIPTION
         Creates a new self service page using Dashworks API v1.
         .PARAMETER Instance
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER name
         name for the self service page.
         .PARAMETER displayName
@@ -23,7 +23,7 @@ function New-JuribaEvergreenSelfServicePage {
         .OUTPUTS
         pageId.
         .EXAMPLE
-        PS> New-JuribaEvergreenSelfServicePage @dwparams -Name "test4" -displayName "test4d" -serviceid 2 -ListID 63 -showInSelfService $true -ObjectType "user"
+        PS> New-JuribaEvergreenSelfServicePage -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -Name "test4" -displayName "test4d" -serviceid 2 -ListID 63 -showInSelfService $true -ObjectType "user"
     #>
     [alias("New-DwEvergreenSelfServicePage")]
     [CmdletBinding(SupportsShouldProcess)]

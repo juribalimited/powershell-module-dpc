@@ -10,7 +10,7 @@ Function Remove-JuribaTag {
 
     .EXAMPLE
 
-    PS> Remove-JuribaTag-Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -Tag 123 -Confirm:$false
+    PS> Remove-JuribaTag-Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -Tag 123 -Confirm:$false
 
     #>
     [alias("Remove-DwTag")]

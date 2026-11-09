@@ -12,11 +12,11 @@ function Get-JuribaImportApplication {
 
         .PARAMETER Instance
 
-        Optional. Instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.platform.juriba.app:8443
+        Juriba instance. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
-        Optional. API key to be provided if not authenticating using Connect-Juriba.
+        API key for the Juriba instance.
 
         .PARAMETER ThrottleLimit
 
@@ -46,13 +46,13 @@ function Get-JuribaImportApplication {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-JuribaImportApplication -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+        PS> Get-JuribaImportApplication -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
         .EXAMPLE
-        PS> Get-JuribaImportApplication -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
+        PS> Get-JuribaImportApplication -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
 
         .EXAMPLE
-        PS> Get-JuribaImportApplication -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Manufacturer, 'zxy123456')"
+        PS> Get-JuribaImportApplication -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Manufacturer, 'zxy123456')"
 
     #>
     [alias("Get-DwImportApplication")]

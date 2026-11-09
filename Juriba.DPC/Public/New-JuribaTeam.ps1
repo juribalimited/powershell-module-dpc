@@ -5,7 +5,7 @@ function New-JuribaTeam {
         .DESCRIPTION
         Create new team using API v1
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER TeamName
@@ -17,7 +17,7 @@ function New-JuribaTeam {
         .OUTPUTS
         teamId
         .EXAMPLE
-        PS> New-JuribaTeam @DwParams -TeamName "A Team" -Description "A new team"
+        PS> New-JuribaTeam -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -TeamName "A Team" -Description "A new team"
     #>
     [alias("New-DwTeam")]
     [CmdletBinding(SupportsShouldProcess)]

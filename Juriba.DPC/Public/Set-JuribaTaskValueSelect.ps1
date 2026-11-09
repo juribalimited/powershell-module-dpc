@@ -8,7 +8,7 @@ function Set-JuribaTaskValueSelect {
         Takes TaskId OR TaskName, along with ProjectID, ObjectKey, and Value as inputs.
 
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
@@ -32,7 +32,7 @@ function Set-JuribaTaskValueSelect {
         The type of object being updated.
 
         .EXAMPLE
-        PS> Set-JuribaTaskValueSelect -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85 -Value 6
+        PS> Set-JuribaTaskValueSelect -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85 -Value 6
     #>
     [alias("Set-DwTaskValueSelect")]
     

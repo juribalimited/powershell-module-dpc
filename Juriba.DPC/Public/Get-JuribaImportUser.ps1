@@ -12,7 +12,7 @@ function Get-JuribaImportUser {
 
         .PARAMETER Instance
 
-        Optional. Instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.platform.juriba.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -46,13 +46,13 @@ function Get-JuribaImportUser {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-JuribaImportUser -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+        PS> Get-JuribaImportUser -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
         .EXAMPLE
-        PS> Get-JuribaImportUser -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Username "123456789" -InfoLevel "Basic"
+        PS> Get-JuribaImportUser -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -Username "123456789" -InfoLevel "Basic"
 
         .EXAMPLE
-        PS> Get-JuribaImportUser -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(EmailAddress, 'zxy123456@x.com')"
+        PS> Get-JuribaImportUser -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -Filter "eq(EmailAddress, 'zxy123456@x.com')"
 
          #>
     [alias("Get-DwImportUser")]

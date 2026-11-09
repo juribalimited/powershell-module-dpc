@@ -10,7 +10,7 @@ function Remove-JuribaImportGroup {
 
         .PARAMETER Instance
 
-        Optional. Juriba Platform  instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -25,7 +25,7 @@ function Remove-JuribaImportGroup {
         ImportId from a User import feed.
 
         .EXAMPLE
-        PS> Remove-JuribaImportGroup -ImportId 1 -UniqueIdentifier "w123abc" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Remove-JuribaImportGroup -ImportId 1 -UniqueIdentifier "w123abc" -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
 

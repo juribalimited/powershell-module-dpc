@@ -5,7 +5,7 @@ function New-JuribaCapacityUnit {
 		.DESCRIPTION
 		Creates capacity unit for a specified project or evegreen.
 		.PARAMETER Instance
-		Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+		Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 		.PARAMETER APIKey
 		Optional. API key to be provided if not authenticating using Connect-Juriba.
 		.PARAMETER ProjectID
@@ -19,7 +19,7 @@ function New-JuribaCapacityUnit {
         .OUTPUTS
         capacityUnitId
 		.EXAMPLE
-		PS> New-JuribaCapacityUnit @dwparams -ProjectID 4 -Name "Unit 1" -Description "Description" -IsDefault $true
+		PS> New-JuribaCapacityUnit -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ProjectID 4 -Name "Unit 1" -Description "Description" -IsDefault $true
     #>
 	[alias("New-DwCapacityUnit")]
     [CmdletBinding(SupportsShouldProcess)]

@@ -6,7 +6,7 @@ function Remove-JuribaTaskValueText {
         Removes a the task value from a project date task.
         Takes TaskId, ProjectID, ObjectKey as inputs.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER TaskId
@@ -19,7 +19,7 @@ function Remove-JuribaTaskValueText {
         The type of object being updated.
 
         .EXAMPLE
-        PS> Remove-JuribaTaskValueText -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85
+        PS> Remove-JuribaTaskValueText -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85
     #>
     [alias("Remove-DwTaskValueText")]
 

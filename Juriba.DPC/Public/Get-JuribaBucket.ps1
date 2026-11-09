@@ -5,7 +5,7 @@ function Get-JuribaBucket {
         .DESCRIPTION
         Returns all buckets using API v1
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ProjectID
@@ -14,7 +14,7 @@ function Get-JuribaBucket {
         Bucket objects
         groupId, groupName, groupTypeID, groupType, teamName, ownerTeamID, default, defaultColumn, devices, users, mailboxes, projectName, projectId, sourceEvergreenGroupName, isMyTeamBucket
         .EXAMPLE
-        PS> Get-JuribaBucket @DwParams -ProjectID 1
+        PS> Get-JuribaBucket -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ProjectID 1
     #>
     [alias("Get-DwBucket")]
     param(

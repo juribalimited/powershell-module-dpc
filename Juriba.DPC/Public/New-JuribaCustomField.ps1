@@ -5,7 +5,7 @@ function New-JuribaCustomField {
         .DESCRIPTION
         Creates a new custom field using the Dashworks API v1, Supporting special characters in the naming. 
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER Name
@@ -26,7 +26,7 @@ function New-JuribaCustomField {
         .OUTPUTS
         Text "Custom field created"
         .EXAMPLE
-        PS> New-JuribaCustomField -ObjectTypes Device, User -Name "MyNewCustomField" -CSVColumnHeader "mynewcustomfield" -Type Text -IsActive $true -AllowUpdate ETL -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> New-JuribaCustomField -ObjectTypes Device, User -Name "MyNewCustomField" -CSVColumnHeader "mynewcustomfield" -Type Text -IsActive $true -AllowUpdate ETL -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
     #>
     [alias("New-DwCustomField")]
     [CmdletBinding(SupportsShouldProcess)]

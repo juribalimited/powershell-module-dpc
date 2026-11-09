@@ -13,7 +13,7 @@ function Get-JuribaImportDevice {
 
         .PARAMETER Instance
 
-        Optional. Instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.platform.juriba.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -51,16 +51,16 @@ function Get-JuribaImportDevice {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-JuribaImportDevice -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+        PS> Get-JuribaImportDevice -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
         .EXAMPLE
-        PS> Get-JuribaImportDevice -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
+        PS> Get-JuribaImportDevice -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
 
         .EXAMPLE
-        PS> Get-JuribaImportDevice -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
+        PS> Get-JuribaImportDevice -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
 
         .EXAMPLE
-        PS> Get-JuribaImportDevice -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
+        PS> Get-JuribaImportDevice -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
 
     #>
     [alias("Get-DwImportDevice")]

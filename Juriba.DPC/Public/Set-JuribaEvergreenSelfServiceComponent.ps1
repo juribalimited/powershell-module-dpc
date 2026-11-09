@@ -5,9 +5,9 @@ function Set-JuribaEvergreenSelfServiceComponent {
         .DESCRIPTION
         Creates a new self service component using Dashworks API v1.
         .PARAMETER Instance
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ComponentName
         name for the self service component.
         .PARAMETER ServiceId
@@ -33,7 +33,7 @@ function Set-JuribaEvergreenSelfServiceComponent {
         .OUTPUTS
         componentId.
         .EXAMPLE
-        PS> Set-JuribaEvergreenSelfServiceComponent @dwparams -ComponentName "test4" -ServiceId 2 -ComponentId 11 -PageId 3 -ComponentType "Text" -ExtraProperties "@{text = ''}" order 1 -ShowInSelfService $true -Translations 
+        PS> Set-JuribaEvergreenSelfServiceComponent -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ComponentName "test4" -ServiceId 2 -ComponentId 11 -PageId 3 -ComponentType "Text" -ExtraProperties "@{text = ''}" order 1 -ShowInSelfService $true -Translations 
              @{languageId = "0" ; languageName = "English" ; isDefault = $true ; translation = '<p>This is your text</p>' ; pageId = 0 ; componentId = 0 ; subComponentTypeId = 1 } -helpText "help_text"
              -ComponentTypeDescription "ComponentTypeDescription"
     #>

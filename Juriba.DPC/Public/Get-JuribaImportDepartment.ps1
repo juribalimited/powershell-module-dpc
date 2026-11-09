@@ -12,7 +12,7 @@ function Get-JuribaImportDepartment {
 
         .PARAMETER Instance
 
-        Optional. Instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.platform.juriba.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -42,13 +42,13 @@ function Get-JuribaImportDepartment {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-JuribaImportDepartment -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+        PS> Get-JuribaImportDepartment -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
         .EXAMPLE
-        PS> Get-JuribaImportDepartment -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Name "Sales" -InfoLevel "Basic"
+        PS> Get-JuribaImportDepartment -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -Name "Sales" -InfoLevel "Basic"
 
         .EXAMPLE
-        PS> Get-JuribaImportDepartment -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Name, 'zxy123456@x.com')"
+        PS> Get-JuribaImportDepartment -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Name, 'zxy123456@x.com')"
 
          #>
     [alias("Get-DwImportDepartment")]

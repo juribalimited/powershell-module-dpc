@@ -5,7 +5,7 @@ function Remove-JuribaTeam {
         .DESCRIPTION
         Delete the teams using API v1
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ReassignedTeamID
@@ -15,7 +15,7 @@ function Remove-JuribaTeam {
         .OUTPUTS
         The selected team has been deleted, and their buckets reassigned
         .EXAMPLE
-        PS> Remove-JuribaTeam @DwParams -ReassignedTeamID 5 -TeamID 1
+        PS> Remove-JuribaTeam -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ReassignedTeamID 5 -TeamID 1
     #>
     [alias("Remove-DwTeam")]
     [CmdletBinding(SupportsShouldProcess)]

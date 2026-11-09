@@ -12,7 +12,7 @@ function Get-JuribaImportMailbox {
 
         .PARAMETER Instance
 
-        Optional. Instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.platform.juriba.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -46,16 +46,16 @@ function Get-JuribaImportMailbox {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-JuribaImportMailbox -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+        PS> Get-JuribaImportMailbox -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
         .EXAMPLE
-        PS> Get-JuribaImportMailbox -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
+        PS> Get-JuribaImportMailbox -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
 
         .EXAMPLE
-        PS> Get-JuribaImportMailbox -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
+        PS> Get-JuribaImportMailbox -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
 
         .EXAMPLE
-        PS> Get-JuribaImportMailbox -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
+        PS> Get-JuribaImportMailbox -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
 
          #>
     [alias("Get-DwImportMailbox")]

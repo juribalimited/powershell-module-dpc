@@ -10,7 +10,7 @@ function Remove-JuribaImportLocationFeed {
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER Port
 
@@ -26,11 +26,11 @@ function Remove-JuribaImportLocationFeed {
 
         .EXAMPLE
 
-        PS> Remove-JuribaImportLocationFeed -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Remove-JuribaImportLocationFeed -ImportId 1 -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
         .EXAMPLE
 
-        PS> Remove-JuribaImportLocationFeed -Confirm:$false -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Remove-JuribaImportLocationFeed -Confirm:$false -ImportId 1 -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
     [alias("Remove-DwImportLocationFeed")]

@@ -5,7 +5,7 @@ function Set-JuribaBucket {
         .DESCRIPTION
         Update bucket using API v1
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ProjectID
@@ -21,7 +21,7 @@ function Set-JuribaBucket {
         .OUTPUTS
         The xxx bucket has been updated
         .EXAMPLE
-        PS> Set-JuribaBucket @DwParams -ProjectID 1 -BucketID 9 -BucketName "01 Preview" -OwnerTeamID 1
+        PS> Set-JuribaBucket -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ProjectID 1 -BucketID 9 -BucketName "01 Preview" -OwnerTeamID 1
     #>
     [alias("Set-DwBucket")]
     [CmdletBinding(SupportsShouldProcess)]

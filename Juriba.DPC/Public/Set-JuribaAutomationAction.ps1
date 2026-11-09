@@ -5,7 +5,7 @@ function Set-JuribaAutomationAction {
         .DESCRIPTION
         Updates an automation action using Dashworks API v1.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ActionId
@@ -25,7 +25,7 @@ function Set-JuribaAutomationAction {
         .OUTPUTS
         ActionId.
         .EXAMPLE
-        PS> Set-JuribaAutomationAction -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ActionId 10 -Name "Update Custom Field Value" -AutomationId 1 -TypeId 1 -ProjectId 1 -IsEvergreen $false
+        PS> Set-JuribaAutomationAction -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ActionId 10 -Name "Update Custom Field Value" -AutomationId 1 -TypeId 1 -ProjectId 1 -IsEvergreen $false
             -Parameter 'parameters=@(@{property="TaskId";value=11;meta="task"};@{property="Value";value=2;meta="Radiobutton"};@{property="ValueActionType";value=1;meta="Radiobutton"};)'
     #>
     [alias("Set-DwAutomationAction")]

@@ -7,7 +7,7 @@ function Get-JuribaImportUserFeed {
         Gets one or more user feeds.
         Use ImportId to get a specific feed or omit for all feeds.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ImportId
@@ -15,9 +15,9 @@ function Get-JuribaImportUserFeed {
         .PARAMETER Name
         Optional. Name of user feed to find. Can only be used when ImportId is not specified.
         .EXAMPLE
-        PS> Get-JuribaImportUserFeed -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Get-JuribaImportUserFeed -ImportId 1 -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
         .EXAMPLE
-        PS> Get-JuribaImportUserFeed -Name "My User Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Get-JuribaImportUserFeed -Name "My User Feed" -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
     #>
     [alias("Get-DwImportUserFeed")]
     [CmdletBinding(DefaultParameterSetName="Name")]

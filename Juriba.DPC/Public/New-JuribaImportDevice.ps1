@@ -10,7 +10,7 @@ function New-JuribaImportDevice {
 
         .PARAMETER Instance
 
-        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -29,10 +29,10 @@ function New-JuribaImportDevice {
         Optional. Send bulk requests asynchronously. Returns the job URI for polling with Wait-JuribaImportJob. Requires DPC 5.17 or later. Only applies to bulk requests.
 
         .EXAMPLE
-        PS> New-JuribaImportDevice -ImportId 1 -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> New-JuribaImportDevice -ImportId 1 -JsonBody $jsonBody -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
         .EXAMPLE
-        PS> New-JuribaImportDevice -ImportId 1 -JsonBody $jsonBody -Async -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> New-JuribaImportDevice -ImportId 1 -JsonBody $jsonBody -Async -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
     #>
     [alias("New-DwImportDevice")]
 

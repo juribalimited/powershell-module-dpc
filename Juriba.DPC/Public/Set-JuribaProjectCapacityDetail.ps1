@@ -5,7 +5,7 @@ function Set-JuribaProjectCapacityDetail {
         .DESCRIPTION
         Update the project capacity detail using API v1
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ProjectID
@@ -25,7 +25,7 @@ function Set-JuribaProjectCapacityDetail {
         .OUTPUTS
         The project capacity details have been updated
         .EXAMPLE
-        PS> Set-JuribaProjectCapacityDetail @DwParams -CapacityMode "Capacity Units" -CapacityUnitMode "Project Capacity Units" 
+        PS> Set-JuribaProjectCapacityDetail -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -CapacityMode "Capacity Units" -CapacityUnitMode "Project Capacity Units" 
             -CapacityToReachBeforeShowAmber 90 -EnableCapacity $true -EnforceCapacityOnProjectObject $false -EnforceCapacityOnSelfService $true
     #>
     [alias("Set-DwProjectCapacityDetail")]

@@ -5,9 +5,9 @@ function New-JuribaEvergreenSelfService {
         .DESCRIPTION
         Creates a new self service using Dashworks API v1.
         .PARAMETER Instance
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER Name
         Name of the new self service.
         .PARAMETER ShortName
@@ -23,7 +23,7 @@ function New-JuribaEvergreenSelfService {
         .OUTPUTS
         serviceId.
         .EXAMPLE
-        PS> New-JuribaEvergreenSelfService -Instance $Instance -APIKey $ApiKey -Name "My New SS3" -ShortName "MyNewSS3" -scopeId 4 -enabled $true -allowAnonymousUsers $true -ObjectType Device
+        PS> New-JuribaEvergreenSelfService -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -Name "My New SS3" -ShortName "MyNewSS3" -scopeId 4 -enabled $true -allowAnonymousUsers $true -ObjectType Device
     #>
     [alias("New-DwEvergreenSelfService")]
     [CmdletBinding(SupportsShouldProcess)]

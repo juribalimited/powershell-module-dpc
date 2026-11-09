@@ -6,7 +6,7 @@ function Get-JuribaProjectPath {
         Returns Paths/Request Types as an array.
         Takes ProjectID as an input
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ProjectID
@@ -16,7 +16,7 @@ function Get-JuribaProjectPath {
         Keys:
         projectId, pathId, pathName, pathDescription, default, objectType, objectTypeId, objectTypeLower, taskCount, languageCount, objectCount
         .EXAMPLE
-        PS> Get-JuribaProjectPath @DwParams -ProjectID 1
+        PS> Get-JuribaProjectPath -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ProjectID 1
     #>
     [alias("Get-DwProjectPath")]
     param (

@@ -5,7 +5,7 @@ Function New-JuribaDashboard {
         .DESCRIPTION
         Creates a new dashboard using Dashworks API v1.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER Name
@@ -15,7 +15,7 @@ Function New-JuribaDashboard {
         .OUTPUTS
         Dashboard object
         .EXAMPLE
-        PS> New-JuribaDashboard -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -Name "W11" -SharedAccessType "SharedAllUsersReadOnly"
+        PS> New-JuribaDashboard -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -Name "W11" -SharedAccessType "SharedAllUsersReadOnly"
     #>
     [alias("New-DwDashboard")]
     [CmdletBinding(SupportsShouldProcess)]

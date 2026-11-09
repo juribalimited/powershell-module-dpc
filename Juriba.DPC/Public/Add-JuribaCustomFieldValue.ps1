@@ -5,9 +5,9 @@ function Add-JuribaCustomFieldValue {
 		.DESCRIPTION
 		Sets custom field values using Dashworks API v1.
 		.PARAMETER Instance
-		Dashworks instance. For example, https://myinstance.dashworks.app:8443
+		Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 		.PARAMETER APIKey
-		Dashworks API Key.
+		Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER CSVColumnHeader
         CSV Column Header
         .PARAMETER Value
@@ -21,7 +21,7 @@ function Add-JuribaCustomFieldValue {
         .OUTPUTS
         New custom field value added successfully
 		.EXAMPLE
-		PS> Add-JuribaCustomFieldValue @dwparams -CustomField "W11 Path" -Value "W11 Device Upgrade" -ObjectKey 100 -ObjectType Device
+		PS> Add-JuribaCustomFieldValue -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -CustomField "W11 Path" -Value "W11 Device Upgrade" -ObjectKey 100 -ObjectType Device
     #>
     [alias("Add-DWCustomFieldValue")]
     [CmdletBinding(SupportsShouldProcess)]
