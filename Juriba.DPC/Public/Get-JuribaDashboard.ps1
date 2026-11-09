@@ -20,6 +20,14 @@ Function Get-JuribaDashboard {
 
     Optional. Id of a single dashboard to return. If omitted, all dashboards are returned.
 
+    .EXAMPLE
+
+    PS> Get-JuribaDashboard -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
+
+    .EXAMPLE
+
+    PS> Get-JuribaDashboard -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -DashboardId 12
+
     #>
     [alias("Get-DwDashboard")]
     param(

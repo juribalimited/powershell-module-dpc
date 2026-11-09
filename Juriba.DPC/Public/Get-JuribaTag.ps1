@@ -16,6 +16,10 @@ Function Get-JuribaTag {
 
     Optional. API key to be provided if not authenticating using Connect-Juriba.
 
+    .EXAMPLE
+
+    PS> Get-JuribaTag -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
+
     #>
     [alias("Get-DwTag")]
 

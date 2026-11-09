@@ -28,6 +28,10 @@ Function Add-JuribaListTag {
 
     Name of an existing tag to add to the list. Use New-JuribaTag to create a tag first.
 
+    .EXAMPLE
+
+    PS> Add-JuribaListTag -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ObjectType "Device" -ListId 123 -Tag "W11 Pilot"
+
     #>
     [alias("Add-DwListTag")]
 

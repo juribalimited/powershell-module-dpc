@@ -32,6 +32,10 @@ Function Set-JuribaDashboardWidgetColour {
 
     Json string containing the widget definition to send. Must be valid json.
 
+    .EXAMPLE
+
+    PS> Set-JuribaDashboardWidgetColour -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -DashboardId 12 -SectionId 3 -WidgetId 7 -JsonBody $jsonBody
+
     #>
     [alias("Set-DwDashboardWidgetColour")]
 

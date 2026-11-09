@@ -20,6 +20,10 @@ Function Remove-JuribaDashboard {
 
     Id of the dashboard to delete.
 
+    .EXAMPLE
+
+    PS> Remove-JuribaDashboard -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -DashboardId 12
+
     #>
     [alias("Remove-DwDashboard")]
 

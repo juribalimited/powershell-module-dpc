@@ -20,6 +20,10 @@ Function Remove-JuribaAutomation {
 
     Id of the automation to delete.
 
+    .EXAMPLE
+
+    PS> Remove-JuribaAutomation -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -AutomationId 5
+
     #>
     [alias("Remove-DwAutomation")]
 

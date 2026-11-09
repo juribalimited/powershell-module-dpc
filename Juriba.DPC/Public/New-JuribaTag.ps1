@@ -20,6 +20,10 @@ Function New-JuribaTag {
 
     Name of the tag to create.
 
+    .EXAMPLE
+
+    PS> New-JuribaTag -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -Name "W11 Pilot"
+
     #>
     [alias("New-DwTag")]
 

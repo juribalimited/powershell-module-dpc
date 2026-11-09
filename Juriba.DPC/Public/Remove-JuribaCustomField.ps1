@@ -20,6 +20,10 @@ Function Remove-JuribaCustomField {
 
     Id of the custom field to delete.
 
+    .EXAMPLE
+
+    PS> Remove-JuribaCustomField -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -CustomFieldId 42
+
     #>
     [alias("Remove-DwCustomField")]
 

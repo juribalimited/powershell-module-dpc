@@ -20,6 +20,10 @@ Function Get-JuribaList {
 
     Object type of the lists to return. Accepts one of: "Device", "User", "Application", "Mailbox". "ApplicationUser" and "ApplicationDevice" are accepted but not implemented.
 
+    .EXAMPLE
+
+    PS> Get-JuribaList -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ObjectType "Device"
+
     #>
     [alias("Get-DwList")]
     param(
