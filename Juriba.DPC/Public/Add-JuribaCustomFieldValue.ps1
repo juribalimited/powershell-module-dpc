@@ -21,7 +21,7 @@ function Add-JuribaCustomFieldValue {
         .OUTPUTS
         New custom field value added successfully
 		.EXAMPLE
-		PS> Add-JuribaCustomFieldValue -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -CustomField "W11 Path" -Value "W11 Device Upgrade" -ObjectKey 100 -ObjectType Device
+		PS> Add-JuribaCustomFieldValue -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -CSVColumnHeader "W11 Path" -Value "W11 Device Upgrade" -ObjectKey 100 -ObjectType Device
     #>
     [alias("Add-DWCustomFieldValue")]
     [CmdletBinding(SupportsShouldProcess)]

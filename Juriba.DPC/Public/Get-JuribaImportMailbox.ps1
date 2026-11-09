@@ -56,9 +56,6 @@ function Get-JuribaImportMailbox {
         PS> Get-JuribaImportMailbox -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
 
         .EXAMPLE
-        PS> Get-JuribaImportMailbox -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
-
-        .EXAMPLE
         PS> Get-JuribaImportMailbox -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
 
          #>

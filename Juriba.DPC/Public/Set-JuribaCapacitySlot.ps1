@@ -61,7 +61,7 @@ function Set-JuribaCapacitySlot {
         .OUTPUTS
         The capacity slot details have been updated
         .EXAMPLE
-        PS> Set-JuribaCapacityUnit -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ProjectID 1 -SlotID 1 -SlotName "W11 Deployment Slot" -DisplayName "Mon - Fri" -CapacityType "Capacity Units" 
+        PS> Set-JuribaCapacitySlot -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ProjectID 1 -SlotID 1 -SlotName "W11 Deployment Slot" -DisplayName "Mon - Fri" -CapacityType "Capacity Units" 
             -ObjectType "Device" -TranslationsObject '[{\"languageId\":0,\"language\":\"English\",\"translatedString\":\"Mon - Fri\",\"isTranslated\":true,\"isDefault\":true}]' -SlotAvailableFrom $null 
             -SlotAvailableTo $null -SlotStartTime "" -SlotEndTime "" -Monday 50 -Tuesday 50 -Wednesday 50 -Thursday 50 -Friday 50 -Saturday 0 -Sunday 0 -RequestTypes "" -Teams "" -Tasks 17 -Units 2
     #>

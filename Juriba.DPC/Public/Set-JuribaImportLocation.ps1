@@ -29,7 +29,7 @@ function Set-JuribaImportLocation {
         Json payload with updated location details.
 
         .EXAMPLE
-        PS> Set-JuribaImportLocation -ImportId 1 -Name "w123abc" -JsonBody $jsonBody -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
+        PS> Set-JuribaImportLocation -ImportId 1 -UniqueIdentifier "London" -JsonBody $jsonBody -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
     [alias("Set-DwImportLocation")]

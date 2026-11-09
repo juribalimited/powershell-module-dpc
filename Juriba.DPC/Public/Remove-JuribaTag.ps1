@@ -22,7 +22,7 @@ Function Remove-JuribaTag {
 
     .EXAMPLE
 
-    PS> Remove-JuribaTag-Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -Tag 123 -Confirm:$false
+    PS> Remove-JuribaTag -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -Tag "W11 Pilot" -Confirm:$false
 
     #>
     [alias("Remove-DwTag")]

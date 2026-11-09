@@ -33,7 +33,10 @@ function New-JuribaEvergreenSelfServiceComponent {
         .OUTPUTS
         componentId.
         .EXAMPLE
-        PS> New-JuribaEvergreenSelfServicecomponent -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ComponentName "test4" -serviceid 2  -displayName "test4d" -ListID 63 -showInSelfService $true -ObjectType "user"
+        PS> $source = Get-JuribaEvergreenSelfServiceComponent -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ServiceId 2 -PageId 7 | Where-Object componentName -eq "Welcome text"
+        PS> New-JuribaEvergreenSelfServiceComponent -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ServiceId 2 -PageId 7 -ComponentId 0 -ComponentName "Welcome text copy" -ComponentType "Text" -ExtraProperties $source.extraProperties -Order 2
+
+        Copies the extra properties of an existing Text component into a new component on the same page.
     #>
     [alias("New-DwEvergreenSelfServiceComponent")]
     [CmdletBinding(SupportsShouldProcess)]

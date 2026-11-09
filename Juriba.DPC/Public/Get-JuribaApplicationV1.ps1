@@ -9,7 +9,7 @@ function Get-JuribaApplicationV1 {
 
         .PARAMETER Filter
 
-        Filter for application search.
+        Optional. Query string appended to the request URL to filter applications, for example '$listid=123'.
 
         .PARAMETER Instance
 
@@ -20,7 +20,10 @@ function Get-JuribaApplicationV1 {
         Optional. API key to be provided if not authenticating using Connect-Juriba.
 
         .EXAMPLE
-        PS> Get-JuribaImportApplication -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+        PS> Get-JuribaApplicationV1 -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
+
+        .EXAMPLE
+        PS> Get-JuribaApplicationV1 -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -Filter '$listid=123'
 
     #>
     [alias("Get-DwApplicationV1")]
