@@ -17,13 +17,22 @@ function Get-JuribaCustomField {
 
     Optional. API key to be provided if not authenticating using Connect-Juriba.
 
+    .PARAMETER CustomFieldId
+
+    Optional. Id of a single custom field to return. When supplied, the full definition of that field is returned,
+    including allowExternalUpdate, valueTypeId and updateSourceId, which are not included when listing all custom fields.
+
     .OUTPUTS
 
-    None.
+    All custom fields, or a single custom field when CustomFieldId is supplied.
 
     .EXAMPLE
 
     PS> Get-JuribaCustomField -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+
+    .EXAMPLE
+
+    PS> Get-JuribaCustomField -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -CustomFieldId 42
 
     #>
 
@@ -32,7 +41,9 @@ function Get-JuribaCustomField {
         [Parameter(Mandatory = $false)]
         [string]$Instance,
         [Parameter(Mandatory = $false)]
-        [string]$APIKey
+        [string]$APIKey,
+        [Parameter(Mandatory = $false)]
+        [int]$CustomFieldId
     )
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
         $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
@@ -40,7 +51,12 @@ function Get-JuribaCustomField {
     }
 
     if ($APIKey -and $Instance) {
-        $uri = "{0}/apiv1/custom-fields" -f $Instance
+        if ($PSBoundParameters.ContainsKey('CustomFieldId')) {
+            $uri = "{0}/apiv1/custom-fields/{1}" -f $Instance, $CustomFieldId
+        }
+        else {
+            $uri = "{0}/apiv1/custom-fields" -f $Instance
+        }
         $headers = @{'x-api-key' = $APIKey }
         try {
             $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType 'application/json'

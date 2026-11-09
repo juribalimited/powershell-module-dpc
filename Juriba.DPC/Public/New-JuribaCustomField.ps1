@@ -21,6 +21,8 @@ function New-JuribaCustomField {
         Set the new custom field to active or inactive. Defaults to Active.
         .PARAMETER AllowUpdate
         Optional. Sets the type of updates allowed for this custom field. Either Directly or ETL. Defaults to Directly.
+        .PARAMETER AllowExternalUpdate
+        Optional. Sets whether the custom field allows external updates. Defaults to $true.
         .OUTPUTS
         Text "Custom field created"
         .EXAMPLE
@@ -49,7 +51,9 @@ function New-JuribaCustomField {
         [bool]$IsActive = $true,
         [Parameter(Mandatory=$false)]
         [ValidateSet("Directly", "ETL")]
-        [string]$AllowUpdate = "Directly"
+        [string]$AllowUpdate = "Directly",
+        [Parameter(Mandatory=$false)]
+        [bool]$AllowExternalUpdate = $true
     )
 
     if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
@@ -72,7 +76,7 @@ function New-JuribaCustomField {
         }
     
         $payload = @{}
-        $payload.Add("allowExternalUpdate", $true)
+        $payload.Add("allowExternalUpdate", $AllowExternalUpdate)
         $payload.Add("csvUpdateColumnHeader", $CSVColumnHeader)
         $payload.Add("IsActive", $IsActive)
         $payload.Add("isApplicationField", ($ObjectTypes -contains "Application"))

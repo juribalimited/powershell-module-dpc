@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.DPC.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.1.19.0'
+    ModuleVersion     = '1.1.20.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -195,6 +195,7 @@
         'Set-JuribaBucket',
         'Set-JuribaCapacitySlot',
         'Set-JuribaCapacityUnit',
+        'Set-JuribaCustomField',
         'Set-JuribaDashboardAccessType',
         'Set-JuribaDashboardSection',
         'Set-JuribaDashboardTeamUserAccess',
