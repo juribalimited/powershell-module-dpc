@@ -23,7 +23,7 @@ function Set-JuribaCustomFieldValue {
         .OUTPUTS
         Custom field value updated successfully
 		.EXAMPLE
-		PS> Set-JuribaCustomFieldValue @dwparams -CSVColumnHeader "W11Path" -Value "W11 Device Upgrade" -ObjectKey 100 -ObjectType Device
+		PS> Set-JuribaCustomFieldValue @dwparams -CSVColumnHeader "W11 Path" -Value "W11 Device Upgrade" -ObjectKey 100 -ObjectType Device
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param(

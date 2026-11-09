@@ -12,7 +12,7 @@ function New-JuribaCustomField {
         .PARAMETER Name
         Name of the new custom field.
         .PARAMETER CSVColumnHeader
-        CSV Column Header for the new custom field. Restricted to alphanumeric characters.
+        CSV Column Header for the new custom field. Must be unique and no more than 50 characters.
         .PARAMETER Type
         Type of the new custom field. One of Text, MultiText, LargeText, Number or Date.
         .PARAMETER ObjectTypes
