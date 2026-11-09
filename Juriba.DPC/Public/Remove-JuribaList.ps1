@@ -1,4 +1,29 @@
 Function Remove-JuribaList {
+    <#
+        .SYNOPSIS
+        Deletes a list.
+
+        .DESCRIPTION
+        Deletes a device, user, application or mailbox list in Juriba DPC using API v1.
+
+        .PARAMETER Instance
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
+
+        .PARAMETER APIKey
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
+
+        .PARAMETER ObjectType
+        Object type of the list. One of Device, User, Application or Mailbox. ApplicationUser and ApplicationDevice are accepted but not yet implemented, and throw an error.
+
+        .PARAMETER ListId
+        Id of the list to delete.
+
+        .OUTPUTS
+        The web response from the API call.
+
+        .EXAMPLE
+        PS> Remove-JuribaList -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ObjectType Device -ListId 42
+    #>
     [alias("Remove-DwList")]
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(

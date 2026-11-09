@@ -1,4 +1,29 @@
 Function New-JuribaDashboardSection {
+    <#
+        .SYNOPSIS
+        Creates a new section on a dashboard.
+
+        .DESCRIPTION
+        Creates a new section on a Juriba DPC dashboard using API v1.
+
+        .PARAMETER Instance
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
+
+        .PARAMETER APIKey
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
+
+        .PARAMETER DashboardId
+        Id of the dashboard to add the section to.
+
+        .PARAMETER Width
+        Optional. Width of the new section. Defaults to 2.
+
+        .OUTPUTS
+        The Id of the new section.
+
+        .EXAMPLE
+        PS> New-JuribaDashboardSection -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -DashboardId 12 -Width 1
+    #>
     [alias("New-DwDashboardSection")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
