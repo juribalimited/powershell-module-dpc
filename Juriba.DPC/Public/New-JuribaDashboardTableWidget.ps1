@@ -1,5 +1,4 @@
 function New-JuribaDashboardTableWidget {
-    [alias("New-DwDashboardTableWidget")]
     <#
         .SYNOPSIS
         Creates a new dashboard table widget.
@@ -42,6 +41,7 @@ function New-JuribaDashboardTableWidget {
         .EXAMPLE
         PS> New-JuribaDashboardTableWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Missed deployments after 10 days" -ListId 337 -SplitBy "project_task_1_15_2_Task" -OrderByField "Split Value" -ObjectType "Applications" -AggregateFunction "count" -MaximumValues 99 -OrientationIsVertical $true -splitByGroupDatesBy "Day"
     #>
+    [alias("New-DwDashboardTableWidget")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

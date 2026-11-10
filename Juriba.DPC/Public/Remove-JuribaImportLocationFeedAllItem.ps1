@@ -1,6 +1,5 @@
 #requires -Version 7
 function Remove-JuribaImportLocationFeedAllItem {
-    [alias("Remove-DwImportLocationFeedAllItem")]
     <#
         .SYNOPSIS
         Deletes all locations in a feed.
@@ -34,6 +33,7 @@ function Remove-JuribaImportLocationFeedAllItem {
         PS> Remove-JuribaImportLocationFeedAllItem -Confirm:$false -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
 
     #>
+    [alias("Remove-DwImportLocationFeedAllItem")]
     [CmdletBinding(
         SupportsShouldProcess,
         ConfirmImpact = 'High'

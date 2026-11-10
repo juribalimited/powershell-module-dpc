@@ -1,5 +1,4 @@
 function Get-JuribaEventLogRun {
-    [Alias("Get-JuribaEventLogRuns")]
     <#
         .SYNOPSIS
         Retrieves recent runs for a specified service from the Juriba API.
@@ -40,6 +39,7 @@ function Get-JuribaEventLogRun {
 
         PS> Get-JuribaEventLogRuns -Instance $Instance -APIKey $APIKey -ServiceID $ETLID.id -Latest -ErrorAction Stop
     #>
+    [Alias("Get-JuribaEventLogRuns")]
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false)]

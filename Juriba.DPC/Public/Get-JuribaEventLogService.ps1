@@ -1,6 +1,5 @@
 #requires -Version 7
 function Get-JuribaEventLogService {
-    [Alias("Get-JuribaEventLogServices")]
     <#
         .SYNOPSIS
         Retrieves service information from the Juriba API.
@@ -33,6 +32,7 @@ function Get-JuribaEventLogService {
 
         PS> Get-JuribaEventLogServices -Instance $Instance -APIKey $APIKey -ServiceName "ETL" -ErrorAction Stop
     #>
+    [Alias("Get-JuribaEventLogServices")]
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false)]

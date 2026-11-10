@@ -1,5 +1,4 @@
 function Get-JuribaImportUser {
-    [alias("Get-DwImportUser")]
     <#
         .SYNOPSIS
         Gets users from the import API.
@@ -56,6 +55,7 @@ function Get-JuribaImportUser {
         PS> Get-JuribaImportUser -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(EmailAddress, 'zxy123456@x.com')"
 
          #>
+    [alias("Get-DwImportUser")]
 
     [CmdletBinding(DefaultParameterSetName="Default")]
     param (

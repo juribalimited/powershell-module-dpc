@@ -1,5 +1,4 @@
 function New-JuribaTeam {
-    [alias("New-DwTeam")]
     <#
         .SYNOPSIS
         Create new team
@@ -20,6 +19,7 @@ function New-JuribaTeam {
         .EXAMPLE
         PS> New-JuribaTeam @DwParams -TeamName "A Team" -Description "A new team"
     #>
+    [alias("New-DwTeam")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

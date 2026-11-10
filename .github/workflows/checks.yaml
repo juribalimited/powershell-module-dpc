@@ -19,3 +19,17 @@ jobs:
       - name: 'Run PSScriptAnalyzer'
         run: Invoke-ScriptAnalyzer -Path .\Juriba.DPC -Recurse -EnableExit -ExcludeRule PSAvoidTrailingWhitespace | Format-List -Property ScriptName, RuleName, Severity, Line, Column, Message
         shell: pwsh
+      - name: 'Check comment-based help'
+        # Get-Help ignores comment-based help unless it is the first thing in the function body.
+        # Description is used because Synopsis falls back to the syntax line when no help is found.
+        run: |
+          Import-Module ./Juriba.DPC/Juriba.DPC.psd1 -Force
+          $missing = Get-Command -Module Juriba.DPC -CommandType Function |
+              Where-Object { -not (Get-Help $_.Name).Description } |
+              Select-Object -ExpandProperty Name
+          if ($missing) {
+              Write-Error "Functions without readable help (put the <# #> help block first in the function body):`n$($missing -join "`n")"
+              exit 1
+          }
+          Write-Output "All exported functions have readable help."
+        shell: pwsh

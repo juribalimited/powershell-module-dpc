@@ -1,6 +1,5 @@
 #Requires -Version 7
 function New-JuribaImportUser {
-    [alias("New-DwImportUser")]
     <#
         .SYNOPSIS
         Creates a new Juriba user using the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
@@ -28,6 +27,7 @@ function New-JuribaImportUser {
         .EXAMPLE
         PS> New-JuribaImportUser -ImportId 1 -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
+    [alias("New-DwImportUser")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param (

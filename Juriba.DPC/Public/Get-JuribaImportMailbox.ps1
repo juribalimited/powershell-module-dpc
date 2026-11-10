@@ -1,5 +1,4 @@
 function Get-JuribaImportMailbox {
-    [alias("Get-DwImportMailbox")]
     <#
         .SYNOPSIS
         Gets mailboxes from the import API.
@@ -59,6 +58,7 @@ function Get-JuribaImportMailbox {
         PS> Get-JuribaImportMailbox -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"
 
          #>
+    [alias("Get-DwImportMailbox")]
 
     [CmdletBinding(DefaultParameterSetName="Default")]
     param (

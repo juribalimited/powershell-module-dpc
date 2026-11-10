@@ -1,5 +1,4 @@
 Function Remove-JuribaTag {
-    [alias("Remove-DwTag")]
     <#
     .SYNOPSIS
 
@@ -14,6 +13,7 @@ Function Remove-JuribaTag {
     PS> Remove-JuribaTag-Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -Tag 123 -Confirm:$false
 
     #>
+    [alias("Remove-DwTag")]
 
     [CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='High')]
     param(

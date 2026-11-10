@@ -1,5 +1,4 @@
 Function Get-JuribaList {
-    [alias("Get-DwList")]
     <#
     .SYNOPSIS
 
@@ -10,6 +9,7 @@ Function Get-JuribaList {
     Returns existing lists using Dashworks API v1.
 
     #>
+    [alias("Get-DwList")]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,

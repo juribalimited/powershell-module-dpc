@@ -1,4 +1,51 @@
 Function Set-JuribaDashboardSection {
+    <#
+        .SYNOPSIS
+        Updates a section on a dashboard.
+
+        .DESCRIPTION
+        Updates the name, description, layout and visibility of a section on a Juriba DPC dashboard using API v1.
+        All section properties are sent on every call, so any parameter you leave out is reset to its default value.
+
+        .PARAMETER Instance
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
+
+        .PARAMETER APIKey
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
+
+        .PARAMETER DashboardId
+        Id of the dashboard that contains the section.
+
+        .PARAMETER SectionId
+        Id of the section to update.
+
+        .PARAMETER Name
+        Optional. Name of the section. Defaults to an empty string.
+
+        .PARAMETER Description
+        Optional. Description of the section. Defaults to an empty string.
+
+        .PARAMETER DisplayOrder
+        Optional. Position of the section on the dashboard. Defaults to 1.
+
+        .PARAMETER Width
+        Optional. Width of the section. Defaults to 2.
+
+        .PARAMETER Hidden
+        Optional. Whether the section is hidden. Defaults to $false.
+
+        .PARAMETER Collapsed
+        Optional. Whether the section is collapsed. Defaults to $false.
+
+        .PARAMETER Expanded
+        Optional. Whether the section is expanded. Defaults to $true.
+
+        .OUTPUTS
+        None.
+
+        .EXAMPLE
+        PS> Set-JuribaDashboardSection -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -DashboardId 12 -SectionId 3 -Name "Readiness" -DisplayOrder 2 -Width 1
+    #>
     [alias("Set-DwDashboardSection")]
     [CmdletBinding(SupportsShouldProcess)]
     param(

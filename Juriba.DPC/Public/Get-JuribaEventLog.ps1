@@ -1,6 +1,4 @@
 function Get-JuribaEventLog {
-    [Alias("Get-JuribaEventLogs")]
-    [OutputType([System.Object[]])]
     <#
         .SYNOPSIS
         Retrieves event logs for a specific service run.
@@ -28,6 +26,8 @@ function Get-JuribaEventLog {
 
         PS> $ETLEvents = Get-JuribaEventLogs -Instance $Instance -APIKey $APIKey -RunID $LatestETLRun.runId -ErrorAction Stop
     #>
+    [Alias("Get-JuribaEventLogs")]
+    [OutputType([System.Object[]])]
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false)]

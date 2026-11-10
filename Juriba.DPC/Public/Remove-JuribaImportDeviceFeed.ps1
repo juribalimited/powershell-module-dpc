@@ -1,6 +1,5 @@
 #requires -Version 7
 function Remove-JuribaImportDeviceFeed {
-    [alias("Remove-DwImportDeviceFeed")]
     <#
         .SYNOPSIS
         Deletes a device feed.
@@ -30,6 +29,7 @@ function Remove-JuribaImportDeviceFeed {
         PS> Remove-JuribaImportDeviceFeed -Confirm:$false -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
+    [alias("Remove-DwImportDeviceFeed")]
     [CmdletBinding(
         SupportsShouldProcess,
         ConfirmImpact = 'High'

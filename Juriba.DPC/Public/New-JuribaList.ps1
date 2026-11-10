@@ -1,5 +1,4 @@
 Function New-JuribaList {
-    [alias("New-DwList")]
     <#
         .SYNOPSIS
         Creates a new list.
@@ -65,6 +64,7 @@ Function New-JuribaList {
 
 
     #>
+    [alias("New-DwList")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

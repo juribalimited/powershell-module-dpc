@@ -1,5 +1,4 @@
 function Get-JuribaCapacityUnit {
-    [alias("Get-DwCapacityUnit")]
     <#
         .SYNOPSIS
         Returns capacity units for a specified project or evergreen.
@@ -19,6 +18,7 @@ function Get-JuribaCapacityUnit {
         .EXAMPLE
         PS> Get-JuribaCapacityUnit @dwparams -ProjectID 1
     #>   
+    [alias("Get-DwCapacityUnit")]
     param (
         [Parameter(Mandatory=$false)]
         [string]$Instance,

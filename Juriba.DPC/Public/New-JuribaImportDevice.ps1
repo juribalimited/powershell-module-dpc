@@ -1,6 +1,5 @@
 #Requires -Version 7
 function New-JuribaImportDevice {
-    [alias("New-DwImportDevice")]
     <#
         .SYNOPSIS
         Creates a new Dashworks device using the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
@@ -35,6 +34,7 @@ function New-JuribaImportDevice {
         .EXAMPLE
         PS> New-JuribaImportDevice -ImportId 1 -JsonBody $jsonBody -Async -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
+    [alias("New-DwImportDevice")]
 
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([String])]

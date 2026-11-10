@@ -1,5 +1,4 @@
 function New-JuribaBucket {
-    [alias("New-DwBucket")]
     <#
         .SYNOPSIS
         Create a new bucket in US English.
@@ -22,6 +21,7 @@ function New-JuribaBucket {
         .EXAMPLE
         PS> New-JuribaBucket @DwParams -ProjectID 1 -BucketName "01 Preview" -OwnerTeamID 1
     #>
+    [alias("New-DwBucket")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

@@ -1,5 +1,4 @@
 function Set-JuribaEvergreenSelfServicePage {
-    [alias("Set-DwEvergreenSelfServicePage")]
     <#
         .SYNOPSIS
         Updates an existing self service page.
@@ -30,6 +29,7 @@ function Set-JuribaEvergreenSelfServicePage {
         .EXAMPLE
         PS> Set-JuribaEvergreenSelfServicePage -Instance $Instance -APIKey $ApiKey -Name "My New SS4" -displayName "MyNewSS4" -Order 1 -PageID 8 -ServiceID 4 -ListId 4 -ObjectType Device
     #>
+    [alias("Set-DwEvergreenSelfServicePage")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory = $false)]

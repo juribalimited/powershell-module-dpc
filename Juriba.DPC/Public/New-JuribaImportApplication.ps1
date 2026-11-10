@@ -1,6 +1,5 @@
 #Requires -Version 7
 function New-JuribaImportApplication {
-    [alias("New-DwImportApplication")]
     <#
         .SYNOPSIS
         Creates a new Dashworks application using the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
@@ -28,6 +27,7 @@ function New-JuribaImportApplication {
         .EXAMPLE
         PS> New-JuribaImportApplication -ImportId 1 -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
+    [alias("New-DwImportApplication")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param (

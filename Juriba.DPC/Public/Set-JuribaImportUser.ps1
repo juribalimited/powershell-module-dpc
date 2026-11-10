@@ -1,6 +1,5 @@
 #Requires -Version 7
 function Set-JuribaImportUser {
-    [alias("Set-DwImportUser")]
     <#
         .SYNOPSIS
         Updates a user in the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
@@ -33,6 +32,7 @@ function Set-JuribaImportUser {
         PS> Set-JuribaImportUser -ImportId 1 -Useranme "w123abc" -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
+    [alias("Set-DwImportUser")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param (

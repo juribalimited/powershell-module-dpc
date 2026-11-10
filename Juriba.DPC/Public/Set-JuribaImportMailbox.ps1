@@ -1,6 +1,5 @@
 #Requires -Version 7
 function Set-JuribaImportMailbox {
-    [alias("Set-DwImportMailbox")]
     <#
         .SYNOPSIS
         Updates a mailbox in the import API.
@@ -33,6 +32,7 @@ function Set-JuribaImportMailbox {
         PS> Set-JuribaImportMailbox -ImportId 1 -UniqueIdentifier "w123abc" -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
+    [alias("Set-DwImportMailbox")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param (

@@ -1,5 +1,4 @@
 function Add-JuribaCustomFieldValue {
-    [alias("Add-DWCustomFieldValue")]
     <#
 		.SYNOPSIS
 		Sets custom field values.
@@ -24,6 +23,7 @@ function Add-JuribaCustomFieldValue {
 		.EXAMPLE
 		PS> Add-JuribaCustomFieldValue @dwparams -CustomField "W11 Path" -Value "W11 Device Upgrade" -ObjectKey 100 -ObjectType Device
     #>
+    [alias("Add-DWCustomFieldValue")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory = $false)]

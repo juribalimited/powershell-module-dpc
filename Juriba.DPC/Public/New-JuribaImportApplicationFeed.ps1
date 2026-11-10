@@ -1,6 +1,5 @@
 #requires -Version 7
 function New-JuribaImportApplicationFeed {
-    [alias("New-DwImportApplicationFeed")]
     <#
         .SYNOPSIS
         Creates a new application feed.
@@ -30,6 +29,7 @@ function New-JuribaImportApplicationFeed {
         PS> New-JuribaImportApplicationFeed -Name "My New Import" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
 
     #>
+    [alias("New-DwImportApplicationFeed")]
     [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory=$false)]

@@ -1,5 +1,4 @@
 function Get-JuribaEvergreenSelfServiceBaseURL {
-    [alias("Get-DwEvergreenSelfServiceBaseURL")]
     <#
         .SYNOPSIS
         Gets the base URL for Evergreen SelfService.
@@ -14,6 +13,7 @@ function Get-JuribaEvergreenSelfServiceBaseURL {
         .EXAMPLE
         PS>  Get-JuribaEvergreenSelfServiceBaseURL @dwparams
     #>
+    [alias("Get-DwEvergreenSelfServiceBaseURL")]
     param(
         [Parameter(Mandatory = $false)]
         [string]$Instance,

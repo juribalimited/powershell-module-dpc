@@ -1,6 +1,5 @@
 #requires -Version 7
 function New-JuribaImportLocationFeed {
-    [alias("New-DwImportLocationFeed")]
     <#
         .SYNOPSIS
         Creates a new location feed.
@@ -30,6 +29,7 @@ function New-JuribaImportLocationFeed {
         PS> New-JuribaImportLocationFeed -Name "My New Import" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
 
     #>
+    [alias("New-DwImportLocationFeed")]
     [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory=$false)]

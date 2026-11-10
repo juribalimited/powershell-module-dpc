@@ -35,7 +35,7 @@ Examples/            - Example scripts organized by integration type
 
 - Pattern: `[Verb]-Juriba[Entity]` (e.g., `Get-JuribaTeam`, `New-JuribaImportDevice`)
 - Use approved PowerShell verbs: `Get`, `New`, `Set`, `Remove`, `Add`, `Connect`, `Disconnect`, `Invoke`, `Export`, `Start`, `Stop`, `Update`
-- Existing functions have a legacy `Dw` alias from when the module was named `Juriba.Dashworks` (e.g., `[alias("Get-DwTeam")]`). New functions do not need an alias.
+- Existing functions have a legacy `Dw` alias from when the module was named `Juriba.Dashworks` (e.g., `[alias("Get-DwTeam")]`). New functions do not need an alias. Where a function has an alias, the `[alias()]` attribute goes after the comment-based help block, never before it.
 - The product is called **Juriba DPC** (not Dashworks). Use "Juriba DPC" in all new function descriptions and documentation. Existing functions may still reference "Dashworks" but new code should not.
 
 ## Function Template
@@ -151,5 +151,5 @@ if ($ver) {
 - `$camelCase` for local variables
 - `$PascalCase` for parameters
 - String formatting with `-f` operator (not string interpolation) for URI construction
-- Comment-based help inside the function, after the alias declaration
+- Comment-based help must be the first thing inside the function body, before `[alias()]`, `[CmdletBinding()]` and any other attributes. Otherwise Get-Help ignores it. CI checks that every exported function has readable help
 - One function per file, filename matches function name exactly

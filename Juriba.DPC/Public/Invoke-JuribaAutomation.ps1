@@ -1,5 +1,4 @@
 Function Invoke-JuribaAutomation {
-    [alias("Invoke-DwAutomation")]
     <#
     .SYNOPSIS
 
@@ -33,6 +32,7 @@ Function Invoke-JuribaAutomation {
 
     PS> Invoke-JuribaAutomation -Instance "https://myinstance.dashworks.app" -APIKey "xxxxx" -Ids @(1,2,3)
     #>
+    [alias("Invoke-DwAutomation")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param(

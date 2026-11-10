@@ -1,5 +1,4 @@
 Function Get-JuribaTag {
-    [alias("Get-DwTag")]
     <#
     .SYNOPSIS
 
@@ -10,6 +9,7 @@ Function Get-JuribaTag {
     Returns existing list tags using Dashworks API v1.
 
     #>
+    [alias("Get-DwTag")]
 
     param(
         [Parameter(Mandatory = $false)]

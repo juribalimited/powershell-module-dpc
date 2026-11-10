@@ -1,6 +1,5 @@
 #Requires -Version 7
 function New-JuribaImportMailbox {
-    [alias("New-DwImportMailbox")]
     <#
         .SYNOPSIS
         Creates a new Dashworks mailbox using the import API.
@@ -28,6 +27,7 @@ function New-JuribaImportMailbox {
         .EXAMPLE
         PS> New-JuribaImportMailbox -ImportId 1 -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
+    [alias("New-DwImportMailbox")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param (

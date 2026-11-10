@@ -1,6 +1,5 @@
 #requires -Version 7
 function Remove-JuribaImportMailboxFeed {
-    [alias("Remove-DwImportMailboxFeed")]
     <#
         .SYNOPSIS
         Deletes a mailbox feed.
@@ -30,6 +29,7 @@ function Remove-JuribaImportMailboxFeed {
         PS> Remove-JuribaImportMailboxFeed -Confirm:$false -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
+    [alias("Remove-DwImportMailboxFeed")]
     [CmdletBinding(
         SupportsShouldProcess,
         ConfirmImpact = 'High'

@@ -1,5 +1,4 @@
 function New-JuribaEvergreenSelfService {
-    [alias("New-DwEvergreenSelfService")]
     <#
         .SYNOPSIS
         Creates a new self service.
@@ -26,6 +25,7 @@ function New-JuribaEvergreenSelfService {
         .EXAMPLE
         PS> New-JuribaEvergreenSelfService -Instance $Instance -APIKey $ApiKey -Name "My New SS3" -ShortName "MyNewSS3" -scopeId 4 -enabled $true -allowAnonymousUsers $true -ObjectType Device
     #>
+    [alias("New-DwEvergreenSelfService")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory = $false)]

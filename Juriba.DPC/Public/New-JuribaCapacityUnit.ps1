@@ -1,5 +1,4 @@
 function New-JuribaCapacityUnit {
-	[alias("New-DwCapacityUnit")]
 	<#
 		.SYNOPSIS
 		Creates capacity unit for a specified project or evegreen.
@@ -22,6 +21,7 @@ function New-JuribaCapacityUnit {
 		.EXAMPLE
 		PS> New-JuribaCapacityUnit @dwparams -ProjectID 4 -Name "Unit 1" -Description "Description" -IsDefault $true
     #>
+	[alias("New-DwCapacityUnit")]
     [CmdletBinding(SupportsShouldProcess)]
 	param (
 		[Parameter(Mandatory=$false)]

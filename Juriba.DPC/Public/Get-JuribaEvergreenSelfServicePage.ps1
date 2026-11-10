@@ -1,5 +1,4 @@
 function Get-JuribaEvergreenSelfServicePage {
-    [alias("Get-DwEvergreenSelfServicePage")]
     <#
     .SYNOPSIS
     Gets pages for existing self services.
@@ -17,6 +16,7 @@ function Get-JuribaEvergreenSelfServicePage {
     .EXAMPLE
     PS> Get-JuribaEvergreenSelfServicePage @dwparams -serviceId 15
     #>							  
+    [alias("Get-DwEvergreenSelfServicePage")]
     param(
         [Parameter(Mandatory = $false)]
         [string]$Instance,

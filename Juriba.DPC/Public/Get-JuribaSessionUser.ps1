@@ -1,5 +1,4 @@
 Function Get-JuribaSessionUser {
-    [alias("Get-DwSessionUser")]
         <#
     .SYNOPSIS
 
@@ -10,6 +9,7 @@ Function Get-JuribaSessionUser {
     Returns information about the authenticated user using Dashworks API v1.
 
     #>
+    [alias("Get-DwSessionUser")]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,

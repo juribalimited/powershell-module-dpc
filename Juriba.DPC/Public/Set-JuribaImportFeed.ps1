@@ -1,6 +1,5 @@
 #requires -Version 7
 function Set-JuribaImportFeed {
-    [alias("Set-DwImportDeviceFeed")]
     <#
         .SYNOPSIS
         Updates a universal feed.
@@ -34,6 +33,7 @@ function Set-JuribaImportFeed {
         PS> Set-JuribaImportFeed -ImportId 1 -Name "My New Import Name" -Enabled $false -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
+    [alias("Set-DwImportDeviceFeed")]
     [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory=$false)]

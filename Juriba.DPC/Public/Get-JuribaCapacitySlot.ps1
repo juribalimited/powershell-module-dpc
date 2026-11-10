@@ -1,5 +1,4 @@
 function Get-JuribaCapacitySlot {
-    [alias("Get-DwCapacitySlot")]
     <#
         .SYNOPSIS
         Returns all capacity slots in US English.
@@ -17,6 +16,7 @@ function Get-JuribaCapacitySlot {
         .EXAMPLE
         PS> Get-JuribaCapacitySlot @DwParams -ProjectID 1
     #>
+    [alias("Get-DwCapacitySlot")]
     param(
         [Parameter(Mandatory=$false)]
         [string]$Instance,

@@ -1,5 +1,4 @@
 function Set-JuribaAutomationAction {
-    [alias("Set-DwAutomationAction")]
     <#
         .SYNOPSIS
         Updates an automation action.
@@ -29,6 +28,7 @@ function Set-JuribaAutomationAction {
         PS> Set-JuribaAutomationAction -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ActionId 10 -Name "Update Custom Field Value" -AutomationId 1 -TypeId 1 -ProjectId 1 -IsEvergreen $false
             -Parameter 'parameters=@(@{property="TaskId";value=11;meta="task"};@{property="Value";value=2;meta="Radiobutton"};@{property="ValueActionType";value=1;meta="Radiobutton"};)'
     #>
+    [alias("Set-DwAutomationAction")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory = $false)]

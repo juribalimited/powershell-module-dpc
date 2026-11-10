@@ -1,5 +1,4 @@
 function Get-JuribaProjectPath {
-    [alias("Get-DwProjectPath")]
     <#
         .SYNOPSIS
         Returns Paths/Request Types for a specified project.
@@ -19,6 +18,7 @@ function Get-JuribaProjectPath {
         .EXAMPLE
         PS> Get-JuribaProjectPath @DwParams -ProjectID 1
     #>
+    [alias("Get-DwProjectPath")]
     param (
         [Parameter(Mandatory=$false)]
         [string]$Instance,

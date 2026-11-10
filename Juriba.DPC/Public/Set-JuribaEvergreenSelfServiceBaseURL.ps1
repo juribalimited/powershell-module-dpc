@@ -1,5 +1,4 @@
 function Set-JuribaEvergreenSelfServiceBaseURL {
-    [alias("Set-DwEvergreenSelfServiceBaseURL")]
     <#
         .SYNOPSIS
         Updates the base URL for Evergreen SelfService.
@@ -16,6 +15,7 @@ function Set-JuribaEvergreenSelfServiceBaseURL {
         .EXAMPLE
         PS>  Set-JuribaEvergreenSelfServiceBaseURL @dwparams -URL "https://myinstance.dashworks.app"
     #>
+    [alias("Set-DwEvergreenSelfServiceBaseURL")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory = $false)]

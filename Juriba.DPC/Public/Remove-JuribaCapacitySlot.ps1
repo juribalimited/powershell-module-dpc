@@ -1,5 +1,4 @@
 function Remove-JuribaCapacitySlot {
-    [alias("Remove-DwCapacitySlot")]
     <#
         .SYNOPSIS
         Delete the capacity slot in the project
@@ -18,6 +17,7 @@ function Remove-JuribaCapacitySlot {
         .EXAMPLE
         PS> Remove-JuribaCapacitySlot @DwParams -ProjectID 1 -SlotID 1
     #>
+    [alias("Remove-DwCapacitySlot")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

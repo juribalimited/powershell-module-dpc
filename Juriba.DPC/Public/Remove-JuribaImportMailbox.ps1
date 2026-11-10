@@ -1,6 +1,5 @@
 #Requires -Version 7
 function Remove-JuribaImportMailbox {
-    [alias("Remove-DwImportMailbox")]
     <#
         .SYNOPSIS
         Deletes a mailbox in the import API.
@@ -29,6 +28,7 @@ function Remove-JuribaImportMailbox {
         PS> Remove-JuribaImportMailbox -ImportId 1 -UniqueIdentifier "w123abc" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
+    [alias("Remove-DwImportMailbox")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param (

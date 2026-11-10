@@ -1,5 +1,4 @@
 function Get-JuribaEvergreenSelfService {
-    [alias("Get-DwEvergreenSelfService")]
     <#
         .SYNOPSIS
         Gets a list of Evergreen self services.
@@ -15,6 +14,7 @@ function Get-JuribaEvergreenSelfService {
         .EXAMPLE
         PS> Get-JuribaEvergreenSelfService @dwparams
     #> 
+    [alias("Get-DwEvergreenSelfService")]
     param(
         [Parameter(Mandatory = $false)]
         [string]$Instance,

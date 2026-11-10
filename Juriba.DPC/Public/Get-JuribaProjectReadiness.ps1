@@ -1,5 +1,4 @@
 function Get-JuribaProjectReadiness {
-    [alias("Get-DwProjectReadiness")]
     <#
         .SYNOPSIS
         Gets the Project Readiness.
@@ -17,6 +16,7 @@ function Get-JuribaProjectReadiness {
         .EXAMPLE
         PS> Get-JuribaProjectReadiness @dwparams -ProjectID 1
     #>
+    [alias("Get-DwProjectReadiness")]
     param(
         [Parameter(Mandatory = $false)]
         [string]$Instance,

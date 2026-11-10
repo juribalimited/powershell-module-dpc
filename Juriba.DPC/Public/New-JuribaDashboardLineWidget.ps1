@@ -1,5 +1,4 @@
 function New-JuribaDashboardLineWidget {
-    [alias("New-DwDashboardLineWidget")]
     <#
         .SYNOPSIS
         Creates a new dashboard line widget.
@@ -40,6 +39,7 @@ function New-JuribaDashboardLineWidget {
         .EXAMPLE
         PS> New-JuribaDashboardLineWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Devices scheduled next 30 days" -AggregateFunction "count" -ListId 337 -SplitBy "project_task_4_49_2_Task" -OrderByDescending $false -OrderByField "Aggregate Value" -MaximumValues 100
 	#>
+    [alias("New-DwDashboardLineWidget")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]

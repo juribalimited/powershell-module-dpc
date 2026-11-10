@@ -1,5 +1,4 @@
 function New-JuribaAutomationAction {
-    [alias("New-DwAutomationAction")]
     <#
         .SYNOPSIS
         Creates a new automation action.
@@ -62,6 +61,7 @@ function New-JuribaAutomationAction {
         PS> New-JuribaAutomationAction -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -Option "ByType" -Name "Resync HWLC Owner" -AutomationId 1 -ProjectId 1 -IsEvergreen $false -Type "Resync" -isOwnerResync $true
              
     #>
+    [alias("New-DwAutomationAction")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory = $false)]

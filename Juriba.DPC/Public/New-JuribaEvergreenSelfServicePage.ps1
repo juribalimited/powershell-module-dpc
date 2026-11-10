@@ -1,5 +1,4 @@
 function New-JuribaEvergreenSelfServicePage {
-    [alias("New-DwEvergreenSelfServicePage")]
     <#
         .SYNOPSIS
         Creates a new self service page.
@@ -26,6 +25,7 @@ function New-JuribaEvergreenSelfServicePage {
         .EXAMPLE
         PS> New-JuribaEvergreenSelfServicePage @dwparams -Name "test4" -displayName "test4d" -serviceid 2 -ListID 63 -showInSelfService $true -ObjectType "user"
     #>
+    [alias("New-DwEvergreenSelfServicePage")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory = $false)]

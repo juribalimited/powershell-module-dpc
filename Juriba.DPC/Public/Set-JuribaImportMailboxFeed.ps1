@@ -1,6 +1,5 @@
 #requires -Version 7
 function Set-JuribaImportMailboxFeed {
-    [alias("Set-DwImportMailboxFeed")]
     <#
         .SYNOPSIS
         Updates a mailbox feed.
@@ -54,6 +53,7 @@ function Set-JuribaImportMailboxFeed {
         PS> Set-JuribaImportMailboxFeed -ImportId 1 -Name "My New Import Name" -Enabled $false -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
+    [alias("Set-DwImportMailboxFeed")]
     [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory=$false)]

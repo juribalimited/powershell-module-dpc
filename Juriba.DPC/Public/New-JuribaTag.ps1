@@ -1,5 +1,4 @@
 Function New-JuribaTag {
-    [alias("New-DwTag")]
     <#
     .SYNOPSIS
 
@@ -10,6 +9,7 @@ Function New-JuribaTag {
     Creates a new list tag using Dashworks API v1.
 
     #>
+    [alias("New-DwTag")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param(

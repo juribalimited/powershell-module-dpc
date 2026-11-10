@@ -1,5 +1,4 @@
 Function Remove-JuribaAutomation {
-    [alias("Remove-DwAutomation")]
     <#
     .SYNOPSIS
 
@@ -10,6 +9,7 @@ Function Remove-JuribaAutomation {
     Deletes an automation using Dashworks API v1.
 
     #>
+    [alias("Remove-DwAutomation")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param(

@@ -1,5 +1,4 @@
 function New-JuribaEvergreenSelfServiceComponent {
-    [alias("New-DwEvergreenSelfServiceComponent")]
     <#
         .SYNOPSIS
         Creates a new self service component.
@@ -36,6 +35,7 @@ function New-JuribaEvergreenSelfServiceComponent {
         .EXAMPLE
         PS> New-JuribaEvergreenSelfServicecomponent @dwparams -ComponentName "test4" -serviceid 2  -displayName "test4d" -ListID 63 -showInSelfService $true -ObjectType "user"
     #>
+    [alias("New-DwEvergreenSelfServiceComponent")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory = $false)]

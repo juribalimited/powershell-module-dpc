@@ -1,5 +1,4 @@
 Function Remove-JuribaCustomField {
-    [alias("Remove-DwCustomField")]
     <#
     .SYNOPSIS
 
@@ -10,6 +9,7 @@ Function Remove-JuribaCustomField {
     Deletes a custom field using Dashworks API v1.
 
     #>
+    [alias("Remove-DwCustomField")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param(

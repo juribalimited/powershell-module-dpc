@@ -1,6 +1,5 @@
 #requires -Version 7
 function Remove-JuribaImportDepartmentFeed {
-    [alias("Remove-DwImportDepartmentFeed")]
     <#
         .SYNOPSIS
         Deletes a department feed.
@@ -34,6 +33,7 @@ function Remove-JuribaImportDepartmentFeed {
         PS> Remove-JuribaImportDepartmentFeed -Confirm:$false -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
 
     #>
+    [alias("Remove-DwImportDepartmentFeed")]
     [CmdletBinding(
         SupportsShouldProcess,
         ConfirmImpact = 'High'

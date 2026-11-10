@@ -1,6 +1,5 @@
 #Requires -Version 7
 function New-JuribaImportLocation {
-    [alias("New-DwImportLocation")]
     <#
         .SYNOPSIS
         Creates a new Juriba location using the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
@@ -28,6 +27,7 @@ function New-JuribaImportLocation {
         .EXAMPLE
         PS> New-JuribaImportLocation -ImportId 1 -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
+    [alias("New-DwImportLocation")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param (

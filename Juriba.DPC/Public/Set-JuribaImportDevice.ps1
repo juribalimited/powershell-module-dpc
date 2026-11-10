@@ -1,6 +1,5 @@
 #Requires -Version 7
 function Set-JuribaImportDevice {
-    [alias("Set-DwImportDevice")]
     <#
         .SYNOPSIS
         Updates a device in the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
@@ -33,6 +32,7 @@ function Set-JuribaImportDevice {
         PS> Set-JuribaImportDevice -ImportId 1 -UniqueIdentifier "w123abc" -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
+    [alias("Set-DwImportDevice")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param (

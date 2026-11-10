@@ -1,6 +1,5 @@
 #requires -Version 7
 function Get-JuribaImportUserFeed {
-    [alias("Get-DwImportUserFeed")]
     <#
         .SYNOPSIS
         Gets user imports.
@@ -20,6 +19,7 @@ function Get-JuribaImportUserFeed {
         .EXAMPLE
         PS> Get-JuribaImportUserFeed -Name "My User Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
+    [alias("Get-DwImportUserFeed")]
     [CmdletBinding(DefaultParameterSetName="Name")]
     param (
         [Parameter(Mandatory=$false)]

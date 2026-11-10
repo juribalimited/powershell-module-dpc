@@ -1,5 +1,4 @@
 function Set-JuribaTaskValueDate {
-    [alias("Set-DwTaskValueDate")]
     <#
         .SYNOPSIS
         Updates a project date task.
@@ -28,6 +27,7 @@ function Set-JuribaTaskValueDate {
         .EXAMPLE
         PS> Set-JuribaTaskValueDate -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85 -Value '2022-01-01' -SlotId 34
     #>
+    [alias("Set-DwTaskValueDate")]
 
     [CmdletBinding(DefaultParameterSetName = "ByTaskId", SupportsShouldProcess)]
     param(

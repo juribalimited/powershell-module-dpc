@@ -1,6 +1,5 @@
 #requires -Version 7
 function Get-JuribaImportDepartmentFeed {
-    [alias("Get-DWImportDepartmentFeed")]
     <#
         .SYNOPSIS
         Gets department imports.
@@ -20,6 +19,7 @@ function Get-JuribaImportDepartmentFeed {
         .EXAMPLE
         PS> Get-JuribaImportDepartmentFeed -Name "My Department Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
     #>
+    [alias("Get-DWImportDepartmentFeed")]
     [CmdletBinding(DefaultParameterSetName="Name")]
     param (
         [Parameter(Mandatory=$false)]

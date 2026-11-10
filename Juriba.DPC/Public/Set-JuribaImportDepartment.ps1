@@ -1,6 +1,5 @@
 #Requires -Version 7
 function Set-JuribaImportDepartment {
-    [alias("Set-DwImportDepartment")]
     <#
         .SYNOPSIS
         Updates a department in the import API. Provide a list of JSON objects in request payload to use bulk functionality (Max 1000 objects per request).
@@ -33,6 +32,7 @@ function Set-JuribaImportDepartment {
         PS> Set-JuribaImportDepartment -ImportId 1 -Name "w123abc" -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
 
     #>
+    [alias("Set-DwImportDepartment")]
 
     [CmdletBinding(SupportsShouldProcess)]
     param (

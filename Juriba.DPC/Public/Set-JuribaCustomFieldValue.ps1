@@ -1,6 +1,4 @@
 function Set-JuribaCustomFieldValue {
-    [alias("Update-JuribaCustomFieldValue")]
-    [alias("Update-DWCustomFieldValue")]
     <#
 		.SYNOPSIS
 		Updates custom field value.
@@ -25,6 +23,8 @@ function Set-JuribaCustomFieldValue {
 		.EXAMPLE
 		PS> Set-JuribaCustomFieldValue @dwparams -CSVColumnHeader "W11 Path" -Value "W11 Device Upgrade" -ObjectKey 100 -ObjectType Device
     #>
+    [alias("Update-JuribaCustomFieldValue")]
+    [alias("Update-DWCustomFieldValue")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory = $false)]

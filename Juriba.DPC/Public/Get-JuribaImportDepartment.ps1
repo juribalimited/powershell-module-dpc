@@ -1,5 +1,4 @@
 function Get-JuribaImportDepartment {
-    [alias("Get-DwImportDepartment")]
     <#
         .SYNOPSIS
         Gets one or more departments from the import API.
@@ -52,6 +51,7 @@ function Get-JuribaImportDepartment {
         PS> Get-JuribaImportDepartment -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Name, 'zxy123456@x.com')"
 
          #>
+    [alias("Get-DwImportDepartment")]
 
     [CmdletBinding(DefaultParameterSetName="Default")]
     param (

@@ -1,5 +1,4 @@
 function New-JuribaDashboardCardWidget {
-    [alias("New-DwDashboardCardWidget")]
     <#
         .SYNOPSIS
         Creates a new dashboard card widget.
@@ -30,6 +29,7 @@ function New-JuribaDashboardCardWidget {
         .EXAMPLE
         PS> New-JuribaDashboardCardWidget @dwparam -DashboardId 1 -SectionId 2 -Title "Windows 11 Upgrade Scope" -ListId 2 -AggregateFunction "Count" -AggregateBy "" -ColourTemplate 1
     #>
+    [alias("New-DwDashboardCardWidget")]
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory=$false)]
