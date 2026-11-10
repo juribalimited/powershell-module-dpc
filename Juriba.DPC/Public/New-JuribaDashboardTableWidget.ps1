@@ -5,7 +5,7 @@ function New-JuribaDashboardTableWidget {
         .DESCRIPTION
         Creates a new dashboard table widget using the Dashworks API v1, Supporting special characters in the naming.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER DashboardId
@@ -39,7 +39,7 @@ function New-JuribaDashboardTableWidget {
         .OUTPUTS
         widgetId
         .EXAMPLE
-        PS> New-JuribaDashboardTableWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Missed deployments after 10 days" -ListId 337 -SplitBy "project_task_1_15_2_Task" -OrderByField "Split Value" -ObjectType "Applications" -AggregateFunction "count" -MaximumValues 99 -OrientationIsVertical $true -splitByGroupDatesBy "Day"
+        PS> New-JuribaDashboardTableWidget -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -DashboardId 46 -SectionId 84 -Title "Missed deployments after 10 days" -ListId 337 -SplitBy "project_task_1_15_2_Task" -OrderByField "Split Value" -ObjectType "Applications" -AggregateFunction "count" -MaximumValues 99 -OrientationIsVertical $true -splitByGroupDatesBy "Day"
     #>
     [alias("New-DwDashboardTableWidget")]
     [CmdletBinding(SupportsShouldProcess)]

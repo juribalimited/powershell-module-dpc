@@ -31,7 +31,7 @@ function Set-JuribaDashboardAccessType {
         The API response from the PUT call.
  
         .EXAMPLE
-        PS> Set-JuribaDashboardAccessType -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxx" -DashboardId 654 -SharedAccessType SharedAllUsersReadOnly
+        PS> Set-JuribaDashboardAccessType -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -DashboardId 654 -SharedAccessType SharedAllUsersReadOnly
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param(

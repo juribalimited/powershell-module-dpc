@@ -10,7 +10,7 @@ function New-JuribaImportLocationFeed {
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -26,7 +26,7 @@ function New-JuribaImportLocationFeed {
 
         .EXAMPLE
 
-        PS> New-JuribaImportLocationFeed -Name "My New Import" -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> New-JuribaImportLocationFeed -Name "My New Import" -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
     [alias("New-DwImportLocationFeed")]

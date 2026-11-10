@@ -8,7 +8,7 @@ Function Set-JuribaListTeamUserAccess {
 
         .PARAMETER Instance
 
-        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.juriba.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -37,7 +37,7 @@ Function Set-JuribaListTeamUserAccess {
         .EXAMPLE
 
         PS> Set-JuribaListTeamUserAccess
-            -Instance "https://myinstance.juriba.app:8443"
+            -Instance "https://myinstance.dpc.juriba.app"
             -APIKey "xxxxx"
             -ObjectType "Device"
             -AccessType "Admin"

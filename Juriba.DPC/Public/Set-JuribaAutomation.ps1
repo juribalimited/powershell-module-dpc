@@ -5,7 +5,7 @@ function Set-JuribaAutomation {
         .DESCRIPTION
         Updates an automation using Dashworks API v1.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER AutomationId    
@@ -27,7 +27,7 @@ function Set-JuribaAutomation {
         .OUTPUTS
         AutomationId.
         .EXAMPLE
-        PS> Set-JuribaAutomation -Instance "https://myinstance.dashworks.app" -APIKey "xxxxx" -AutomationId 1 -Name "My Automation" -Description "Automation Description" -ListId 123 -IsActive $true -StopOnFailedAction $false -ObjectType Device -Schedule Manual
+        PS> Set-JuribaAutomation -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -AutomationId 1 -Name "My Automation" -Description "Automation Description" -ListId 123 -IsActive $true -StopOnFailedAction $false -ObjectType Device -Schedule Manual
     #>
     [alias("Set-DwAutomation")]
     [CmdletBinding(SupportsShouldProcess)]

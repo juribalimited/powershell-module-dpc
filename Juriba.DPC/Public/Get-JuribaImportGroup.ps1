@@ -13,7 +13,7 @@ function Get-JuribaImportGroup {
 
         .PARAMETER Instance
 
-        Optional. Instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.platform.juriba.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -47,16 +47,16 @@ function Get-JuribaImportGroup {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-JuribaImportGroup -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
+        PS> Get-JuribaImportGroup -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -InfoLevel "Full"
 
         .EXAMPLE
-        PS> Get-JuribaImportGroup -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
+        PS> Get-JuribaImportGroup -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
 
         .EXAMPLE
-        PS> Get-JuribaImportGroup -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Name "wabc123"
+        PS> Get-JuribaImportGroup -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -Name "wabc123"
 
         .EXAMPLE
-        PS> Get-JuribaImportGroup -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(domain, 'zxy123456')"
+        PS> Get-JuribaImportGroup -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -Filter "eq(domain, 'zxy123456')"
 
          #>
 

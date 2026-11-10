@@ -5,7 +5,7 @@ function New-JuribaDashboardHalfDonutWidget {
         .DESCRIPTION
         Creates a new dashboard half donut widget using the Dashworks API v1, Supporting special characters in the naming.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER DashboardId
@@ -37,7 +37,7 @@ function New-JuribaDashboardHalfDonutWidget {
         .OUTPUTS
         widgetId
         .EXAMPLE
-        PS> New-JuribaDashboardHalfDonutWidget @dwparams -DashboardId 46 -SectionId 84 -Title "No Path Assigned" -ListId 337 -SplitBy "chassisCategory" -OrderByField "Aggregate Value" -OrderByDescending $true -AggregateFunction "count" -MaximumValues 100 -Legend "Bottom"
+        PS> New-JuribaDashboardHalfDonutWidget -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -DashboardId 46 -SectionId 84 -Title "No Path Assigned" -ListId 337 -SplitBy "chassisCategory" -OrderByField "Aggregate Value" -OrderByDescending $true -AggregateFunction "count" -MaximumValues 100 -Legend "Bottom"
     #>
     [alias("New-DwDashboardHalfDonutWidget")]
     [CmdletBinding(SupportsShouldProcess)]

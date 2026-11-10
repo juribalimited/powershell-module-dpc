@@ -6,7 +6,7 @@ function Set-JuribaTaskValueDate {
         Updates a project task. This cannot be used to clear the date value.
         Takes TaskId, ProjectId, ObjectKey, Value and SlotId (optional) as inputs.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER TaskId
@@ -25,7 +25,7 @@ function Set-JuribaTaskValueDate {
         The type of object being updated.
 
         .EXAMPLE
-        PS> Set-JuribaTaskValueDate -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85 -Value '2022-01-01' -SlotId 34
+        PS> Set-JuribaTaskValueDate -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ObjectKey 12345 -ObjectType Device -TaskId 123 -ProjectId 85 -Value '2022-01-01' -SlotId 34
     #>
     [alias("Set-DwTaskValueDate")]
 

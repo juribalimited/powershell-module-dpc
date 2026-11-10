@@ -41,7 +41,7 @@ function Set-JuribaCustomField {
         None.
 
         .EXAMPLE
-        PS> Set-JuribaCustomField -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxx" -CustomFieldId 42 -ObjectTypes Device, User -IsActive $false
+        PS> Set-JuribaCustomField -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -CustomFieldId 42 -ObjectTypes Device, User -IsActive $false
 
         .EXAMPLE
         PS> Set-JuribaCustomField -CustomFieldId 42 -Name "Warranty End Date" -AllowExternalUpdate $false

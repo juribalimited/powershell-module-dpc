@@ -5,7 +5,7 @@ function Remove-JuribaCapacityUnit {
         .DESCRIPTION
         Delete the capacity unit using API v1
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER UnitID
@@ -13,7 +13,7 @@ function Remove-JuribaCapacityUnit {
         .OUTPUTS
         The selected unit has been deleted
         .EXAMPLE
-        PS> Remove-JuribaCapacityUnit @DwParams -UnitID 1
+        PS> Remove-JuribaCapacityUnit -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -UnitID 1
     #>
     [alias("Remove-DwCapacityUnit")]
     [CmdletBinding(SupportsShouldProcess)]

@@ -5,16 +5,16 @@ function Get-JuribaEvergreenSelfServicePage {
     .DESCRIPTION
     Gets pages for existing self services using Dashworks API v1.
     .PARAMETER Instance
-    Dashworks instance. For example, https://myinstance.dashworks.app:8443
+    Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
     .PARAMETER APIKey
-    Dashworks API Key.
+    Optional. API key to be provided if not authenticating using Connect-Juriba.
     .PARAMETER serviceId
     serviceId for the self service being edited.
     .OUTPUTS
     Self service page objects
     pageId, serviceId, objectTypeId, order, name, displayName, showInSelfService, listId, userListId, isPageInteractive, pageStatusId, pageStatusName, isPageInvalid, nextPageId, previousPageId, components
     .EXAMPLE
-    PS> Get-JuribaEvergreenSelfServicePage @dwparams -serviceId 15
+    PS> Get-JuribaEvergreenSelfServicePage -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -serviceId 15
     #>							  
     [alias("Get-DwEvergreenSelfServicePage")]
     param(

@@ -5,9 +5,9 @@ function Set-JuribaEvergreenSelfService {
         .DESCRIPTION
         Updates the Evergreen SelfService using Dashworks API v1.
         .PARAMETER Instance
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ServiceID
         ServiceID for the self service.
         .PARAMETER ScopeID
@@ -23,7 +23,7 @@ function Set-JuribaEvergreenSelfService {
         .OUTPUTS
         Self service details have updated successfully
         .EXAMPLE
-        PS> Set-JuribaEvergreenSelfService @dwparams -ServiceID 20 -ScopeID 115 -ServiceName 'W11 Deployment' -ServiceShortName 'W11-App' -ObjectType 'Device' -Enabled $true
+        PS> Set-JuribaEvergreenSelfService -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ServiceID 20 -ScopeID 115 -ServiceName 'W11 Deployment' -ServiceShortName 'W11-App' -ObjectType 'Device' -Enabled $true
     #>
     [alias("Set-DwEvergreenSelfService")]
     [CmdletBinding(SupportsShouldProcess)]

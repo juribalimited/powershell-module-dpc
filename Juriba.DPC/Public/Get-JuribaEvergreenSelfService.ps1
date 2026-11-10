@@ -5,14 +5,14 @@ function Get-JuribaEvergreenSelfService {
         .DESCRIPTION
         Gets a list of Evergreen self services using Dashworks API v1.
         .PARAMETER Instance
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
         .OUTPUTS
         Self service objects
         serviceId, name, serviceShortName, enabled, objectType, objectTypeId, creationDate, selfServiceUrl, allowAnonymousUsers, scopeId, scopeName, scopeNameUrlParameter, interactiveComponentCount, scopeNameQueryParameters, scopeLinkAvailable, createdByUser, selfServiceLink, pageIds, completionStatus, objectGuid, scopeIsBroken
         .EXAMPLE
-        PS> Get-JuribaEvergreenSelfService @dwparams
+        PS> Get-JuribaEvergreenSelfService -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
     #> 
     [alias("Get-DwEvergreenSelfService")]
     param(

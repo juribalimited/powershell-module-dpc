@@ -9,15 +9,15 @@ function Connect-Juriba {
 
         .PARAMETER APIKey
 
-        Optional. API key to be provided if not authenticating using Connect-Juriba.
+        API key for the Juriba instance.
 
         .PARAMETER Instance
 
-        Dashworks instance with specified port e.g. "https://myinstance.dashworks.app:8443
+        Juriba instance to connect to. For example, https://myinstance.dpc.juriba.app
 
         .EXAMPLE
 
-        PS> Connect-Juriba -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Connect-Juriba -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidGlobalVars", "")]

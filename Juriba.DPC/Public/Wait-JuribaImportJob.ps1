@@ -10,7 +10,7 @@ function Wait-JuribaImportJob {
 
         .PARAMETER Instance
 
-        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -28,12 +28,12 @@ function Wait-JuribaImportJob {
         Job details object containing requestId, status, error, and result properties.
 
         .EXAMPLE
-        PS> $jobUri = New-JuribaImportDevice @DwParams -ImportId 1 -JsonBody $jsonBody -Async
-        PS> $result = Wait-JuribaImportJob @DwParams -JobUri $jobUri
+        PS> $jobUri = New-JuribaImportDevice -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -JsonBody $jsonBody -Async
+        PS> $result = Wait-JuribaImportJob -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -JobUri $jobUri
 
         .EXAMPLE
-        PS> $jobUris = foreach ($batch in $batches) { New-JuribaImportDevice @DwParams -ImportId 1 -JsonBody $batch -Async }
-        PS> $results = $jobUris | ForEach-Object { Wait-JuribaImportJob @DwParams -JobUri $_ }
+        PS> $jobUris = foreach ($batch in $batches) { New-JuribaImportDevice -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -JsonBody $batch -Async }
+        PS> $results = $jobUris | ForEach-Object { Wait-JuribaImportJob -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -JobUri $_ }
 
     #>
 

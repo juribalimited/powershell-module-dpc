@@ -5,7 +5,7 @@ function Set-JuribaTeam {
         .DESCRIPTION
         Update the team using API v1
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER TeamID
@@ -19,7 +19,7 @@ function Set-JuribaTeam {
         .OUTPUTS
         The team was successfully updated
         .EXAMPLE
-        PS> Set-JuribaTeam @DwParams -TeamID 1 -TeamName "A Team" -Description "A new team"
+        PS> Set-JuribaTeam -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -TeamID 1 -TeamName "A Team" -Description "A new team"
     #>
     [alias("Set-DwTeam")]
     [CmdletBinding(SupportsShouldProcess)]

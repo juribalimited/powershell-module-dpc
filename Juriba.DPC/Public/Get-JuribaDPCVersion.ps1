@@ -9,7 +9,7 @@ function Get-JuribaDPCVersion {
 
     .PARAMETER Instance
 
-    DPC instance with specified port e.g. "https://myinstance.dashworks.app:8443
+    Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
     .PARAMETER MinimumVersion
 
@@ -17,8 +17,8 @@ function Get-JuribaDPCVersion {
 
     .EXAMPLE
 
-    PS> Get-JuribaDPCVersion -Instance "https://myinstance.dashworks.app:8443"
-    PS> Get-JuribaDPCVersion -Instance "https://myinstance.dashworks.app:8443" -MinimumVersion "5.14"
+    PS> Get-JuribaDPCVersion -Instance "https://myinstance.dpc.juriba.app"
+    PS> Get-JuribaDPCVersion -Instance "https://myinstance.dpc.juriba.app" -MinimumVersion "5.14"
 
 #>
     [CmdletBinding()]

@@ -5,7 +5,7 @@ function Set-JuribaCapacitySlot {
         .DESCRIPTION
         Create a new capacity slot using API v1
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ProjectID
@@ -61,7 +61,7 @@ function Set-JuribaCapacitySlot {
         .OUTPUTS
         The capacity slot details have been updated
         .EXAMPLE
-        PS> Set-JuribaCapacityUnit -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -ProjectID 1 -SlotID 1 -SlotName "W11 Deployment Slot" -DisplayName "Mon - Fri" -CapacityType "Capacity Units" 
+        PS> Set-JuribaCapacityUnit -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ProjectID 1 -SlotID 1 -SlotName "W11 Deployment Slot" -DisplayName "Mon - Fri" -CapacityType "Capacity Units" 
             -ObjectType "Device" -TranslationsObject '[{\"languageId\":0,\"language\":\"English\",\"translatedString\":\"Mon - Fri\",\"isTranslated\":true,\"isDefault\":true}]' -SlotAvailableFrom $null 
             -SlotAvailableTo $null -SlotStartTime "" -SlotEndTime "" -Monday 50 -Tuesday 50 -Wednesday 50 -Thursday 50 -Friday 50 -Saturday 0 -Sunday 0 -RequestTypes "" -Teams "" -Tasks 17 -Units 2
     #>

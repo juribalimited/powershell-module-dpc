@@ -10,7 +10,7 @@ function Remove-JuribaImportDepartment {
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -25,7 +25,7 @@ function Remove-JuribaImportDepartment {
         ImportId for the department.
 
         .EXAMPLE
-        PS> Remove-JuribaImportDepartment -ImportId 1 -UniqueIdentifier "app123" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Remove-JuribaImportDepartment -ImportId 1 -UniqueIdentifier "app123" -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
     [alias("Remove-DwImportDepartment")]

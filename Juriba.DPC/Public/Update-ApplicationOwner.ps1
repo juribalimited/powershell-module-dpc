@@ -10,7 +10,7 @@ function Update-ApplicationOwner {
 		.DESCRIPTION
 		Export applications and users from DPC for use in Application Owner.
 		.PARAMETER DpcInstance
-		DPC instance. For example, https://myinstance.dashworks.app:8443
+		DPC instance. For example, https://myinstance.dpc.juriba.app
 		.PARAMETER DpcApiKey
 		DPC API Key.
 		.PARAMETER AoInstance
@@ -26,7 +26,7 @@ function Update-ApplicationOwner {
         .PARAMETER OutputBatchLength
         The maximum number of records sent in a single call to AOM.
 		.EXAMPLE
-		PS> Update-ApplicationOwner https://myinstance.dashworks.app:8443 pCyty***** https://myinstance.juriba.app hoF7k*****
+		PS> Update-ApplicationOwner -DpcInstance "https://myinstance.dpc.juriba.app" -DpcApiKey "xxxxx" -AoInstance "https://myinstance.juriba.app" -AoApiKey "xxxxx"
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param(

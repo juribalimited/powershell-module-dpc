@@ -5,14 +5,14 @@ function Get-JuribaTeam {
         .DESCRIPTION
         Returns all teams using API v1
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .OUTPUTS
         Team objects
         teamID, teamName, description, members, evergreenGroups, projectGroups, isDefault, defaultColumn
         .EXAMPLE
-        PS> Get-JuribaTeam @DwParams
+        PS> Get-JuribaTeam -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
     #>
     [alias("Get-DwTeam")]
     param(

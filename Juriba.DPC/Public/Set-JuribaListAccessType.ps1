@@ -46,7 +46,7 @@ function Set-JuribaListAccessType {
         The API response from the PUT call (typically the string "Update success").
 
         .EXAMPLE
-        PS> Set-JuribaListAccessType -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxx" `
+        PS> Set-JuribaListAccessType -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" `
                 -ObjectType Device -ListId 1234 -ViewAccessType SpecificUserTeam
 
         .EXAMPLE

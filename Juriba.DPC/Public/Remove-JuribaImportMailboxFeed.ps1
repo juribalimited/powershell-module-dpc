@@ -10,7 +10,7 @@ function Remove-JuribaImportMailboxFeed {
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -22,11 +22,11 @@ function Remove-JuribaImportMailboxFeed {
 
         .EXAMPLE
 
-        PS> Remove-JuribaImportMailboxFeed -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Remove-JuribaImportMailboxFeed -ImportId 1 -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
         .EXAMPLE
 
-        PS> Remove-JuribaImportMailboxFeed -Confirm:$false -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Remove-JuribaImportMailboxFeed -Confirm:$false -ImportId 1 -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
     [alias("Remove-DwImportMailboxFeed")]

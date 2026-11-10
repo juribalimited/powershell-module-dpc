@@ -5,7 +5,7 @@ function New-JuribaAutomationAction {
         .DESCRIPTION
         Creates a new automation action using Dashworks API v1.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER Option
@@ -56,9 +56,9 @@ function New-JuribaAutomationAction {
         .OUTPUTS
         ActionId.
         .EXAMPLE
-        PS> New-JuribaAutomationAction -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -Option "ByParameterObject" -Name "Update Custom Field Value" -AutomationId 1 -TypeId 1 -ProjectId 1 -IsEvergreen $false
+        PS> New-JuribaAutomationAction -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -Option "ByParameterObject" -Name "Update Custom Field Value" -AutomationId 1 -TypeId 1 -ProjectId 1 -IsEvergreen $false
              -Parameter 'parameters=@(@{property="TaskId";value=11;meta="task"};@{property="Value";value=2;meta="Radiobutton"};@{property="ValueActionType";value=1;meta="Radiobutton"};)'
-        PS> New-JuribaAutomationAction -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx" -Option "ByType" -Name "Resync HWLC Owner" -AutomationId 1 -ProjectId 1 -IsEvergreen $false -Type "Resync" -isOwnerResync $true
+        PS> New-JuribaAutomationAction -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -Option "ByType" -Name "Resync HWLC Owner" -AutomationId 1 -ProjectId 1 -IsEvergreen $false -Type "Resync" -isOwnerResync $true
              
     #>
     [alias("New-DwAutomationAction")]

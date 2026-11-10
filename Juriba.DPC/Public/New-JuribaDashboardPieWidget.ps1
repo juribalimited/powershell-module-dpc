@@ -5,7 +5,7 @@ function New-JuribaDashboardPieWidget {
         .DESCRIPTION
         Creates a new dashboard pie widget using the Dashworks API v1, Supporting special characters in the naming.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER DashboardId
@@ -37,7 +37,7 @@ function New-JuribaDashboardPieWidget {
         .OUTPUTS
         widgetId
         .EXAMPLE
-        PS> New-JuribaDashboardPieWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Forecast next 7 days" -ListId 337 -SplitBy "locationName" -OrderByField "Aggregate Value" -OrderByDescending $false -AggregateFunction "count" -MaximumValues 100 -displayDataLabels $true -Legend "None"
+        PS> New-JuribaDashboardPieWidget -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -DashboardId 46 -SectionId 84 -Title "Forecast next 7 days" -ListId 337 -SplitBy "locationName" -OrderByField "Aggregate Value" -OrderByDescending $false -AggregateFunction "count" -MaximumValues 100 -displayDataLabels $true -Legend "None"
     #>
     [alias("New-DwDashboardPieWidget")]
     [CmdletBinding(SupportsShouldProcess)]

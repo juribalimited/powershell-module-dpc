@@ -5,15 +5,15 @@ function Remove-JuribaEvergreenSelfServicePortal {
 		.DESCRIPTION
 		Deletes a self service portal using Dashworks API v1.
 		.PARAMETER Instance
-		Dashworks instance. For example, https://myinstance.dashworks.app:8443
+		Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 		.PARAMETER APIKey
-		Dashworks API Key.
+		Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ServiceId
         ServiceID for the self service to be deleted.
         .OUTPUTS
         The self service portal has been deleted
 		.EXAMPLE
-		PS> Remove-JuribaEvergreenSelfServicePortal @dwparams -ServiceId 1
+		PS> Remove-JuribaEvergreenSelfServicePortal -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ServiceId 1
 	#>
     [alias("Remove-DwEvergreenSelfServicePortal")]						 
     [CmdletBinding(SupportsShouldProcess)]

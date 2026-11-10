@@ -5,9 +5,9 @@ function Get-JuribaEvergreenSelfServiceComponent {
         .DESCRIPTION
          Get the info of the self service component using Dashworks API v1.
         .PARAMETER Instance
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ServiceId
         ServiceId to get page information from.
         .PARAMETER PageId
@@ -16,8 +16,8 @@ function Get-JuribaEvergreenSelfServiceComponent {
         Components object
         componentId, pageId, componentTypeId, order, componentName, helpText, componentType, showInSelfService, isComponentInteractive, isComponentInvalid, componentErrorMessages, isReadOnlyForEndUser, childComponentCount, parentComponent, components, extraProperties
         .EXAMPLE
-        PS> Get-JuribaEvergreenSelfServiceComponent @dwparams -ServiceId 1
-        PS> Get-JuribaEvergreenSelfServiceComponent @dwparams -ServiceId 1 -PageId 7
+        PS> Get-JuribaEvergreenSelfServiceComponent -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ServiceId 1
+        PS> Get-JuribaEvergreenSelfServiceComponent -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ServiceId 1 -PageId 7
     #>
     [alias("Get-DwEvergreenSelfServiceComponent")]
     param(

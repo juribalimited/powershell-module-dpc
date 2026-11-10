@@ -10,7 +10,7 @@ function Remove-JuribaImportFeed {
 
         .PARAMETER Instance
 
-        Optional. DPC instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER Port
 
@@ -26,11 +26,11 @@ function Remove-JuribaImportFeed {
 
         .EXAMPLE
 
-        PS> Remove-JuribaImportFeed -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Remove-JuribaImportFeed -ImportId 1 -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
         .EXAMPLE
 
-        PS> Remove-JuribaImportFeed -Confirm:$false -ImportId 1 -Instance "myinstance.dashworks.app" -APIKey "xxxxx"
+        PS> Remove-JuribaImportFeed -Confirm:$false -ImportId 1 -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
     [CmdletBinding(

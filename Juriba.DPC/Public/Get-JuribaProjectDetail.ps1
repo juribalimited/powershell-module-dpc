@@ -5,7 +5,7 @@ function Get-JuribaProjectDetail {
         .DESCRIPTION
         Returns all project details using API v1
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ProjectID
@@ -14,7 +14,7 @@ function Get-JuribaProjectDetail {
         Project details object
         name, shortName, description, bucketModeId, ringModeId, capacityUnitModeId, showOriginalApplicationColumnOnApplicationDashboard, languageId, projectTypeId, capacityModeId, enableCapacity, enforceCapacityOnSelfService, enforceCapacityOnProjectObject, capacityToReachBeforeShowAmber, translations, isEvergreenProject, createdObjectsCount, languages, projectType
         .EXAMPLE
-        PS> Get-JuribaProjectDetail @DwParams -ProjectID 1
+        PS> Get-JuribaProjectDetail -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ProjectID 1
     #>
     [alias("Get-DwProjectDetail")]
     param(

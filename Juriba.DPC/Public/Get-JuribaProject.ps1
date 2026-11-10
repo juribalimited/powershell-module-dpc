@@ -6,14 +6,14 @@ function Get-JuribaProject {
         Returns all project details as an array.
         Takes no inputs except authentication
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .OUTPUTS
         Project objects
         projectName, shortName, active, projectType, projectTypeId, userScopeName, mailboxScopeName, deviceScopeName, applicationScopeName, isEmpty, isEvergreenProject, isEvergreenProjectColumn, objectTypeName, projectId, primaryObjectTypeId, includeDevices, deviceScopeListId, includeUsers, userScopeListId, includeApplications, applicationScopeListId, applicationAssociationDeviceOwnerScopeListId, applicationAssociationOwnedDeviceScopeListId, includeMailboxes, mailboxScopeListId, mailboxAssociationDeviceOwnerScopeListId, includeAppsInstalledOnDevice, includeAppsEntitledToDevice, includeAppsEntitledToUser, includeAppsUsedOnDeviceByAnyUser, includeAppsUsedOnDeviceByDeviceOwner, includeAppsUsedByUserOnAnyDevice, includeMailboxesOwnedByUser, includeMailboxesDelegatedToUser, includeMailboxOwner, includeMailboxDelegates, capacityUnitOnboardActionId, capacityUnitOnboardActionOverridable, autoOnboardScheduleTypeId, autoOnboardDevices, autoOffboardDevices, autoOnboardUsers, autoOffboardUsers, autoOnboardApplications, autoOffboardApplications, autoOnboardMailboxes, autoOffboardMailboxes, includeApplicationOwners, applicationOwnerScopeListId, applicationOwnerRequestTypeId, includeMailboxPermissionUsers, includeFolderPermissionUsers, autoOnboardSQLAgentJobName, evergreenProjectMailboxPermissions, objectType, capacityUnitOnboardAction, project
         .EXAMPLE
-        PS> Get-JuribaProject @DwParams
+        PS> Get-JuribaProject -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
     #>   
     [alias("Get-DwProject")]
     param (

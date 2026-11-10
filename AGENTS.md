@@ -65,7 +65,7 @@ function Verb-JuribaEntity {
         Description of what is returned.
 
         .EXAMPLE
-        PS> Verb-JuribaEntity -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxx" -ExampleParam "value"
+        PS> Verb-JuribaEntity -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ExampleParam "value"
     #>
     [CmdletBinding(SupportsShouldProcess)]  # Include SupportsShouldProcess for New/Set/Remove functions
     param(
@@ -152,4 +152,6 @@ if ($ver) {
 - `$PascalCase` for parameters
 - String formatting with `-f` operator (not string interpolation) for URI construction
 - Comment-based help must be the first thing inside the function body, before `[alias()]`, `[CmdletBinding()]` and any other attributes. Otherwise Get-Help ignores it. CI checks that every exported function has readable help
+- Help examples pass the connection explicitly with the standard dummy values: `-Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"`. Don't use undefined splats such as `@dwparams` or variables such as `$Instance`, so every example can be copied and run as-is
+- Describe `Instance` and `APIKey` with the exact wording in the template above
 - One function per file, filename matches function name exactly

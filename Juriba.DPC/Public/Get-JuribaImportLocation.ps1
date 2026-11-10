@@ -13,7 +13,7 @@ function Get-JuribaImportLocation {
 
         .PARAMETER Instance
 
-        Optional. Instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.platform.juriba.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -47,7 +47,7 @@ function Get-JuribaImportLocation {
         Default is Basic.
 
         .EXAMPLE
-        PS> Get-JuribaImportLocation -Instance "https://myinstance.platform.juriba.app:8443" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Region, 'EU')"
+        PS> Get-JuribaImportLocation -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -Filter "eq(Region, 'EU')"
 
          #>
     [alias("Get-DwImportLocation")]

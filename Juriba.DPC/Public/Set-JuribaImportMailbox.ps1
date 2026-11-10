@@ -10,7 +10,7 @@ function Set-JuribaImportMailbox {
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -29,7 +29,7 @@ function Set-JuribaImportMailbox {
         Json payload with updated mailbox details.
 
         .EXAMPLE
-        PS> Set-JuribaImportMailbox -ImportId 1 -UniqueIdentifier "w123abc" -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Set-JuribaImportMailbox -ImportId 1 -UniqueIdentifier "w123abc" -JsonBody $jsonBody -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
     [alias("Set-DwImportMailbox")]

@@ -7,7 +7,7 @@ function Get-JuribaCapacityUnit {
         Takes ProjectID as an input - returns for project if provided or 
         for evegreen AND project if not provided.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ProjectID
@@ -16,7 +16,7 @@ function Get-JuribaCapacityUnit {
         Capacity unit objects
         unitId, projectId, unitName, unitDescription, isDefault, sourceUnitId, capacityUnits1, capacityUnit1, projectObjects, capacitySlots, devices, users, mailboxes, applications, projectName, isDefaultColumn, slotsCount, sourceEvergreenUnitName, sourceEvergreenUnitId, objectKey, evergreenObjectId
         .EXAMPLE
-        PS> Get-JuribaCapacityUnit @dwparams -ProjectID 1
+        PS> Get-JuribaCapacityUnit -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ProjectID 1
     #>   
     [alias("Get-DwCapacityUnit")]
     param (

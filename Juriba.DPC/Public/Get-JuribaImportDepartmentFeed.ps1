@@ -7,7 +7,7 @@ function Get-JuribaImportDepartmentFeed {
         Gets one or more department feeds.
         Use ImportId to get a specific feed or omit for all feeds.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ImportId
@@ -15,9 +15,9 @@ function Get-JuribaImportDepartmentFeed {
         .PARAMETER Name
         Optional. Name of department feed to find. Can only be used when ImportId is not specified.
         .EXAMPLE
-        PS> Get-JuribaImportDepartmentFeed -ImportId 1 -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Get-JuribaImportDepartmentFeed -ImportId 1 -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
         .EXAMPLE
-        PS> Get-JuribaImportDepartmentFeed -Name "My Department Feed" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Get-JuribaImportDepartmentFeed -Name "My Department Feed" -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
     #>
     [alias("Get-DWImportDepartmentFeed")]
     [CmdletBinding(DefaultParameterSetName="Name")]

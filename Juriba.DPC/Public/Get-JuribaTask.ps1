@@ -5,9 +5,9 @@ function Get-JuribaTask {
         .DESCRIPTION
         Returns existing tasks using Dashworks API v2.
         .PARAMETER Instance
-        Dashworks instance. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
-        Dashworks API Key.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER ThrottleLimit
         Optional. Maximum number of pages to request concurrently on PowerShell 7+. Defaults to 8. Set to 1 to force sequential paging.
         .PARAMETER ProjectID
@@ -16,7 +16,7 @@ function Get-JuribaTask {
         Project tasks objects
         id, name, help, stage, objectType, role, showDetailsAboutLastChangeNextToTask, hideCapacitySlotsOnSelfServiceWhenOnlyOneSlot, enabled, taskType, readOnly, languages, paths
         .EXAMPLE
-        PS> Get-JuribaTask @dwparams -ProjectID 1
+        PS> Get-JuribaTask -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ProjectID 1
     #>
     [alias("Get-DwTask")]
     param(

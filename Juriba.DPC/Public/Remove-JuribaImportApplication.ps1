@@ -10,7 +10,7 @@ function Remove-JuribaImportApplication {
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -29,10 +29,10 @@ function Remove-JuribaImportApplication {
         Optional. Json payload for bulk deletion. Provide an array of URI strings for each object to be deleted (Max 1000 objects per request).
 
         .EXAMPLE
-        PS> Remove-JuribaImportApplication -ImportId 1 -UniqueIdentifier "app123" -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Remove-JuribaImportApplication -ImportId 1 -UniqueIdentifier "app123" -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
         .EXAMPLE
-        PS> Remove-JuribaImportApplication -ImportId 1 -JsonBody $jsonBody -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Remove-JuribaImportApplication -ImportId 1 -JsonBody $jsonBody -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
     [alias("Remove-DwImportApplication")]

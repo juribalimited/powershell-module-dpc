@@ -5,7 +5,7 @@ function New-JuribaDashboardListWidget {
         .DESCRIPTION
         Creates a new dashboard list widget using the Dashworks API v1, Supporting special characters in the naming.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER DashboardId
@@ -25,7 +25,7 @@ function New-JuribaDashboardListWidget {
         .OUTPUTS
         widgetId
         .EXAMPLE
-        PS> New-JuribaDashboardListWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Today's Direct Ships" -ListId 337 -maxRows 1000 -maxColumns 10
+        PS> New-JuribaDashboardListWidget -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -DashboardId 46 -SectionId 84 -Title "Today's Direct Ships" -ListId 337 -maxRows 1000 -maxColumns 10
     #>
     [alias("New-DwDashboardListWidget")]
     [CmdletBinding(SupportsShouldProcess)]

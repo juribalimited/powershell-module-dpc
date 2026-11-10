@@ -10,7 +10,7 @@ Function Invoke-JuribaAutomation {
 
     .PARAMETER Instance
 
-    Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+    Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
     .PARAMETER APIKey
 
@@ -30,7 +30,7 @@ Function Invoke-JuribaAutomation {
 
     .EXAMPLE
 
-    PS> Invoke-JuribaAutomation -Instance "https://myinstance.dashworks.app" -APIKey "xxxxx" -Ids @(1,2,3)
+    PS> Invoke-JuribaAutomation -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -Ids @(1,2,3)
     #>
     [alias("Invoke-DwAutomation")]
 

@@ -9,7 +9,7 @@ function Export-JuribaList {
 
         .PARAMETER Instance
 
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
@@ -25,7 +25,7 @@ function Export-JuribaList {
 
         .EXAMPLE
 
-        PS> Export-JuribaList -ListId 1234 -ObjectType Device -Instance "https://myinstance.dashworks.app:8443" -APIKey "xxxxx"
+        PS> Export-JuribaList -ListId 1234 -ObjectType Device -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
     #>
     [alias("Export-DwList")]
 

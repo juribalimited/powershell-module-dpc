@@ -5,7 +5,7 @@ function New-JuribaDashboardBarWidget {
         .DESCRIPTION
         Creates a new dashboard bar widget using the Dashworks API v1, Supporting special characters in the naming.
         .PARAMETER Instance
-        Optional. Dashworks instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dashworks.app:8443
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
         .PARAMETER APIKey
         Optional. API key to be provided if not authenticating using Connect-Juriba.
         .PARAMETER DashboardId
@@ -43,7 +43,7 @@ function New-JuribaDashboardBarWidget {
         .OUTPUTS
         widgetId
         .EXAMPLE
-        PS> New-JuribaDashboardBarWidget @dwparams -DashboardId 46 -SectionId 84 -Title "Device exceptions by reason/Location" -ListId 337 -SplitBy "project_task_4_49_2_Task" -OrderByField "Aggregate Value" -OrderByDescending $true -AggregateFunction "count" -CategoriseByMaximumValues 30 -Legend "Top" -splitByGroupDatesBy "None" -splitByIncludeEmptyDates $true
+        PS> New-JuribaDashboardBarWidget -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -DashboardId 46 -SectionId 84 -Title "Device exceptions by reason/Location" -ListId 337 -SplitBy "project_task_4_49_2_Task" -OrderByField "Aggregate Value" -OrderByDescending $true -AggregateFunction "count" -CategoriseByMaximumValues 30 -Legend "Top" -splitByGroupDatesBy "None" -splitByIncludeEmptyDates $true
     #>
     [alias("New-DwDashboardBarWidget")]
     [CmdletBinding(SupportsShouldProcess)]
