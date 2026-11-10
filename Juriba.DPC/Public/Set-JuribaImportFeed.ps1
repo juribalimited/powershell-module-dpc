@@ -33,7 +33,6 @@ function Set-JuribaImportFeed {
         PS> Set-JuribaImportFeed -ImportId 1 -Name "My New Import Name" -Enabled $false -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
-    [alias("Set-DwImportDeviceFeed")]
     [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory=$false)]

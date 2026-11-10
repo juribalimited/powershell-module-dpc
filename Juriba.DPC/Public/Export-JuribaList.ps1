@@ -23,6 +23,10 @@ function Export-JuribaList {
 
         Object type of the list. One of Device, User, Application, Mailbox
 
+        .PARAMETER PageSize
+
+        Optional. Number of records to request per page. If omitted or 0, the list is requested in a single call without paging.
+
         .EXAMPLE
 
         PS> Export-JuribaList -ListId 1234 -ObjectType Device -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"

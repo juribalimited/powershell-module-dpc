@@ -6,11 +6,23 @@ Function Remove-JuribaTag {
 
     .DESCRIPTION
 
-    Deletes a list tag using Dashworks API v1.
+    Deletes a list tag using Dashworks API v1. The tag is removed from all lists.
+
+    .PARAMETER Instance
+
+    Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
+
+    .PARAMETER APIKey
+
+    Optional. API key to be provided if not authenticating using Connect-Juriba.
+
+    .PARAMETER Tag
+
+    Name of the tag to delete.
 
     .EXAMPLE
 
-    PS> Remove-JuribaTag-Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -Tag 123 -Confirm:$false
+    PS> Remove-JuribaTag -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -Tag "W11 Pilot" -Confirm:$false
 
     #>
     [alias("Remove-DwTag")]

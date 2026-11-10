@@ -29,7 +29,7 @@ function Set-JuribaImportUser {
         Json payload with updated user details.
 
         .EXAMPLE
-        PS> Set-JuribaImportUser -ImportId 1 -Useranme "w123abc" -JsonBody $jsonBody -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
+        PS> Set-JuribaImportUser -ImportId 1 -UniqueIdentifier "jsmith" -JsonBody $jsonBody -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
     [alias("Set-DwImportUser")]

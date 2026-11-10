@@ -1,3 +1,4 @@
+#requires -Version 7
 function Get-JuribaEvergreenSelfServiceComponent {
     <#
         .SYNOPSIS
@@ -31,28 +32,37 @@ function Get-JuribaEvergreenSelfServiceComponent {
         [int]$PageId
     )
 
-    $headers = @{'x-api-key' = $APIKey }
-    $uri = "{0}/apiv1/admin/selfservices/{1}/pages" -f $Instance, $ServiceId
-    
-    #Try to create SS component
-    try {
-        $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType 'application/json'
-        if($result.StatusCode -eq 200) {
-            $resulttable = $result.Content | ConvertFrom-Json
+    if ((Get-Variable 'dwConnection' -Scope 'Global' -ErrorAction 'Ignore') -and !$APIKey -and !$Instance) {
+        $APIKey = ConvertFrom-SecureString -SecureString $dwConnection.secureAPIKey -AsPlainText
+        $Instance = $dwConnection.instance
+    }
 
-            if($PageId -gt 0) {
-                [array]$results = ($resulttable | Where-Object {$_.pageId -eq $PageId}).components
-                $results += ($resulttable | Where-Object {$_.pageId -eq $PageId}).components.components
-                return $results                    
-            }
-            else {
-                [array]$results = $resulttable.components
-                $results += $resulttable.components.components
-                return $results
+    if ($APIKey -and $Instance) {
+        $headers = @{'x-api-key' = $APIKey }
+        $uri = "{0}/apiv1/admin/selfservices/{1}/pages" -f $Instance, $ServiceId
+    
+        #Try to create SS component
+        try {
+            $result = Invoke-WebRequest -Uri $uri -Method GET -Headers $headers -ContentType 'application/json'
+            if($result.StatusCode -eq 200) {
+                $resulttable = $result.Content | ConvertFrom-Json
+
+                if($PageId -gt 0) {
+                    [array]$results = ($resulttable | Where-Object {$_.pageId -eq $PageId}).components
+                    $results += ($resulttable | Where-Object {$_.pageId -eq $PageId}).components.components
+                    return $results                    
+                }
+                else {
+                    [array]$results = $resulttable.components
+                    $results += $resulttable.components.components
+                    return $results
+                }
             }
         }
-    }
-    catch {
-        Write-Error $_
+        catch {
+            Write-Error $_
+        }
+    } else {
+        Write-Error "No connection found. Please ensure `$APIKey and `$Instance is provided or connect using Connect-Juriba before proceeding."
     }
 }

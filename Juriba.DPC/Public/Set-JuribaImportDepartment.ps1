@@ -29,7 +29,7 @@ function Set-JuribaImportDepartment {
         Json payload with updated department details.
 
         .EXAMPLE
-        PS> Set-JuribaImportDepartment -ImportId 1 -Name "w123abc" -JsonBody $jsonBody -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
+        PS> Set-JuribaImportDepartment -ImportId 1 -UniqueIdentifier "Finance" -JsonBody $jsonBody -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
 
     #>
     [alias("Set-DwImportDepartment")]

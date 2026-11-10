@@ -16,10 +16,6 @@ Function Invoke-JuribaAutomation {
 
     Optional. API key to be provided if not authenticating using Connect-Juriba.
 
-    .PARAMETER Name
-
-    Name of the new automation.
-
     .PARAMETER Ids
 
     Array of Automation Id's to run.

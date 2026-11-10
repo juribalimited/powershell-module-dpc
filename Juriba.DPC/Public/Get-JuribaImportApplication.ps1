@@ -12,11 +12,15 @@ function Get-JuribaImportApplication {
 
         .PARAMETER Instance
 
-        Juriba instance. For example, https://myinstance.dpc.juriba.app
+        Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
 
         .PARAMETER APIKey
 
-        API key for the Juriba instance.
+        Optional. API key to be provided if not authenticating using Connect-Juriba.
+
+        .PARAMETER PageSize
+
+        Optional. Number of records to request per page when returning more than one record. Defaults to 200.
 
         .PARAMETER ThrottleLimit
 
@@ -59,9 +63,9 @@ function Get-JuribaImportApplication {
     [OutputType([string])]
     [CmdletBinding(DefaultParameterSetName="Default")]
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$Instance,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [string]$APIKey,
         [Parameter(Mandatory=$false, ParameterSetName="UniqueIdentifier")]
         [string]$UniqueIdentifier,

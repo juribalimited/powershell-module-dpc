@@ -18,6 +18,10 @@ function Get-JuribaImportMailbox {
 
         Optional. API key to be provided if not authenticating using Connect-Juriba.
 
+        .PARAMETER PageSize
+
+        Optional. Number of records to request per page when returning more than one record. Defaults to 200.
+
         .PARAMETER ThrottleLimit
 
         Optional. Maximum number of pages to request concurrently on PowerShell 7+. Defaults to 8. Set to 1 to force sequential paging.
@@ -50,9 +54,6 @@ function Get-JuribaImportMailbox {
 
         .EXAMPLE
         PS> Get-JuribaImportMailbox -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -UniqueIdentifier "123456789" -InfoLevel "Basic"
-
-        .EXAMPLE
-        PS> Get-JuribaImportMailbox -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -Hostname "wabc123"
 
         .EXAMPLE
         PS> Get-JuribaImportMailbox -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ImportId 1 -Filter "eq(SerialNumber, 'zxy123456')"

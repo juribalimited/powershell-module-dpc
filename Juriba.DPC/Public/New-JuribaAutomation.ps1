@@ -50,7 +50,7 @@ Function New-JuribaAutomation {
 
     .EXAMPLE
 
-    PS> New-JuribaAutomation -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -Name "My New Automation" -Description "Automation Description" -Active $true -StopOnFailedAction $false -ListId 123 -ObjectType Device -Schedule Manual
+    PS> New-JuribaAutomation -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -Name "My New Automation" -Description "Automation Description" -IsActive $true -StopOnFailedAction $false -ListId 123 -ObjectType Device -Schedule Manual
 
     #>
     [alias("New-DwAutomation")]

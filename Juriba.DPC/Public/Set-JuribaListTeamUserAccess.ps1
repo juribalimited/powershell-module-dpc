@@ -34,6 +34,10 @@ Function Set-JuribaListTeamUserAccess {
 
         Sets the TeamID for the Team for Access to be set fro the list.
 
+        .PARAMETER UserId
+
+        Sets the UserId for the User for Access to be set for the list. Used when UserTeam is "User".
+
         .EXAMPLE
 
         PS> Set-JuribaListTeamUserAccess
@@ -79,7 +83,7 @@ Function Set-JuribaListTeamUserAccess {
             "ApplicationUser" { throw "not implemented" }
             "ApplicationDevice" { throw "not implemented" }
             "Device" { $endpoint = "devices"}
-            "User" { $endpoint = "users "}
+            "User" { $endpoint = "users"}
             "Application" { $endpoint = "applications" }
             "Mailbox" { $endpoint = "mailboxes" }
         }

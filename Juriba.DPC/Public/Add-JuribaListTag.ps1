@@ -8,6 +8,30 @@ Function Add-JuribaListTag {
 
     Adds an existing tag to a list using Dashworks API v1.
 
+    .PARAMETER Instance
+
+    Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
+
+    .PARAMETER APIKey
+
+    Optional. API key to be provided if not authenticating using Connect-Juriba.
+
+    .PARAMETER ObjectType
+
+    Object type of the list. Accepts one of: "Device", "User", "Application", "Mailbox". "ApplicationUser" and "ApplicationDevice" are accepted but not implemented.
+
+    .PARAMETER ListId
+
+    Id of the list to add the tag to.
+
+    .PARAMETER Tag
+
+    Name of an existing tag to add to the list. Use New-JuribaTag to create a tag first.
+
+    .EXAMPLE
+
+    PS> Add-JuribaListTag -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -ObjectType "Device" -ListId 123 -Tag "W11 Pilot"
+
     #>
     [alias("Add-DwListTag")]
 
@@ -37,7 +61,7 @@ Function Add-JuribaListTag {
             "ApplicationUser" { throw "not implemented" }
             "ApplicationDevice" { throw "not implemented" }
             "Device" { $endpoint = "devices" }
-            "User" { $endpoint = "users " }
+            "User" { $endpoint = "users" }
             "Application" { $endpoint = "applications" }
             "Mailbox" { $endpoint = "mailboxes" }
         }

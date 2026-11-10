@@ -8,6 +8,18 @@ Function Get-JuribaTag {
 
     Returns existing list tags using Dashworks API v1.
 
+    .PARAMETER Instance
+
+    Optional. Juriba instance to be provided if not authenticating using Connect-Juriba. For example, https://myinstance.dpc.juriba.app
+
+    .PARAMETER APIKey
+
+    Optional. API key to be provided if not authenticating using Connect-Juriba.
+
+    .EXAMPLE
+
+    PS> Get-JuribaTag -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx"
+
     #>
     [alias("Get-DwTag")]
 
