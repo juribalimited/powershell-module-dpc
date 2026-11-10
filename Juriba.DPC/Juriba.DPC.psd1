@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.DPC.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.1.20.0'
+    ModuleVersion     = '1.1.21.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -86,6 +86,9 @@
         'Get-JuribaDashboard',
         'Get-JuribaDPCVersion',
         'Get-JuribaETLJob',
+        'Get-JuribaEventLog',
+        'Get-JuribaEventLogRun',
+        'Get-JuribaEventLogService',
         'Get-JuribaEvergreenSelfService',
         'Get-JuribaEvergreenSelfServiceBaseURL',
         'Get-JuribaEvergreenSelfServiceComponent',
@@ -96,9 +99,6 @@
         'Get-JuribaImportDepartmentFeed',
         'Get-JuribaImportDevice',
         'Get-JuribaImportDeviceFeed',
-        'Get-JuribaEventLogRuns',
-        'Get-JuribaEventLogs',
-        'Get-JuribaEventLogServices',
         'Get-JuribaImportFeed',
         'Get-JuribaImportGroup',
         'Get-JuribaImportLocation',
@@ -196,6 +196,7 @@
         'Set-JuribaCapacitySlot',
         'Set-JuribaCapacityUnit',
         'Set-JuribaCustomField',
+        'Set-JuribaCustomFieldValue',
         'Set-JuribaDashboardAccessType',
         'Set-JuribaDashboardSection',
         'Set-JuribaDashboardTeamUserAccess',
@@ -226,7 +227,6 @@
         'Start-JuribaETLJob',
         'Stop-JuribaETLJob',
         'Update-ApplicationOwner',
-        'Set-JuribaCustomFieldValue',
         'Wait-JuribaImportJob'
     )
 
