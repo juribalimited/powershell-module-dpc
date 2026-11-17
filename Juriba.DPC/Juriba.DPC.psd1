@@ -12,7 +12,7 @@
     RootModule        = 'Juriba.DPC.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.1.24.0'
+    ModuleVersion     = '1.1.25.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -76,6 +76,7 @@
         'Connect-Juriba',
         'Disconnect-Juriba',
         'Export-JuribaList',
+        'Export-JuribaListDefinition',
         'Get-JuribaApplicationV1',
         'Get-JuribaAutomation',
         'Get-JuribaAutomationAction',
@@ -109,6 +110,9 @@
         'Get-JuribaImportUserFeed',
         'Get-JuribaImportVulnerability',
         'Get-JuribaList',
+        'Get-JuribaListField',
+        'Get-JuribaListFilter',
+        'Get-JuribaListFilterOption',
         'Get-JuribaProject',
         'Get-JuribaProjectCategory',
         'Get-JuribaProjectDetail',
@@ -119,6 +123,7 @@
         'Get-JuribaTask',
         'Get-JuribaTaskBulkUpdateLog',
         'Get-JuribaTeam',
+        'Import-JuribaListDefinition',
         'Invoke-JuribaAutomation',
         'New-JuribaAutomation',
         'New-JuribaAutomationAction',
