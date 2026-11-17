@@ -34,7 +34,7 @@ Examples/            - Example scripts organized by integration type
 ## Function Naming
 
 - Pattern: `[Verb]-Juriba[Entity]` (e.g., `Get-JuribaTeam`, `New-JuribaImportDevice`)
-- Use approved PowerShell verbs: `Get`, `New`, `Set`, `Remove`, `Add`, `Connect`, `Disconnect`, `Invoke`, `Export`, `Start`, `Stop`, `Update`
+- Use approved PowerShell verbs: `Get`, `New`, `Set`, `Remove`, `Add`, `Connect`, `Disconnect`, `Invoke`, `Export`, `Import`, `Start`, `Stop`, `Update`
 - Existing functions have a legacy `Dw` alias from when the module was named `Juriba.Dashworks` (e.g., `[alias("Get-DwTeam")]`). New functions do not need an alias. Where a function has an alias, the `[alias()]` attribute goes after the comment-based help block, never before it.
 - The product is called **Juriba DPC** (not Dashworks). Use "Juriba DPC" in all new function descriptions and documentation. Existing functions may still reference "Dashworks" but new code should not.
 

@@ -128,7 +128,7 @@ Function New-JuribaList {
         $uri = "{0}/apiv1/lists/{1}"  -f  $instance, $endpoint
 
         if ($PSCmdlet.ShouldProcess($Name)) {
-            $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body $body -Method POST -ContentType $contentType
+            $result = Invoke-WebRequest -Uri $uri -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($body)) -Method POST -ContentType $contentType
 
             return ($result.content | ConvertFrom-Json)
         }

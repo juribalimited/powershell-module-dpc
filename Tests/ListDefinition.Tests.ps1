@@ -64,6 +64,15 @@ Describe 'List queryString parser' {
             (Get-FilterSegment '$filter=(1=0)' 'Filter') | Should -BeNullOrEmpty
         }
 
+        It 'ends an operator with no values at AND/OR' {
+            $qs = '$filter=(customField_1%20IS%20EMPTY%20AND%20isActive%20EQUALS%20TRUE%20OR%20hostname%20EQUALS%20(''a''))'
+            (Get-FilterSegment $qs 'Filter').Text | Should -Be @('customField_1', 'isActive', 'hostname')
+            $values = Get-FilterSegment $qs 'Value'
+            $values.Text | Should -Be @('a')
+            $values.Field | Should -Be @('hostname')
+            ConvertTo-JuribaListQueryString -Parameters (ConvertFrom-JuribaListQueryString -QueryString $qs) | Should -BeExactly $qs
+        }
+
         It 'unescapes doubled quotes in values' {
             (Get-FilterSegment '$filter=(hostname%20CONTAINS%20(''O''''Brien''))' 'Value').Text | Should -Be "O'Brien"
         }

@@ -114,7 +114,8 @@ function Split-JuribaListFilterExpression {
                 $w = $m
                 while ($w -lt $n -and [char]::IsUpper($s[$w])) { $w++ }
                 $isWord = ($w -gt $m) -and ($w -ge $n -or -not (& $isIdentChar $s[$w]))
-                if (-not $isWord) { break }
+                # AND/OR join conditions, so they end an operator that has no values, e.g. "IS EMPTY AND ...".
+                if (-not $isWord -or $s.Substring($m, $w - $m) -cin @('AND', 'OR')) { break }
                 $k = $w
             }
         }
@@ -152,7 +153,7 @@ function Split-JuribaListFilterExpression {
             }
             if ($i -lt $n) { [void]$text.Append(')'); $i++ }
         }
-        elseif ($s[$i] -ne ')') {
+        elseif ($s[$i] -ne ')' -and $s.Substring($i) -cnotmatch '^(AND|OR)(?=[\s(])') {
             # Single bare value, e.g. ">= 1" or "> 2025-03-07".
             $e = $i
             while ($e -lt $n -and -not [char]::IsWhiteSpace($s[$e]) -and $s[$e] -ne ')') { $e++ }

@@ -79,7 +79,7 @@ This checks every list against the target and writes the report without creating
 | InputPath | The export file | `.\lists.json` |
 | ReportPath | Where to write the CSV report | `.\list-import-report.csv` |
 | NameSuffix | Text added to every list name, e.g. `" (imported)"` | None |
-| Overwrite | Replace lists that already exist with the same name | Off |
+| Overwrite | Replace lists you already own with the same name and list type. Lists owned by other users are never changed | Off |
 | DryRun | Report only, create nothing | Off |
 
 ## Reading the report
@@ -89,8 +89,9 @@ This checks every list against the target and writes the report without creating
 | Created | The list was created. |
 | CreatedBroken | The list was created but DPC reports it as broken. Open it in DPC to check its filters. |
 | Updated | The list already existed and its definition was replaced (`-Overwrite`). |
-| Exists | A list with the same name already exists, so it was left alone. |
-| Skipped | Something the list uses doesn't exist on the target (see MissingReferences), a list it depends on wasn't imported, or the name with `NameSuffix` is longer than DPC's 50-character limit. See Reason. |
+| UpdatedBroken | The list's definition was replaced but DPC reports it as broken. |
+| Exists | You already own a list with the same name, so it was left alone. |
+| Skipped | Something the list uses doesn't exist on the target (see MissingReferences), a list it depends on wasn't imported, the name with `NameSuffix` is longer than DPC's 50-character limit, another list in the export has the same name, or the existing list can't be overwritten because it's a different list type. See Reason. |
 | Failed | The API call failed. See Reason. |
 | WhatIf | Dry run: the list would be created or updated. |
 

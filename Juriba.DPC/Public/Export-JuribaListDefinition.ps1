@@ -163,10 +163,19 @@ function Export-JuribaListDefinition {
         }
         $filterCache[$type]
     }
+    # Each filter's options, indexed by value, and whether the values are IDs rather than text.
+    # Only ID-valued filters need mapping. Where every option's value is its own text (e.g. OS
+    # names) the value is portable as-is.
     $getOptions = {
         param($optionsUrl)
         if (-not $optionCache.ContainsKey($optionsUrl)) {
-            $optionCache[$optionsUrl] = @(Get-JuribaListFilterOption @connection -OptionsUrl $optionsUrl -ErrorAction Stop)
+            $byValue = [System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::OrdinalIgnoreCase)
+            $idValued = $false
+            foreach ($option in @(Get-JuribaListFilterOption @connection -OptionsUrl $optionsUrl -ErrorAction Stop)) {
+                if (-not $byValue.ContainsKey([string]$option.Value)) { $byValue[[string]$option.Value] = $option }
+                if ($option.Value -ne 'NULL' -and $option.Value -cne $option.Text) { $idValued = $true }
+            }
+            $optionCache[$optionsUrl] = [pscustomobject]@{ ByValue = $byValue; IdValued = $idValued }
         }
         $optionCache[$optionsUrl]
     }
@@ -182,13 +191,14 @@ function Export-JuribaListDefinition {
         $queue.Enqueue($entry)
     }
 
-    try {
-        while ($queue.Count -gt 0) {
-            $entry = $queue.Dequeue()
-            $list = $entry.List
-            $id = [int]$list.listId
-            if ($exported.ContainsKey($id)) { continue }
-
+    # A failure on one list (e.g. an options call that errors) skips that list, not the whole export.
+    $failed = [System.Collections.Generic.HashSet[int]]::new()
+    while ($queue.Count -gt 0) {
+        $entry = $queue.Dequeue()
+        $list = $entry.List
+        $id = [int]$list.listId
+        if ($exported.ContainsKey($id) -or $failed.Contains($id)) { continue }
+        try {
             $fields = & $getFields $entry.ObjectType
             $filters = & $getFilters $entry.ObjectType
             $parameters = @(ConvertFrom-JuribaListQueryString -QueryString ([string]$list.queryString))
@@ -234,13 +244,10 @@ function Export-JuribaListDefinition {
                         if (-not $filter -or $segment.Text -eq 'NULL' -or -not $ref.ValuesSeen.Add($segment.Text)) { continue }
                         if ([string]$filter.OptionsUrl -notmatch '/filters/options/') { continue }
 
-                        # Only ID-valued filters need mapping. Where every option's value is its own
-                        # text (e.g. OS names) the value is portable as-is.
                         $options = & $getOptions $filter.OptionsUrl
-                        $idValued = $filter.IsSavedListFilter -or @($options | Where-Object { $_.Value -ne 'NULL' -and $_.Value -cne $_.Text }).Count -gt 0
-                        if (-not $idValued) { continue }
+                        if (-not ($filter.IsSavedListFilter -or $options.IdValued)) { continue }
 
-                        $option = $options | Where-Object { $_.Value -eq $segment.Text } | Select-Object -First 1
+                        $option = if ($options.ByValue.ContainsKey($segment.Text)) { $options.ByValue[$segment.Text] } else { $null }
                         if (-not $option) {
                             Write-Warning ("List '{0}': value '{1}' of filter '{2}' was not found on this instance; the list may be broken." -f $list.listName, $segment.Text, $filter.Name)
                         }
@@ -279,10 +286,10 @@ function Export-JuribaListDefinition {
             }
             $exportOrder.Add($id)
         }
-    }
-    catch {
-        Write-Error $_
-        return
+        catch {
+            [void]$failed.Add($id)
+            Write-Warning ("List '{0}' ({1}) was not exported: {2}" -f $list.listName, $id, $_)
+        }
     }
 
     # Order so that every list comes after the lists it depends on.

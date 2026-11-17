@@ -15,8 +15,10 @@ function Import-JuribaListDefinition {
         skipped and MissingReferences says what was missing. Lists that depend on a skipped list are
         skipped too. Nothing on this instance is created or changed apart from the lists themselves.
 
-        A list whose name already exists here for the same object type is left alone and reported as
-        Exists, unless -Overwrite is used, in which case its definition is replaced.
+        A list the API key's user already owns with the same name and object type is left alone and
+        reported as Exists, unless -Overwrite is used, in which case its definition is replaced. Only a
+        list of the same list type can be overwritten. Lists owned by other users are never matched or
+        changed, even if they are shared.
 
         New lists are owned by the user of the API key and are not shared. List sharing permissions are
         not imported.
@@ -36,7 +38,8 @@ function Import-JuribaListDefinition {
         Path to a JSON file saved from Export-JuribaListDefinition.
 
         .PARAMETER Overwrite
-        Replace the definition of lists that already exist with the same name and object type.
+        Replace the definition of lists the API key's user already owns with the same name, object type
+        and list type.
 
         .PARAMETER NameSuffix
         Optional. Text added to the end of every list name, for example " (imported)". The name with the
@@ -45,8 +48,9 @@ function Import-JuribaListDefinition {
 
         .OUTPUTS
         One object per list with SourceListId, ListName, ObjectType, Status, TargetListId, MissingReferences,
-        Reason and QueryString. Status is one of Created, CreatedBroken, Updated, Exists, Skipped, Failed or WhatIf.
-        CreatedBroken means the list was created but DPC reports it as broken.
+        Reason and QueryString. Status is one of Created, CreatedBroken, Updated, UpdatedBroken, Exists,
+        Skipped, Failed or WhatIf. CreatedBroken and UpdatedBroken mean the list was saved but DPC reports
+        it as broken.
 
         .EXAMPLE
         PS> Import-JuribaListDefinition -Instance "https://myinstance.dpc.juriba.app" -APIKey "xxxxx" -Path ".\lists.json" -WhatIf
@@ -110,11 +114,12 @@ function Import-JuribaListDefinition {
             (($signature -split '\|') | Where-Object { $_ }) -join ' > '
         }
 
-        # Target metadata by signature, and existing lists by name.
+        # Target metadata by signature, and the importing user's own lists by name.
         $fieldsBySig = @{}
         $filtersBySig = @{}
         $existing = @{}
         try {
+            $userId = [string](Get-JuribaSessionUser @connection -ErrorAction Stop).userId
             foreach ($type in $types) {
                 Write-Verbose ("Getting {0} list fields and filters" -f $type)
                 $f = @{}
@@ -129,8 +134,12 @@ function Import-JuribaListDefinition {
                     $f[$filter.Signature].Add($filter)
                 }
                 $filtersBySig[$type] = $f
+                # Lists other users have shared are left alone: they are never matched or overwritten.
                 foreach ($list in @(Get-JuribaList @connection -ObjectType $type -ErrorAction Stop)) {
-                    $existing[('{0}|{1}' -f $type, $list.listName.ToLowerInvariant())] = $list
+                    if ([string]$list.userId -ne $userId) { continue }
+                    $key = '{0}|{1}' -f $type, $list.listName.ToLowerInvariant()
+                    if (-not $existing.ContainsKey($key)) { $existing[$key] = [System.Collections.Generic.List[object]]::new() }
+                    $existing[$key].Add($list)
                 }
             }
         }
@@ -139,19 +148,37 @@ function Import-JuribaListDefinition {
             return
         }
 
+        # Each filter's options, indexed by path. Lists created by this import never need a fresh
+        # copy: values that point at them are mapped through $results instead.
         $optionCache = @{}
-        $savedListOptionUrls = [System.Collections.Generic.HashSet[string]]::new()
         $getOptions = {
             param($filter)
-            if ($filter.IsSavedListFilter) { [void]$savedListOptionUrls.Add($filter.OptionsUrl) }
             if (-not $optionCache.ContainsKey($filter.OptionsUrl)) {
-                $optionCache[$filter.OptionsUrl] = @(Get-JuribaListFilterOption @connection -OptionsUrl $filter.OptionsUrl -ErrorAction Stop)
+                $byPath = [System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::OrdinalIgnoreCase)
+                foreach ($option in @(Get-JuribaListFilterOption @connection -OptionsUrl $filter.OptionsUrl -ErrorAction Stop)) {
+                    $path = [string]$option.Path
+                    if (-not $byPath.ContainsKey($path)) { $byPath[$path] = [System.Collections.Generic.List[object]]::new() }
+                    $byPath[$path].Add($option)
+                }
+                $optionCache[$filter.OptionsUrl] = $byPath
             }
             $optionCache[$filter.OptionsUrl]
         }
 
-        $userId = $null
+        # Runs DPC's broken-list check. Returns the reason the list is broken, or nothing.
+        $testBroken = {
+            param($listId)
+            try {
+                $checkUri = "{0}/apiv1/lists/all/{1}/isListBrokenCommand?userAgnostic=true" -f $Instance, $listId
+                $null = Invoke-RestMethod -Uri $checkUri -Method PUT -Headers $headers -ContentType "application/json"
+            }
+            catch {
+                'DPC reports the list as broken: {0}' -f $_.Exception.Message
+            }
+        }
+
         $results = @{}
+        $namesUsed = [System.Collections.Generic.HashSet[string]]::new()
 
         foreach ($list in $lists) {
             $targetName = '{0}{1}' -f $list.listName, $NameSuffix
@@ -169,13 +196,41 @@ function Import-JuribaListDefinition {
 
             try {
                 $existingKey = '{0}|{1}' -f $list.objectType, $targetName.ToLowerInvariant()
-                $current = $existing[$existingKey]
+                if (-not $namesUsed.Add($existingKey)) {
+                    $result.Status = 'Skipped'
+                    $result.Reason = 'Another list in this import has the same name and object type. Rename one of them on the source.'
+                    Write-Output $result
+                    continue
+                }
+
+                $current = $null
+                if ($existing.ContainsKey($existingKey)) {
+                    if ($existing[$existingKey].Count -gt 1) {
+                        $result.Status = 'Skipped'
+                        $result.Reason = 'You already own {0} lists with this name, so it is not clear which one to use.' -f $existing[$existingKey].Count
+                        Write-Output $result
+                        continue
+                    }
+                    $current = $existing[$existingKey][0]
+                }
                 if ($current -and -not $Overwrite) {
                     $result.Status = 'Exists'
                     $result.TargetListId = $current.listId
-                    $result.Reason = 'A list with this name already exists. Use -Overwrite to replace it.'
+                    $result.Reason = 'You already own a list with this name. Use -Overwrite to replace it.'
                     Write-Output $result
                     continue
+                }
+
+                if ($current) {
+                    $isAssociation = $current.PSObject.Properties['isAssociationList'] -and $current.isAssociationList
+                    if ($current.listType -ne $list.listType -or $isAssociation) {
+                        $kind = if ($isAssociation) { 'an association list' } else { "a '{0}' list" -f $current.listType }
+                        $result.Status = 'Skipped'
+                        $result.TargetListId = $current.listId
+                        $result.Reason = "The existing list with this name is {0}, so it can't be overwritten with a '{1}' list." -f $kind, $list.listType
+                        Write-Output $result
+                        continue
+                    }
                 }
 
                 if (-not $current -and $targetName.Length -gt 50) {
@@ -241,7 +296,7 @@ function Import-JuribaListDefinition {
 
                     $values = @($filter.values)
                     if ($values.Count -eq 0) { continue }
-                    $options = if ([string]$target.OptionsUrl -match '/filters/options/') { & $getOptions $target } else { @() }
+                    $options = if ([string]$target.OptionsUrl -match '/filters/options/') { & $getOptions $target } else { @{} }
                     $map = @{}
                     foreach ($value in $values) {
                         # A saved list that is part of this import maps straight to its new id.
@@ -260,7 +315,7 @@ function Import-JuribaListDefinition {
                             $missing.Add(("Value '{0}' of filter '{1}' (not found on the source instance)" -f $value.value, (& $describe $filter.signature)))
                             continue
                         }
-                        $match = @($options | Where-Object { $_.Path -eq $value.path })
+                        $match = if ($options.ContainsKey([string]$value.path)) { @($options[[string]$value.path]) } else { @() }
                         if ($match.Count -eq 1) {
                             $map[[string]$value.value] = $match[0].Value
                         }
@@ -317,8 +372,13 @@ function Import-JuribaListDefinition {
                     $body['queryString'] = $queryString
                     $json = $body | ConvertTo-Json
                     $null = Invoke-RestMethod -Uri $uri -Method PUT -Headers $headers -ContentType "application/json" -Body ([System.Text.Encoding]::UTF8.GetBytes($json))
-                    $result.Status = 'Updated'
                     $result.TargetListId = $current.listId
+                    $result.Status = 'Updated'
+                    $broken = & $testBroken $current.listId
+                    if ($broken) {
+                        $result.Status = 'UpdatedBroken'
+                        $result.Reason = $broken
+                    }
                 }
                 else {
                     if (-not $PSCmdlet.ShouldProcess($targetName, "Create list")) {
@@ -326,28 +386,16 @@ function Import-JuribaListDefinition {
                         Write-Output $result
                         continue
                     }
-                    if (-not $userId) {
-                        $userId = (Get-JuribaSessionUser @connection -ErrorAction Stop).userId
-                    }
                     $created = New-JuribaList @connection -Name $targetName -UserId $userId -ListType $list.listType `
                         -QueryString $queryString -ObjectType $list.objectType -Confirm:$false -ErrorAction Stop
                     $result.TargetListId = $created.listId
-                    $existing[$existingKey] = $created
-
-                    # Ask DPC whether the new list is valid.
                     $result.Status = 'Created'
-                    try {
-                        $checkUri = "{0}/apiv1/lists/all/{1}/isListBrokenCommand?userAgnostic=true" -f $Instance, $created.listId
-                        $null = Invoke-RestMethod -Uri $checkUri -Method PUT -Headers $headers -ContentType "application/json"
-                    }
-                    catch {
+                    $broken = & $testBroken $created.listId
+                    if ($broken) {
                         $result.Status = 'CreatedBroken'
-                        $result.Reason = 'DPC reports the new list as broken: {0}' -f $_.Exception.Message
+                        $result.Reason = $broken
                     }
                 }
-
-                # New or changed lists can now be picked in saved-list filters.
-                foreach ($url in $savedListOptionUrls) { $optionCache.Remove($url) }
             }
             catch {
                 $result.Status = 'Failed'

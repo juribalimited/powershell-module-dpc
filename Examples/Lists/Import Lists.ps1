@@ -47,7 +47,7 @@ $results |
 
 Write-Information ""
 $results | Group-Object Status | ForEach-Object { Write-Information ("{0,-14} {1}" -f $_.Name, $_.Count) }
-foreach ($skipped in $results | Where-Object Status -in 'Skipped', 'Failed', 'CreatedBroken') {
+foreach ($skipped in $results | Where-Object Status -in 'Skipped', 'Failed', 'CreatedBroken', 'UpdatedBroken') {
     Write-Warning ("{0} '{1}': {2}" -f $skipped.Status, $skipped.ListName, $skipped.Reason)
     foreach ($missing in @($skipped.MissingReferences)) {
         Write-Warning ("    missing: {0}" -f $missing)
