@@ -315,7 +315,7 @@ function Import-JuribaListDefinition {
                             $missing.Add(("Value '{0}' of filter '{1}' (not found on the source instance)" -f $value.value, (& $describe $filter.signature)))
                             continue
                         }
-                        $match = if ($options.ContainsKey([string]$value.path)) { @($options[[string]$value.path]) } else { @() }
+                        $match = @(if ($options.ContainsKey([string]$value.path)) { $options[[string]$value.path] })
                         if ($match.Count -eq 1) {
                             $map[[string]$value.value] = $match[0].Value
                         }
