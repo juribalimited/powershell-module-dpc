@@ -31,6 +31,7 @@ Built-in fields such as `hostname` are the same everywhere and are kept as they 
 - PowerShell 7
 - The `Juriba.DPC` module, version 1.1.25.0 or later: `Install-Module Juriba.DPC`
 - An API key for each instance. The import key's user will own the new lists.
+- The custom fields, projects and other items your lists use must already exist on the target, with the same names. If custom fields are missing, copy them first with the scripts in [`Examples/Custom Fields`](../Custom%20Fields/README.md).
 
 ## Usage
 
@@ -97,7 +98,7 @@ This checks every list against the target and writes the report without creating
 
 MissingReferences names what couldn't be found, for example:
 
-- `Column 'Custom Fields > Cost Centre'`: create the custom field on the target, then import again.
+- `Column 'Custom Fields > Cost Centre'`: create the custom field on the target, then import again. The scripts in [`Examples/Custom Fields`](../Custom%20Fields/README.md) copy custom fields between instances.
 - `Filter 'Project-Win11 > Properties > Win11: Ring'`: the project doesn't exist on the target, or has a different short name.
 - `Value 'Ring 2: Pilot' of filter 'Project-Win11 > Properties > Win11: Ring'`: the project exists but has no ring with that name.
 
